@@ -1,5 +1,5 @@
-## Make a profile
-# Make profile from cookiecutter template
+# Make a profile
+## Make profile from cookiecutter template
 ```
 cookiecutter https://github.com/Snakemake-Profiles/slurm.git
 profile_name [slurm]: slurm.my_account
@@ -13,7 +13,7 @@ cluster_name []:
 cluster_config_help: [The use of cluster-config is discouraged. Rather, set snakemake CLI options in the profile configuration file (see snakemake documentation on best practices). Enter to continue...]
 cluster_config []:
 ```
-# Move the profile to the correct location 
+## Move the profile to the correct location 
 ```
 mkdir ~/.config/snakemake
 mv slurm.my_account/ ~/.config/snakemake/
