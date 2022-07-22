@@ -1,0 +1,15 @@
+experiment_directory: /nethome/kpandit/pyseq-image/src/demo/
+output_directory: /nethome/kpandit/hudson/results/
+resources:
+  partition: pi3
+  time: '1:00:00'
+  mem: 16G
+  dask_worker:
+    cores: 2
+    extra:
+    - --lifetime
+    - 55m
+    - --lifetime-stagger
+    - 4m
+    memory: 32G
+    walltime: '1:00:00'

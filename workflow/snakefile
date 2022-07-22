@@ -1,0 +1,37 @@
+#from pre import utils
+from os.path import join
+import configparser
+#configfile: 'config.yaml'
+
+exp_dir = config['experiment_directory']
+exp_conf_path = config.get('experiment_config','logs/config.cfg')
+exp_conf_path = join(exp_dir, exp_conf_path)
+exp_conf = configparser.ConfigParser()
+exp_conf.read(exp_conf_path)
+
+experiment_name = exp_conf.get('experiment','experiment name')
+output_dir = join(config['output_directory'], experiment_name)
+sections = exp_conf.options('sections')
+
+rule all:
+    input:
+        expand('{dir}/processed_zarr/{s}.zarr', dir = output_dir, s = sections)
+
+rule fix_lighting:
+    input:
+        {exp_conf_path}
+    params:
+        save_path = join(output_dir,'processed_zarr'),
+        section = '{sections}'
+    output:
+        directory('{output_dir}/processed_zarr/{sections}.zarr')
+       # '{output_dir}/processed_zarr/{sections}.attrs'
+    conda:
+	'envs/fix_lighting.yaml'
+#    resources:
+#	#jobs: len(sections)
+#	partition: config.resources['partition']
+#	mem: config.resources['mem']
+#        time: config.resources['time']
+    script:
+        'scripts/preprocess.py'
