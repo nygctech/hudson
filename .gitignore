@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 
 # snakemake stuff
-workflows/.snakemake/*
-workflows/*.out
+workflow/.snakemake/*
+workflow/*.out
+results/
