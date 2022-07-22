@@ -3,6 +3,9 @@ from os.path import join
 import configparser
 #configfile: 'config.yaml'
 
+import os
+print(os.environ['PATH'])
+
 exp_dir = config['experiment_directory']
 exp_conf_path = config.get('experiment_config','logs/config.cfg')
 exp_conf_path = join(exp_dir, exp_conf_path)
@@ -26,12 +29,17 @@ rule fix_lighting:
     output:
         directory('{output_dir}/processed_zarr/{sections}.zarr')
        # '{output_dir}/processed_zarr/{sections}.attrs'
-    conda:
-        'envs/fix_lighting.yaml'
+#    containerized: 'dockerfile'
+#    conda:
+#        'envs/fix_lighting.yaml'
 #    resources:
 #	#jobs: len(sections)
 #	partition: config.resources['partition']
 #	mem: config.resources['mem']
 #        time: config.resources['time']
     script:
+        #shell('source ~/.bashrc'),
+        shell('conda init bash'),
+	shell('source ~/.bashrc'),
+	shell('conda activate pyseq_pipe'),
         'scripts/preprocess.py'

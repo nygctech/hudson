@@ -1,9 +1,13 @@
-from pyseq import image_analysis as ia
+#from pyseq import image_analysis as ia
+
+import os
+print(os.environ['PATH'])
+
 from pre import utils
+from pre import image_analysis as ia
 from os.path import join
-from utils import get_cluster
-
-
+from utils.utils import get_cluster
+from dask.distributed import Client
 
 
 experiment_config = utils.get_config(snakemake.input[0])
@@ -16,31 +20,34 @@ section_name = snakemake.params.section
 image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
 
 # Start dask cluster
-winfo = snakemake.config.resources.dask_worker
-p = snakemake.config.resources['partition']
-cluster, client = get_cluster(log_dir=None, queue_name = p, **winfo)
-print('Client::', cluster.dashboard_link)
-ntiles = int(len(im.im.col)/2048)
-min_workers = 2*ntiles
+default_winfo = {'cores':2, 'memory':'32G', 'walltime':'1:00:00'}
+winfo = snakemake.config.get('resources',{}).get('dask_worker', default_winfo)
+p = snakemake.config['resources']['partition']
+cluster = get_cluster(log_dir=None, queue_name = p, **winfo)
+ntiles = int(len(image.im.col)/2048)
+min_workers = max(1,2*ntiles)
 max_workers = 2*min_workers
-cluster.adapt(minimum = min_workers, maximum=max_workers)
-client.wait_for_workers(int(min_workers/2), 60*5)
 
 # Print out info about section
 print('machine::', image.machine)
 print('image path::',image_path)
 print('section::', section_name)
 
-# Correct Background
-print('Correcting background')
-print('Pixel group adjustments')
-for ch, values in image.config.items(image.machine+'background'):
-    print(f'Channel {ch}::',values)
+# Start computation
+with Client(cluster) as client:
 
-image.correct_background()
-image.register_channels2()
+	cluster.adapt(minimum = min_workers, maximum=max_workers)
+	client.wait_for_workers(int(min_workers/2), 60*5)
+
+
+	# Correct Background
+	print('Correcting background')
+	print('Pixel group adjustments')
+	for ch, values in image.config.items(image.machine+'background'):
+    		print(f'Channel {ch}::',values)
+
+	image.correct_background()
+	image.register_channels2()
 
 #
-image.save_zarr(snakemake.params.save_path)
-
-print(image.machine)
+	image.save_zarr(snakemake.params.save_path)
