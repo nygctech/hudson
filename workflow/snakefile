@@ -27,7 +27,7 @@ rule fix_lighting:
         directory('{output_dir}/processed_zarr/{sections}.zarr')
        # '{output_dir}/processed_zarr/{sections}.attrs'
     conda:
-	'envs/fix_lighting.yaml'
+        'envs/fix_lighting.yaml'
 #    resources:
 #	#jobs: len(sections)
 #	partition: config.resources['partition']
