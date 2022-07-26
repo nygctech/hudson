@@ -20,9 +20,26 @@ rule all:
     input:
         expand('{dir}/processed_zarr/{s}.zarr', dir = output_dir, s = sections)
 
-rule fix_lighting:
+rule dummy:
     input:
         {exp_conf_path}
+    output:
+        'deleteme.out'
+    conda:
+        'envs/pyseq-image.yaml'
+    log:
+        'output/log.txt'
+    shell:
+        """
+        which python > {log:q}
+        echo $PATH >> {log:q} 2>&1
+        touch {output:q}
+        """
+
+rule fix_lighting:
+    input:
+        {exp_conf_path},
+        'deleteme.out'
     params:
         save_path = join(output_dir,'processed_zarr'),
         section = '{sections}'
@@ -30,16 +47,13 @@ rule fix_lighting:
         directory('{output_dir}/processed_zarr/{sections}.zarr')
        # '{output_dir}/processed_zarr/{sections}.attrs'
 #    containerized: 'dockerfile'
-#    conda:
-#        'envs/fix_lighting.yaml'
+    conda:
+#        'pyseq_pipe'
+        'envs/pyseq-image.yaml'
 #    resources:
 #	#jobs: len(sections)
 #	partition: config.resources['partition']
 #	mem: config.resources['mem']
 #        time: config.resources['time']
     script:
-        #shell('source ~/.bashrc'),
-        shell('conda init bash'),
-	shell('source ~/.bashrc'),
-	shell('conda activate pyseq_pipe'),
         'scripts/preprocess.py'

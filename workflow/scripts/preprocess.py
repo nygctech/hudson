@@ -1,14 +1,19 @@
 #from pyseq import image_analysis as ia
 
 import os
-print(os.environ['PATH'])
+import sys
+
+print('Python PATH')
+os.system('which python')
+print('executing python', sys.executable)
+
+
 
 from pre import utils
 from pre import image_analysis as ia
 from os.path import join
 from utils.utils import get_cluster
 from dask.distributed import Client
-
 
 experiment_config = utils.get_config(snakemake.input[0])
 exp_dir = snakemake.config['experiment_directory']
