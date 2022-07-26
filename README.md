@@ -17,21 +17,7 @@ cluster_config_help: [The use of cluster-config is discouraged. Rather, set snak
 cluster_config []:
 ```
 
-## 2) Set temporary directory path
-Edit the `slurm/slurm-jobscript.sh` bash script to look like below
-
-```
-#!/bin/bash
-# properties = {properties}
-
-export TMPDIR=/scratch
-export TEMP=/scratch
-export TMP=/scratch
-
-{exec_job}
-```
-
-## 3) Move the profile to the correct location 
+## 2) Move the profile to the correct location 
 ```
 mkdir ~/.config/snakemake
 mv slurm ~/.config/snakemake/
