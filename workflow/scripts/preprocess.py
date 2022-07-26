@@ -25,13 +25,15 @@ section_name = snakemake.params.section
 image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
 
 # Start dask cluster
-default_winfo = {'cores':2, 'memory':'32G', 'walltime':'1:00:00'}
-winfo = snakemake.config.get('resources',{}).get('dask_worker', default_winfo)
-p = snakemake.config['resources']['partition']
-cluster = get_cluster(log_dir=None, queue_name = p, **winfo)
+# specify default worker options in ~/.config/dask/jobqueue.yaml
+winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
+cluster = get_cluster(**winfo)
+print(cluster.dashboard_link)
+print(cluster.job_script())
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
 max_workers = 2*min_workers
+print(min_workers, max_workers)
 
 # Print out info about section
 print('machine::', image.machine)

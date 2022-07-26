@@ -1,2 +1,0 @@
-/gpfs/commons/home/kpandit/hudson/workflow/.snakemake/conda/a00923b437b7d5da2ddd58c4a4a62cf8/bin/python
-/gpfs/commons/home/kpandit/hudson/workflow/.snakemake/conda/a00923b437b7d5da2ddd58c4a4a62cf8/bin:/gpfs/commons/home/kpandit/mambaforge/condabin:/opt/slurm/slurm-19.05.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/lpp/mmfs/bin:/opt/puppetlabs/bin:/nethome/kpandit/bin:/nethome/kpandit/tvnc/opt/TurboVNC/bin

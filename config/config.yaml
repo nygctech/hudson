@@ -5,11 +5,5 @@ resources:
   time: '1:00:00'
   mem: 16G
   dask_worker:
-    cores: 2
-    extra:
-    - --lifetime
-    - 55m
-    - --lifetime-stagger
-    - 4m
-    memory: 32G
-    walltime: '1:00:00'
+    # or specify in .config/dask/jobqueue.yaml
+    log_directory: None
