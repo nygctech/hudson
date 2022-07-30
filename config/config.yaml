@@ -7,3 +7,20 @@ resources:
   dask_worker:
     # or specify in .config/dask/jobqueue.yaml
     log_directory: None
+stains:
+  # cycle:
+  #   channel1: marker1
+  #   channel2: marker2
+  1:
+    610: GFAP
+  2:
+    740: ELAVL2
+  3:
+    558: LMN1b
+  4:
+    687: MBP
+  5:
+    558: LMN1b
+    610: GFAP
+    687: MBP
+    740: ELAVL2
