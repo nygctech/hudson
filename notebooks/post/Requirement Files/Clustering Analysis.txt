@@ -1,0 +1,10 @@
+dask==2022.5.2
+libpysal==4.6.2
+matplotlib==3.5.2
+esda==2.4.1
+numpy==1.21.5
+scipy==1.8.1
+pandas==1.4.3
+squidpy==1.2.2
+geopandas==0.10.2
+anndata==0.7.8
