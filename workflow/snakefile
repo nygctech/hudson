@@ -39,7 +39,7 @@ rule unmix:
     params:
         save_path = join(output_dir,'final_zarr'),
     output:
-        directory('{output_dir}/processed_zarr/{sections}.zarr')
+        directory('{output_dir}/final_zarr/{sections}.zarr')
     conda:
         'envs/unmix.yaml'
     script:

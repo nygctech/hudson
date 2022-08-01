@@ -40,13 +40,14 @@ for cy, ch_stains in stains_config.items():
         for so in so_:
             so_ind = np.where(all_ch == so)
             mm[so_ind, c] = -1
-    cy_mm[cy] = [mm, list(all_ch), list(si_so.keys())]
+    cy_mm[cy] = [mm, list(all_ch), list(si_so.keys())]                          # dict with cycle keys and value = list with mixing matrix, all images, and all sink image
 
 
 # Unmix images and stack by stain instead of cycle > channel
 stain_stack = []
 stain_name = []
 for cy , ch_stains in stains_config.items():
+    print(f'Unmixing cycle {cy}')
 
     mm, all_ch, sinks = cy_mm.get(cy,[None, None, []])
     if len(sinks) > 0:
@@ -66,4 +67,4 @@ for cy , ch_stains in stains_config.items():
 
 # Save image
 unmixed = xr.concat(stain_stack, dim = 'marker', coordinates = {'marker':stain_name})
-unmixed.to_dataset().to_zarr(snakemake.params.save_path)
+delayed_store = unmixed.to_dataset().to_zarr(snakemake.params.save_path, compute = False)
