@@ -45,6 +45,18 @@ rule unmix:
     script:
         'scripts/unmix.py'
 
+# rule segmentation:
+#     input:
+#         directory('{output_dir}/final_zarr/{sections}.zarr')
+#     output:
+#         '{output_dir}/masks/{sections}.tiff'
+#     resources:
+#         mem_mb = 32000
+#     conda:
+#         'envs/cellpose.yaml'
+#     script:
+#         'scripts/segementation.py'
+
 
 # rule color unmixing
 
