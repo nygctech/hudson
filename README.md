@@ -17,6 +17,28 @@ cluster_config_help: [The use of cluster-config is discouraged. Rather, set snak
 cluster_config []:
 ```
 
+## 2) Edit profile config `slurm/config.yaml`
+
+Add default resources, for example:
+``` 
+restart-times: 1
+jobscript: "slurm-jobscript.sh"
+cluster: "slurm-submit.py"
+cluster-status: "slurm-status.py"
+cluster-sidecar: "slurm-sidecar.py"
+cluster-cancel: "scancel"
+max-jobs-per-second: 1
+max-status-checks-per-second: 10
+local-cores: 1
+latency-wait: 60
+
+# Example resource configuration
+default-resources:
+  - runtime=60
+  - mem_mb=8000
+  - tmpdir="/scratch"
+```
+
 ## 2) Move the profile to the correct location 
 ```
 mkdir ~/.config/snakemake
@@ -29,7 +51,3 @@ Replace `N` with number of sections defined in the config file.
 ```
 snakemake --configfile ../config/config.yaml --profile slurm --use-conda -j N
 ```
-
-
-
-

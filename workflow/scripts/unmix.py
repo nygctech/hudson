@@ -62,7 +62,7 @@ for cy , ch_stains in stains_config.items():
         model = PICASSOnn(cy_mm[cy][0])
 
         # Fit alpha and background
-        for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=10):
+        for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=snakemake.params.max_iter):
             pass
         print('Mixing params:')
         coords = {'channel':all_ch, 'sink':sinks}
