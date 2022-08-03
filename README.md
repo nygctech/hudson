@@ -1,12 +1,12 @@
 # Install pipeline
-## 1) Install snakemake and cookiecutter in a new environment
-```
-conda create -n snakemake python cookiecutter snakemake=7.9.0 -c bioconda
-```
-
-## 2 Clone repository
+## 1 Clone repository
 ```
 git clone 
+```
+
+## 2) Create environment from environment.yaml
+```
+conda env create -f hudson/environment.yaml
 ```
 
 ## 3) Make a cluster profile
