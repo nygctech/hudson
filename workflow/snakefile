@@ -18,7 +18,7 @@ sections = exp_conf.options('sections')
 
 rule all:
     input:
-        expand('{dir}/processed_zarr/{s}.zarr', dir = output_dir, s = sections)
+        expand('{dir}/final_zarr/{s}.zarr', dir = output_dir, s = sections)
 
 rule fix_lighting:
     input:
@@ -36,14 +36,26 @@ rule fix_lighting:
 rule unmix:
     input:
         directory('{output_dir}/processed_zarr/{sections}.zarr')
-    params:
-        save_path = join(output_dir,'final_zarr'),
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
+    resources:
+        mem_mb = 32000
     conda:
         'envs/unmix.yaml'
     script:
         'scripts/unmix.py'
+
+rule segmentation:
+    input:
+        directory('{output_dir}/final_zarr/{sections}.zarr')
+    output:
+        '{output_dir}/masks/{sections}.tiff'
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/cellpose.yaml'
+    script:
+        'scripts/segementation.py'
 
 
 # rule color unmixing

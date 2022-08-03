@@ -20,7 +20,9 @@ stains:
   4:
     687: MBP
   5:
-    558: LMN1b
-    610: GFAP
-    687: MBP
-    740: ELAVL2
+    558: LMN1b_5
+    610: GFAP_5
+    687: MBP_5
+    740: ELAVL2_5
+segmentation:
+  marker: LMN1b_5

@@ -34,12 +34,12 @@ for cy, ch_stains in stains_config.items():
             if source_ch in ch_stains.keys():                                   # add source channel to sink_source dict (si_so)
                 si_so.setdefault(ch,[]).append(source_ch)
                 all_ch.append(source_ch)
-    all_ch =+ si_so.keys()
+    all_ch += si_so.keys()
     all_ch = np.unique(all_ch)
 
     # Making mixing matrix for cycle
     mm = np.zeros((len(all_ch), len(si_so)))
-    for c, si, so_ in enumerate(si_so.items()):s
+    for c, (si, so_) in enumerate(si_so.items()):
         si_ind = np.where(all_ch == si)
         mm[si_ind, c] = 1
         for so in so_:
@@ -52,6 +52,7 @@ for cy, ch_stains in stains_config.items():
 # Unmix images and stack by stain instead of cycle > channel
 stain_stack = []
 stain_name = []
+dims = ['channel','sink']
 for cy , ch_stains in stains_config.items():
     mm, all_ch, sinks = cy_mm.get(cy)
 
@@ -61,11 +62,11 @@ for cy , ch_stains in stains_config.items():
         model = PICASSOnn(cy_mm[cy][0])
 
         # Fit alpha and background
-        for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch)):
+        for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=10):
             pass
         print('Mixing params:')
         coords = {'channel':all_ch, 'sink':sinks}
-        alpha = xr.DataArray(model.mixing_parameters[0,:,:], name = 'alpha' dims = dims, coords = coords)
+        alpha = xr.DataArray(model.mixing_parameters[0,:,:], name = 'alpha', dims = dims, coords = coords)
         bg = xr.DataArray(model.mixing_parameters[1,:,:], name = 'background', dims = dims, coords = coords)
         print(alpha)
         print(bg)
@@ -79,14 +80,14 @@ for cy , ch_stains in stains_config.items():
         unmixed_ims = xr.concat(ch_stack, dim='channel').assign_coords({'channel':sinks})
 
     # Save as markers instead of cycle & channel
-    for ch, marker = ch_stains.items():
+    for ch, marker in ch_stains.items():
         if ch in sinks:
             stain_stack.append(unmixed_ims.sel(channel=ch))                     # add unmixed sink
         else:
-            stain_stack.append(image.im.sel(cycle=cy, channel=ch))              # add channel that did not have any spillover
+            stain_stack.append(image.sel(cycle=cy, channel=ch))              # add channel that did not have any spillover
         stain_name.append(marker)
 
 # Save image
 unmixed = xr.concat(stain_stack, dim='marker').assign_coords({'marker':stain_name})
-delayed_store = unmixed.to_dataset().to_zarr(snakemake.params.save_path, compute = False)
+delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
 dask.compute(delayed_store)
