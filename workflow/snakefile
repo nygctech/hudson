@@ -1,6 +1,7 @@
 #from pre import utils
 from os.path import join
 import configparser
+import subprocess
 #configfile: 'config.yaml'
 
 import os
@@ -15,6 +16,16 @@ exp_conf.read(exp_conf_path)
 experiment_name = exp_conf.get('experiment','experiment name')
 output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
+print(config)
+print(cluster_config)
+
+def get_gpu():
+    result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
+    gpu_available = 0
+    if 'pe2dg2' in result.stdout:
+        gpu_available = 1
+
+return gpu_available
 
 rule all:
     input:
@@ -33,15 +44,22 @@ rule fix_lighting:
     script:
         'scripts/preprocess.py'
 
+if get_gpu():
+    cluster_config.update({'unmix':config['gpu_spec']})
+
 rule unmix:
     input:
         directory('{output_dir}/processed_zarr/{sections}.zarr')
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
-    resources:
-        mem_mb = 32000
+    params:
+        max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
+#    resources:
+#        mem_mb = 32000
+#    cluster:
+#        partition = 'pe2'
     conda:
-        'envs/unmix.yaml'
+        'envs/unmix_gpu.yaml'
     script:
         'scripts/unmix.py'
 

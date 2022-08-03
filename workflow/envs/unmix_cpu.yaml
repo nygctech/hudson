@@ -162,7 +162,6 @@ dependencies:
   - mysql-libs=8.0.29=h28c427c_1
   - napari=0.4.16=pyh275ddea_0_pyqt
   - napari-console=0.0.4=pyhd8ed1ab_1
-  - napari-picasso=0.3.0=pyhd8ed1ab_0
   - napari-plugin-engine=0.2.0=pyhd8ed1ab_2
   - napari-svg=0.1.6=pyhd8ed1ab_0
   - ncurses=6.3=h27087fc_1
@@ -281,4 +280,6 @@ dependencies:
   - zlib=1.2.12=h166bdaf_2
   - zlib-ng=2.0.6=h166bdaf_0
   - zstd=1.5.2=h8a70e8d_2
+  - pip:
+    - -e git+https://github.com/nygctech/PICASSO.git#egg=napari-picasso
 prefix: /gpfs/commons/home/kpandit/mambaforge/envs/unmix
