@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 import xarray as xr
 import cellpose
+from cellpose import core, models, io
 from pathlib import Path
-import io
 import imageio
 
 

@@ -25,11 +25,11 @@ def get_gpu():
     if 'pe2dg2' in result.stdout:
         gpu_available = 1
 
-return gpu_available
+    return gpu_available
 
 rule all:
     input:
-        expand('{dir}/final_zarr/{s}.zarr', dir = output_dir, s = sections)
+        expand('{dir}/masks/{s}.tiff', dir = output_dir, s = sections)
 
 rule fix_lighting:
     input:
@@ -74,7 +74,7 @@ rule segmentation:
     conda:
         'envs/cellpose.yaml'
     script:
-        'scripts/segementation.py'
+        'scripts/segmentation.py'
 
 
 # rule color unmixing
