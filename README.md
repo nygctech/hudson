@@ -1,3 +1,17 @@
+# Install pipeline
+## 1) Install snakemake and cookiecutter in a new environment
+```
+conda create -n snakemake python=3.9 cookiecutter snakemake
+```
+
+## 2 Clone repository
+```
+git clone 
+```
+
+## 3) Make a cluster profile
+See the example below to make a SLURM profile
+
 # Make a SLURM Profile
 ## 1) Make profile from cookiecutter template
 
