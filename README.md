@@ -1,7 +1,7 @@
 # Install pipeline
 ## 1) Install snakemake and cookiecutter in a new environment
 ```
-conda create -n snakemake python=3.9 cookiecutter snakemake
+conda create -n snakemake python cookiecutter snakemake=7.9.0 -c bioconda
 ```
 
 ## 2 Clone repository
@@ -17,6 +17,12 @@ See the example below to make a SLURM profile
 
 To receive emails with jobs or finished or an error occurs replace `mail-user=account@email.com` with your email address. If you do not want emails, leave `sbatch_defaults []:` blank.
 
+run:
+```
+cookiecutter https://github.com/Snakemake-Profiles/slurm.git
+```
+
+Example prompt
 ```
 cookiecutter https://github.com/Snakemake-Profiles/slurm.git
 profile_name [slurm]: slurm
