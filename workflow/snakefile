@@ -1,6 +1,7 @@
 #from pre import utils
 from os.path import join
 import configparser
+import subprocess
 #configfile: 'config.yaml'
 
 import os
@@ -19,7 +20,12 @@ print(config)
 print(cluster_config)
 
 def get_gpu():
-    return 0
+    result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
+    gpu_available = 0
+    if 'pe2dg2' in result.stdout:
+        gpu_available = 1
+
+return gpu_available
 
 rule all:
     input:
