@@ -56,12 +56,13 @@ rule unmix:
         max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
 #    resources:
 #        mem_mb = 32000
-#    cluster:
-#        partition = 'pe2'
     conda:
         'envs/unmix_gpu.yaml'
     script:
         'scripts/unmix.py'
+
+if get_gpu():
+    cluster_config.update({'segmentation':config['gpu_spec']})
 
 rule segmentation:
     input:

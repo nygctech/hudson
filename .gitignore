@@ -134,3 +134,4 @@ workflow/.snakemake/*
 workflow/*.out
 results/
 workflow/dask_logs/*
+notebook/
