@@ -92,7 +92,24 @@ rule segmentation:
 # append mean_intensity to ann_data
 
 # rule clustering
-
+rule celltype:
+  input:
+    prot:'{output_dir}/tables/{sections}_prot.csv',
+    param:'{output_dir}/tables/{sections}_param.csv'
+  output:
+    '{output_dir}/tables/{sections}.csv'
+  resources:
+    mem_mb = 32000
+  conda:
+    'envs/celltype.yaml'
+  shell:
+    '''
+    Rscript scripts/celltype.R \
+      --input_prot={input.prot} \
+      --input_param={input.param} \
+      --output={output} \
+      --ref=config["reference"]["seurat"]
+      
 # append cell types to ann_data
 
 # spatial neighborhoods
