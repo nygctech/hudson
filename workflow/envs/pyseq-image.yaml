@@ -215,5 +215,4 @@ dependencies:
     - urllib3==1.26.11
     - wrapt==1.14.1
     - yte==1.5.1
-    - -e /nethome/kpandit/pyseq-image
-prefix: /gpfs/commons/home/kpandit/mambaforge/envs/pyseq_image
+    - git+https://github.com/nygctech/pyseq-image.git@73fccc87c8edad2364bcb6d57e284f916eb72191

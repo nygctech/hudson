@@ -282,4 +282,3 @@ dependencies:
   - zstd=1.5.2=h8a70e8d_2
   - pip:
     - -e git+https://github.com/nygctech/PICASSO.git#egg=napari-picasso
-prefix: /gpfs/commons/home/kpandit/mambaforge/envs/unmix

@@ -104,5 +104,4 @@ dependencies:
   - zlib=1.2.12=h166bdaf_2
   - zstd=1.5.2=h8a70e8d_2
   - pip:
-    - -e git+https://github.com/nygctech/PICASSO.git@c86e4cc1d5e833769d994a795627d0441adfca95#egg=napari-picasso
-prefix: /gpfs/commons/home/kpandit/mambaforge/envs/unmix_gpu
+    - git+https://github.com/nygctech/PICASSO.git@c86e4cc1d5e833769d994a795627d0441adfca95#egg=napari-picasso

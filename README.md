@@ -17,7 +17,7 @@ See the example below to make a SLURM profile
 ### 1) Create template config file
 import dask-jobqueue to create template config file at `~/.config/dask/`.
 ```
-python -c import dask-jobqueue
+python -c 'import dask_jobqueue'
 ```
 ### 2) Configure for your cluster
 See here https://jobqueue.dask.org/en/latest/configuration.html for details
@@ -78,7 +78,7 @@ mv slurm ~/.config/snakemake/
 # Running pipeline
 Replace `N` with number of sections defined in the config file.
 Mamba is the preferred package manager, if however you want to use conda add
-`--conda-frontend conda` to the snakemake command. 
+`--conda-frontend conda` to the snakemake command.
 
 ```
 snakemake --configfile ../config/config.yaml --profile slurm --use-conda -j N
