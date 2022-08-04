@@ -1,16 +1,26 @@
 # Install pipeline
 ## 1 Clone repository
 ```
-git clone 
+git clone https://github.com/nygctech/hudson.git
 ```
 
-## 2) Create environment from environment.yaml
+## 2) Create snakemake environment from environment.yaml and activate
 ```
 conda env create -f hudson/environment.yaml
+conda activate snakemake
 ```
 
 ## 3) Make a cluster profile
 See the example below to make a SLURM profile
+
+## 4) Configure dask-jobqueue (optional)
+### 1) Create template config file
+import dask-jobqueue to create template config file at `~/.config/dask/`.
+```
+python -c import dask-jobqueue
+```
+### 2) Configure for your cluster
+See here https://jobqueue.dask.org/en/latest/configuration.html for details
 
 # Make a SLURM Profile
 ## 1) Make profile from cookiecutter template
@@ -40,7 +50,7 @@ cluster_config []:
 ## 2) Edit profile config `slurm/config.yaml`
 
 Add default resources, for example:
-``` 
+```
 restart-times: 1
 jobscript: "slurm-jobscript.sh"
 cluster: "slurm-submit.py"
@@ -59,14 +69,16 @@ default-resources:
   - tmpdir="/scratch"
 ```
 
-## 2) Move the profile to the correct location 
+## 2) Move the profile to the correct location
 ```
 mkdir ~/.config/snakemake
 mv slurm ~/.config/snakemake/
 ```
 
 # Running pipeline
-Replace `N` with number of sections defined in the config file. 
+Replace `N` with number of sections defined in the config file.
+Mamba is the preferred package manager, if however you want to use conda add
+`--conda-frontend conda` to the snakemake command. 
 
 ```
 snakemake --configfile ../config/config.yaml --profile slurm --use-conda -j N
