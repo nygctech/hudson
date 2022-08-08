@@ -25,6 +25,10 @@ gpu_spec:
   partition: gpu
   gres: gpu:tesla:1
 resources:
-    # or specify in .config/dask/jobqueue.yaml
-    # log_directory: None
-  dask_worker:
+     log_directory: None
+  # or specify in .config/dask/jobqueue.yaml
+  # dask_worker:
+unmix:
+  max_iter: 10               # Max iterations to optimize unmixing
+reference:
+  seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
