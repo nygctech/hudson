@@ -2,10 +2,7 @@
 from os.path import join
 import configparser
 import subprocess
-#configfile: 'config.yaml'
 
-import os
-print(os.environ['PATH'])
 
 exp_dir = config['experiment_directory']
 exp_conf_path = config.get('experiment_config','logs/config.cfg')
@@ -16,8 +13,7 @@ exp_conf.read(exp_conf_path)
 experiment_name = exp_conf.get('experiment','experiment name')
 output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
-print(config)
-print(cluster_config)
+
 
 def get_gpu():
     result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
@@ -77,24 +73,22 @@ rule segmentation:
         'scripts/segmentation.py'
 
 
-# rule color unmixing
+# append mean_intensity to ann_data; region props, ann_data
+# voronoi, graphs, spatial neighborhoods
 
-# final image object
-
-# rule segmenting
-
-# make graph
-
-# region props ann_data
-
-# rule for convert ann data object
-
-# append mean_intensity to ann_data
-
-# rule clustering
+# clustering and celltypes
 
 # append cell types to ann_data
+# output cells colored by cell_type (if we can)
 
-# spatial neighborhoods
+########
+#spatial neighborhood analysis
+
+
+
+
+
+
+
 
 # export image cells by ROI

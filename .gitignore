@@ -135,3 +135,6 @@ workflow/*.out
 results/
 workflow/dask_logs/*
 notebook/
+
+# MACOS
+.DS_Store

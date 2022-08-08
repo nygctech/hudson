@@ -1,9 +1,5 @@
-experiment_directory: /nethome/kpandit/pyseq-image/src/demo/
+experiment_directory: /Users/kpandit/pyseq-image/src/demo/
 output_directory: /nethome/kpandit/hudson/results/
-resources:
-  dask_worker:
-    # or specify in .config/dask/jobqueue.yaml
-    # log_directory: None
 stains:
   # cycle:
   #   channel1: marker1
@@ -23,9 +19,12 @@ stains:
     740: ELAVL2_5
 segmentation:
   marker: LMN1b_5
+unmix:
+  max_iter: 10               # Max iterations to optimize unmixing
 gpu_spec:
   partition: gpu
   gres: gpu:tesla:1
-unmix:
-  max_iter: 10               # Max iterations to optimize unmixing
-
+resources:
+    # or specify in .config/dask/jobqueue.yaml
+    # log_directory: None
+  dask_worker:
