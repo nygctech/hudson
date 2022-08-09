@@ -1,0 +1,58 @@
+/gpfs/commons/home/jsingh/.conda/envs/spatial/lib/python3.9/site-packages/distributed/cli/dask_worker.py:334: FutureWarning: The --nprocs flag will be removed in a future release. It has been renamed to --nworkers.
+  warnings.warn(
+2022-08-06 16:25:19,000 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.39:35191'
+2022-08-06 16:25:19,016 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.39:40560'
+2022-08-06 16:25:19,026 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.39:45979'
+2022-08-06 16:25:19,034 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.39:34462'
+2022-08-06 16:25:21,775 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.39:40628
+2022-08-06 16:25:21,775 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.39:40628
+2022-08-06 16:25:21,775 - distributed.worker - INFO -          dashboard at:          10.4.200.39:36768
+2022-08-06 16:25:21,775 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,775 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,775 - distributed.worker - INFO -               Threads:                          3
+2022-08-06 16:25:21,776 - distributed.worker - INFO -                Memory:                  29.80 GiB
+2022-08-06 16:25:21,776 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-qqj5n082
+2022-08-06 16:25:21,776 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,778 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.39:38711
+2022-08-06 16:25:21,778 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.39:38711
+2022-08-06 16:25:21,778 - distributed.worker - INFO -          dashboard at:          10.4.200.39:38578
+2022-08-06 16:25:21,778 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,778 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,778 - distributed.worker - INFO -               Threads:                          3
+2022-08-06 16:25:21,778 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.39:35013
+2022-08-06 16:25:21,778 - distributed.worker - INFO -                Memory:                  29.80 GiB
+2022-08-06 16:25:21,778 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.39:35013
+2022-08-06 16:25:21,779 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-p3q6y809
+2022-08-06 16:25:21,779 - distributed.worker - INFO -          dashboard at:          10.4.200.39:35843
+2022-08-06 16:25:21,779 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,779 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,779 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,779 - distributed.worker - INFO -               Threads:                          3
+2022-08-06 16:25:21,779 - distributed.worker - INFO -                Memory:                  29.80 GiB
+2022-08-06 16:25:21,779 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-ufbcxasn
+2022-08-06 16:25:21,779 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,779 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.39:33731
+2022-08-06 16:25:21,780 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.39:33731
+2022-08-06 16:25:21,780 - distributed.worker - INFO -          dashboard at:          10.4.200.39:38118
+2022-08-06 16:25:21,780 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,783 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,783 - distributed.worker - INFO -               Threads:                          3
+2022-08-06 16:25:21,784 - distributed.worker - INFO -                Memory:                  29.80 GiB
+2022-08-06 16:25:21,784 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-qv_6b3_o
+2022-08-06 16:25:21,784 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,802 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,802 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,803 - distributed.core - INFO - Starting established connection
+2022-08-06 16:25:21,806 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,806 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,807 - distributed.core - INFO - Starting established connection
+2022-08-06 16:25:21,807 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,808 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,808 - distributed.core - INFO - Starting established connection
+2022-08-06 16:25:21,811 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:35813
+2022-08-06 16:25:21,811 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 16:25:21,812 - distributed.core - INFO - Starting established connection
+2022-08-06 16:27:58,612 - distributed.core - INFO - Event loop was unresponsive in Worker for 3.21s.  This is often caused by long-running GIL-holding functions or moving large chunks of data. This can cause timeouts and instability.
+2022-08-06 16:27:58,612 - distributed.core - INFO - Event loop was unresponsive in Worker for 3.24s.  This is often caused by long-running GIL-holding functions or moving large chunks of data. This can cause timeouts and instability.
+2022-08-06 16:27:58,633 - distributed.core - INFO - Event loop was unresponsive in Worker for 3.26s.  This is often caused by long-running GIL-holding functions or moving large chunks of data. This can cause timeouts and instability.
+slurmstepd: error: *** JOB 25948141 ON pe2cc3-009 CANCELLED AT 2022-08-06T17:25:41 DUE TO TIME LIMIT ***

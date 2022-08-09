@@ -1,8 +1,10 @@
 experiment_directory: /nethome/kpandit/pyseq-image/src/demo/
-output_directory: /nethome/kpandit/hudson/results/
+output_directory: /gpfs/commons/home/jsingh/results/
 resources:
   dask_worker:
     # or specify in .config/dask/jobqueue.yaml
+    cores: 2
+    memory: 16GB
     # log_directory: None
 stains:
   # cycle:

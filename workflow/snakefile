@@ -68,7 +68,7 @@ rule segmentation:
     input:
         directory('{output_dir}/final_zarr/{sections}.zarr')
     output:
-        '{output_dir}/masks/{sections}.tiff'
+        directory('{output_dir}/masks/{sections}.tiff')
     resources:
         mem_mb = 32000
     conda:
@@ -76,6 +76,61 @@ rule segmentation:
     script:
         'scripts/segmentation.py'
 
+
+rule mean_intensity:
+    input:
+        directory('{output_dir}/final_zarr/{sections}.zarr')
+        directory('{output_dir}/masks/{sections}.tiff')
+    
+    output:
+        directory('{output_dir}/intensities/{sections}.pkl')
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/mean_intensity.yaml'
+    script:
+        'scripts/segmentation.py'
+        
+        
+
+
+rule anndata:
+    input:
+        directory('{output_dir}/masks/{sections}.tiff')
+        directory('{output_dir}/intensities/{sections}.pkl')
+    
+    output:
+        directory('{output_dir}/anndata/{sections}.h5ad')
+        directory('{output_dir}/centroid/{sections}.csv')
+        directory('{output_dir}/uns/{sections}.npu')
+        
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/make_anndata.yaml'
+    script:
+        'scripts/segmentation.py'
+        
+        
+
+
+rule spatial_neighborhood:
+    input:
+        directory('{output_dir}/masks/{sections}.tiff')
+        directory('{output_dir}/intensities/{sections}.pkl')
+    
+    output:
+        directory('{output_dir}/anndata/{sections}.h5ad')
+        directory('{output_dir}/centroid/{sections}.csv')
+        directory('{output_dir}/uns/{sections}.npu')
+        
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/make_anndata.yaml'
+    script:
+        'scripts/segmentation.py'
+        
 
 # rule color unmixing
 

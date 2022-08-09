@@ -1,0 +1,45 @@
+/gpfs/commons/home/jsingh/.conda/envs/spatial/lib/python3.9/site-packages/distributed/cli/dask_worker.py:334: FutureWarning: The --nprocs flag will be removed in a future release. It has been renamed to --nworkers.
+  warnings.warn(
+2022-08-06 18:29:58,175 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.36:41828'
+2022-08-06 18:29:58,187 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.36:37899'
+2022-08-06 18:29:58,188 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.36:46721'
+2022-08-06 18:29:59,002 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-px5297dt', purging
+2022-08-06 18:29:59,017 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-awvn69d1', purging
+2022-08-06 18:29:59,030 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-dl98vpn8', purging
+2022-08-06 18:30:00,320 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.36:33940
+2022-08-06 18:30:00,320 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.36:33940
+2022-08-06 18:30:00,320 - distributed.worker - INFO -          dashboard at:          10.4.200.36:38547
+2022-08-06 18:30:00,320 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,320 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,320 - distributed.worker - INFO -               Threads:                          2
+2022-08-06 18:30:00,320 - distributed.worker - INFO -                Memory:                  18.63 GiB
+2022-08-06 18:30:00,320 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-6sg7qgxc
+2022-08-06 18:30:00,321 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,321 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.36:36312
+2022-08-06 18:30:00,321 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.36:36312
+2022-08-06 18:30:00,321 - distributed.worker - INFO -          dashboard at:          10.4.200.36:45730
+2022-08-06 18:30:00,321 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,321 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,321 - distributed.worker - INFO -               Threads:                          2
+2022-08-06 18:30:00,321 - distributed.worker - INFO -                Memory:                  18.63 GiB
+2022-08-06 18:30:00,321 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-l7i03g8r
+2022-08-06 18:30:00,321 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,322 - distributed.worker - INFO -       Start worker at:    tcp://10.4.200.36:37857
+2022-08-06 18:30:00,323 - distributed.worker - INFO -          Listening to:    tcp://10.4.200.36:37857
+2022-08-06 18:30:00,323 - distributed.worker - INFO -          dashboard at:          10.4.200.36:36966
+2022-08-06 18:30:00,323 - distributed.worker - INFO - Waiting to connect to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,323 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,323 - distributed.worker - INFO -               Threads:                          2
+2022-08-06 18:30:00,323 - distributed.worker - INFO -                Memory:                  18.63 GiB
+2022-08-06 18:30:00,323 - distributed.worker - INFO -       Local Directory: /gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-gbo3o1f2
+2022-08-06 18:30:00,326 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,379 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,379 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,380 - distributed.core - INFO - Starting established connection
+2022-08-06 18:30:00,380 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,380 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,381 - distributed.worker - INFO -         Registered to:    tcp://10.4.200.71:33221
+2022-08-06 18:30:00,381 - distributed.worker - INFO - -------------------------------------------------
+2022-08-06 18:30:00,382 - distributed.core - INFO - Starting established connection
+2022-08-06 18:30:00,382 - distributed.core - INFO - Starting established connection
+slurmstepd: error: *** JOB 25948162 ON pe2cc3-006 CANCELLED AT 2022-08-06T19:08:02 ***
