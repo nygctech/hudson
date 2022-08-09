@@ -1,22 +1,12 @@
-#from pyseq import image_analysis as ia
-
-import os
-import sys
-
-print('Python PATH')
-os.system('which python')
-print('executing python', sys.executable)
-
-
-
 from pre import utils
 from pre import image_analysis as ia
 from os.path import join
 from utils.utils import get_cluster
 from dask.distributed import Client
+import dask
 
 experiment_config = utils.get_config(snakemake.input[0])
-exp_dir = snakemake.config['experiment_directory']
+
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
 image_path = join(exp_dir, image_path)
 
@@ -56,5 +46,14 @@ with Client(cluster) as client:
 	image.correct_background()
 	image.register_channels2()
 
-#
-	image.save_zarr(snakemake.params.save_path)
+	delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
+	dask.compute(delayed_store)
+
+
+
+section_info = {'nchunks_per_plane': ntiles,
+				'planesize':image.,
+				'path': snakemake.params.save_path,
+				'machine': image.machine,
+				'experiment': experiment_config['experiment']['experiment name']
+				}
