@@ -6,7 +6,7 @@ from dask.distributed import Client
 import dask
 
 experiment_config = utils.get_config(snakemake.input[0])
-
+exp_dir = snakemake.config['experiment_directory']
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
 image_path = join(exp_dir, image_path)
 
@@ -19,11 +19,9 @@ image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
 cluster = get_cluster(**winfo)
 print(cluster.dashboard_link)
-print(cluster.job_script())
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
 max_workers = 2*min_workers
-print(min_workers, max_workers)
 
 # Print out info about section
 print('machine::', image.machine)
