@@ -131,10 +131,20 @@ dmypy.json
 
 # snakemake stuff
 workflow/.snakemake/*
+workflow/.snakemake
 workflow/*.out
 results/
-workflow/dask_logs/*
+
 notebook/
 
 # MACOS
 .DS_Store
+
+# slurm outputs
+slurm-*.out
+
+# vim temp files
+*.swp
+
+# dask stuff
+workflow/dask*/
