@@ -1,16 +1,11 @@
-<<<<<<< HEAD
-experiment_directory: /nethome/kpandit/pyseq-image/src/demo/
-output_directory: /gpfs/commons/home/jsingh/results/
+experiment_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
+output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
 resources:
   dask_worker:
     # or specify in .config/dask/jobqueue.yaml
     cores: 2
     memory: 16GB
     # log_directory: None
-=======
-experiment_directory: /Users/kpandit/pyseq-image/src/demo/
-output_directory: /nethome/kpandit/hudson/results/
->>>>>>> db8f5b39f742bb04e1d6e328571908cfa1b484db
 stains:
   # cycle:
   #   channel1: marker1
