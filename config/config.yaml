@@ -3,6 +3,7 @@ output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipel
 resources:
   dask_worker:
     # or specify in .config/dask/jobqueue.yaml
+    queue: pe2
     cores: 2
     memory: 16GB
     # log_directory: None

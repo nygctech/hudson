@@ -75,7 +75,7 @@ rule segmentation:
 
 rule mean_intensity:
     input:
-        directory('{output_dir}/final_zarr/{sections}.zarr')
+        directory('{output_dir}/final_zarr/{sections}.zarr'),
         '{output_dir}/masks/{sections}.tiff'
     
     output:
@@ -147,8 +147,8 @@ rule anndata:
 # rule clustering
 rule celltype:
   input:
-    prot:'{output_dir}/tables/{sections}_prot.csv',
-    param:'{output_dir}/tables/{sections}_param.csv'
+    '{output_dir}/tables/{sections}_prot.csv',
+    '{output_dir}/tables/{sections}_param.csv'
   output:
     '{output_dir}/tables/{sections}.csv'
   resources:
@@ -162,7 +162,7 @@ rule celltype:
       --input_param={input.param} \
       --output={output} \
       --ref=config["reference"]["seurat"]
-
+    '''
 # append cell types to ann_data
 
 

@@ -135,7 +135,7 @@ workflow/.snakemake
 workflow/*.out
 results/
 
-notebook/
+notebooks/
 
 # MACOS
 .DS_Store
