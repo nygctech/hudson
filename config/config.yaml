@@ -3,9 +3,9 @@ output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipel
 resources:
   dask_worker:
     # or specify in .config/dask/jobqueue.yaml
-    queue: pe2
+    queue: 'pe2'
     cores: 2
-    memory: 16GB
+    memory: '16G'
     # log_directory: None
 stains:
   # cycle:
@@ -31,10 +31,6 @@ unmix:
 gpu_spec:
   partition: gpu
   gres: gpu:tesla:1
-resources:
-     log_directory: None
-  # or specify in .config/dask/jobqueue.yaml
-  # dask_worker:
 unmix:
   max_iter: 10               # Max iterations to optimize unmixing
 reference:

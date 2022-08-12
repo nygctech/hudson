@@ -1,7 +1,8 @@
 from pre import utils
 from pre import image_analysis as ia
 from os.path import join
-from utils.utils import get_cluster
+#from utils.utils import get_cluster
+from utils import get_cluster
 from dask.distributed import Client
 import dask
 
@@ -50,7 +51,7 @@ with Client(cluster) as client:
 
 
 section_info = {'nchunks_per_plane': ntiles,
-				'planesize':image.,
+				'planesize':image.nbytes,
 				'path': snakemake.params.save_path,
 				'machine': image.machine,
 				'experiment': experiment_config['experiment']['experiment name']
