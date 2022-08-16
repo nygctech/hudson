@@ -1,5 +1,11 @@
 ## Overview
 Hudson is a computational pipeline for spatial analysis of single cells in multiplexed images developed by Jagjit Singh and Kunal Pandit.
+
+You can install by following the steps [here](https://github.com/nygctech/hudson)
+
+
+##
+
 ### Markdown
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
