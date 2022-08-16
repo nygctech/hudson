@@ -1,5 +1,5 @@
 ## Overview
-Hudson is a high-performance computational pipeline for spatial analysis of multiplexed bio-imaging and single cell analysis
+Hudson is a computational pipeline for spatial analysis of single cells in multiplexed images developed by Jagjit Singh, Kunal Pandit, and Rui Fu. 
 
 ### Markdown
 
