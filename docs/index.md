@@ -1,6 +1,5 @@
 ## Overview
-Hudson is a computational pipeline for spatial analysis of single cells in multiplexed images developed by Jagjit Singh, Kunal Pandit, and Rui Fu. 
-
+Hudson is a computational pipeline for spatial analysis of single cells in multiplexed images developed by Jagjit Singh and Kunal Pandit.
 ### Markdown
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
