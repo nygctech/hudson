@@ -1,8 +1,7 @@
 ## Overview
-Hudson is a computational pipeline for spatial analysis of single cells in multiplexed images. It is developed by Jagjit Singh, Kunal Pandit, and Rui Fu.
+hudson is a computational pipeline for spatial analysis of single cells in multiplexed images. It is developed by Jagjit Singh, Kunal Pandit, and Rui Fu.
 
 You can install by following the steps [here](https://github.com/nygctech/hudson)
-
 
 ##
 
