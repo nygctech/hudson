@@ -1,9 +1,24 @@
 ## Overview
-hudson is a computational pipeline for spatial analysis of single cells in multiplexed images. It is developed by Jagjit Singh, Kunal Pandit, and Rui Fu.
+hudson is a computational pipeline for spatial analysis of single cells in multiplexed fluorescence imaging. It is developed by Jagjit Singh, Kunal Pandit, and Rui Fu. The pipeline can installed by following the steps [here](https://github.com/nygctech/hudson)
 
-You can install by following the steps [here](https://github.com/nygctech/hudson)
+Fluorescent Imaging, is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues. fluorescence microscopy. 
 
-##
+
+
+IMAGE HERE
+
+
+The pipeline has parallel capibility meaning it can be scaled over any cluster using the SLURM manager. It makes use of GPU nodes if avaiable for quick image processing and computation. The structure is defined in the next section.  
+
+### Structure
+
+The pipiline uses the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow management system to unite all its differnet components into one single workflow which can be replicated over any user machine or cluster. The different sections being: 
+
+1) 
+
+
+
+
 
 ### Markdown
 
