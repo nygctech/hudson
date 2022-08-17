@@ -10,6 +10,13 @@ Following is an example of a multiplexed fluorescence image:
 
 The pipeline has parallel capibility meaning it can be scaled over any cluster using the SLURM manager. It makes use of GPU nodes if avaiable for quick image processing and computation. The structure is defined in the next section.  
 
+
+---
+layout: default
+title: Structure
+nav_order: 2
+---
+
 ## Structure
 
 The pipiline uses the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow management system to unite all its differnet components into one single workflow that can be replicated over any machine or scaled over any cluster. The different sections being: 
