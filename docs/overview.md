@@ -14,7 +14,13 @@ The pipeline has parallel capibility meaning it can be scaled over any cluster u
 
 The pipiline uses the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow management system to unite all its differnet components into one single workflow which can be replicated over any user machine or cluster. The different sections being: 
 
-1) 
+1) **Fix Lighting** : Explanation
+2) **UNMIX**: Explanation
+3) **Segmentation** : In the semgmenation step, the pipline performs instance segmentation on the image to generate a masks array of dimnension ... Thi                         masks 
+4) **Intensity Computation** : 
+5) **Data Object**
+6) **Spatial Neighborhood**:
+7) 
 
 
 
