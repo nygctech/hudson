@@ -3,7 +3,7 @@ hudson is a computational pipeline for spatial analysis of single cells in multi
 
 Fluorescent Imaging, is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues. fluorescence microscopy. 
 
-![Image](https://user-images.githubusercontent.com/42875353/185255493-a0706a1f-b297-46cd-87b8-6d87732ee6a1.png)
+![Image](https://user-images.githubusercontent.com/42875353/185256084-e6656ffd-9b51-4878-b428-76428c33dc25.png)
 
 
 The pipeline has parallel capibility meaning it can be scaled over any cluster using the SLURM manager. It makes use of GPU nodes if avaiable for quick image processing and computation. The structure is defined in the next section.  
