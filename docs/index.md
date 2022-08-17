@@ -14,13 +14,14 @@ The pipeline has parallel capibility meaning it can be scaled over any cluster u
 
 The pipiline uses the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow management system to unite all its differnet components into one single workflow which can be replicated over any user machine or cluster. The different sections being: 
 
-1) **Fix Lighting** : Explanation
-2) **UNMIX**: Explanation
-3) **Segmentation** : In the semgmenation step, the pipline performs instance segmentation on the image to generate a masks array of dimnension ... Thi                         masks 
-4) **Intensity Computation** : 
-5) **Data Object**
-6) **Spatial Neighborhood**:
-7) 
+1) **Fix Lighting** : Explanation. 
+2) **UNMIX**: Explanation. 
+3) **Segmentation** : In the semgmenation step, the pipline performs instance segmentation on the image to generate a masks array of the same dimension as the input. The masks array is essentially the assignment of each pixel to a certain cell in the image. The users can select over which marker(LMN1b, GFAP, MBP, EVALV2,..) they want to segment on. Each cell is indexed as a label starting from 1 to the n'th cell that is segmented.
+4) **Intensity Computation** : The next step is to compute the mean intensity per label using the masks array and the image. We need this to infer the cell types for the different labels that we got from the segmentation step. 
+5) **Cell Type Indentification** 
+6) **Data Object* 
+7) **Spatial Neighborhood**:
+8) 
 
 
 
