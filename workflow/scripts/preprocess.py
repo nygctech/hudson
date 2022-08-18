@@ -3,7 +3,7 @@ from pre import image_analysis as ia
 from os.path import join
 #from utils.utils import get_cluster
 from utils import get_cluster
-from dask.distributed import Client
+from dask.distributed import Client, wait
 import dask
 
 experiment_config = utils.get_config(snakemake.input[0])
@@ -43,15 +43,17 @@ with Client(cluster) as client:
     		print(f'Channel {ch}::',values)
 
 	image.correct_background()
-	image.register_channels2()
+	image.register_channels()
 
 	delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
 	dask.compute(delayed_store)
+	wait(delayed_store)
+
 
 
 
 section_info = {'nchunks_per_plane': ntiles,
-				'planesize':image.nbytes,
+				'planesize':image.im.nbytes,
 				'path': snakemake.params.save_path,
 				'machine': image.machine,
 				'experiment': experiment_config['experiment']['experiment name']
