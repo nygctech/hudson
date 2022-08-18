@@ -1,5 +1,5 @@
 ---
 layout: default
-title: Structure
+title: Motivation
 nav_order: 5
 ---
