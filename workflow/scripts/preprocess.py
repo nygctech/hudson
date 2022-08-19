@@ -21,6 +21,7 @@ image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
 # specify default worker options in ~/.config/dask/jobqueue.yaml
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
 cluster = get_cluster(**winfo)
+print(cluster.new_worker_spec())
 print(cluster.dashboard_link)
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
@@ -38,11 +39,11 @@ with Client(cluster) as client:
 	client.wait_for_workers(int(min_workers/2), 60*5)
 
 
-        # Write Raw Images
+    # Write Raw Images
 	raw_path = Path(snakemake.params.save_path).parents[0] / 'raw_zarr'
 	if isdir(raw_path):
 		makedirs(raw_path, exist_ok = True)
-		delayed_store = image.save_zarr(raw_path)
+		delayed_store = image.save_zarr(raw_path, compute = False)
 		dask.compute(delayed_store)
 		wait(delayed_store)
 

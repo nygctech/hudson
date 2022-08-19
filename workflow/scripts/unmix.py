@@ -11,9 +11,10 @@ image = xr.open_zarr(image_path).to_array()
 image = image.squeeze().drop_vars('variable').rename(im_name)
 
 # Make sure only 1 objective step
-if len(image.obj_step) > 1:
-	mid_step = image.obj_step[image.obj_step.size//2]
-	image = image.sel(obj_step = mid_step)
+if image.obj_step.dims == 1:
+    if len(image.obj_step) > 1:
+    	mid_step = image.obj_step[image.obj_step.size//2]
+    	image = image.sel(obj_step = mid_step)
 
 # Get config data
 stains_config = snakemake.config.get('stains')
