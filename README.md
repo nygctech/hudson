@@ -1,4 +1,4 @@
-# Install pipeline
+# Steps to install hudson:
 ## 1 Clone repository
 ```
 git clone https://github.com/nygctech/hudson.git

@@ -1,9 +1,0 @@
-/gpfs/commons/home/jsingh/.conda/envs/spatial/lib/python3.9/site-packages/distributed/cli/dask_worker.py:334: FutureWarning: The --nprocs flag will be removed in a future release. It has been renamed to --nworkers.
-  warnings.warn(
-2022-08-06 18:25:30,705 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.41:46532'
-2022-08-06 18:25:30,761 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.41:39158'
-2022-08-06 18:25:30,766 - distributed.nanny - INFO -         Start Nanny at: 'tcp://10.4.200.41:41576'
-2022-08-06 18:25:31,895 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-ao6gyi_c', purging
-2022-08-06 18:25:31,902 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-dh5e0oqi', purging
-2022-08-06 18:25:31,909 - distributed.diskutils - INFO - Found stale lock file and directory '/gpfs/commons/home/jsingh/hudson/workflow/scripts/dask-worker-space/worker-i1vrpb3f', purging
-slurmstepd: error: *** JOB 25948157 ON pe2cc3-011 CANCELLED AT 2022-08-06T18:25:37 ***

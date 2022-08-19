@@ -1,12 +1,13 @@
 from pre import utils
 from pre import image_analysis as ia
 from os.path import join
-from utils.utils import get_cluster
-from dask.distributed import Client
+#from utils.utils import get_cluster
+from utils import get_cluster
+from dask.distributed import Client, wait
 import dask
 
 experiment_config = utils.get_config(snakemake.input[0])
-
+exp_dir = snakemake.config['experiment_directory']
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
 image_path = join(exp_dir, image_path)
 
@@ -19,11 +20,9 @@ image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
 cluster = get_cluster(**winfo)
 print(cluster.dashboard_link)
-print(cluster.job_script())
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
 max_workers = 2*min_workers
-print(min_workers, max_workers)
 
 # Print out info about section
 print('machine::', image.machine)
@@ -44,15 +43,21 @@ with Client(cluster) as client:
     		print(f'Channel {ch}::',values)
 
 	image.correct_background()
-	image.register_channels2()
+	image.register_channels()
 
 	delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
 	dask.compute(delayed_store)
+	wait(delayed_store)
+
 
 
 
 section_info = {'nchunks_per_plane': ntiles,
+<<<<<<< HEAD
 				'planesize':image,
+=======
+				'planesize':image.im.nbytes,
+>>>>>>> 4ed3e8bd59dae4228d88ed1535631df2e4a99861
 				'path': snakemake.params.save_path,
 				'machine': image.machine,
 				'experiment': experiment_config['experiment']['experiment name']
