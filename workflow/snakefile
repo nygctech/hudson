@@ -9,7 +9,12 @@ exp_conf_path = config.get('experiment_config','logs/config.cfg')
 exp_conf_path = join(exp_dir, exp_conf_path)
 exp_conf = configparser.ConfigParser()
 exp_conf.read(exp_conf_path)
+print(exp_conf_path)
+with open(exp_conf_path) as f:
+    for line in f:
+        print(f)
 
+print(exp_conf.sections())
 experiment_name = exp_conf.get('experiment','experiment name')
 output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
@@ -75,7 +80,7 @@ rule segmentation:
 
 rule mean_intensity:
     input:
-        directory('{output_dir}/final_zarr/{sections}.zarr')
+        directory('{output_dir}/final_zarr/{sections}.zarr'),
         '{output_dir}/masks/{sections}.tiff'
     
     output:
@@ -96,8 +101,8 @@ rule anndata:
         '{output_dir}/intensities/{sections}.pkl'
     
     output:
-        '{output_dir}/anndata/{sections}.h5ad'
-        '{output_dir}/centroid/{sections}.csv'
+        '{output_dir}/anndata/{sections}.h5ad',
+        '{output_dir}/centroid/{sections}.csv',
         '{output_dir}/uns/{sections}.npy'
         
     resources:
@@ -113,11 +118,11 @@ rule anndata:
 #rule spatial_neighborhood:
 #    input:
 #        '{output_dir}/masks/{sections}.tiff'
-#        '{output_dir}/intensities/{sections}.pkl'
+#        '{output_dir}/intensities/{sections}.pkl',
 #    
 #    output:
-#       '{output_dir}/anndata/{sections}.h5ad'
-#       '{output_dir}/centroid/{sections}.csv')
+#       '{output_dir}/anndata/{sections}.h5ad',
+#       '{output_dir}/centroid/{sections}.csv'),
 #       '{output_dir}/uns/{sections}.npy')
 #        
 #    resources:
@@ -145,23 +150,23 @@ rule anndata:
 
 
 # rule clustering
-rule celltype:
-  input:
-    prot:'{output_dir}/tables/{sections}_prot.csv',
-    param:'{output_dir}/tables/{sections}_param.csv'
-  output:
-    '{output_dir}/tables/{sections}.csv'
-  resources:
-    mem_mb = 32000
-  conda:
-    'envs/celltype.yaml'
-  shell:
-    '''
-    Rscript scripts/celltype.R \
-      --input_prot={input.prot} \
-      --input_param={input.param} \
-      --output={output} \
-      --ref=config["reference"]["seurat"]
+#rule celltype:
+#  input:
+#    prot:'{output_dir}/tables/{sections}_prot.csv',
+#    param:'{output_dir}/tables/{sections}_param.csv'
+#  output:
+#    '{output_dir}/tables/{sections}.csv'
+#  resources:
+#    mem_mb = 32000
+#  conda:
+#    'envs/celltype.yaml'
+#  shell:
+#    '''
+#    Rscript scripts/celltype.R \
+#      --input_prot={input.prot} \
+#      --input_param={input.param} \
+#      --output={output} \
+#      --ref=config["reference"]["seurat"]
 
 # append cell types to ann_data
 

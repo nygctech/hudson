@@ -64,7 +64,7 @@ if torch.cuda.is_available() == False:
     print(results)
     
     intensity_dict = {}
-    intensity_dict.update({'m1a':results})
+    intensity_dict.update({'values':results})
     with open(Path(snakemake.output[0], 'wb')) as f:
         pickle.dump(intensity_dict, f)
         
@@ -86,7 +86,10 @@ else:
     pl = plane.values
     mean_int = get_mean_intensity(pl)
     
-    print(mean_int)
+    intensity_dict = {}
+    intensity_dict.update({'values':mean_int})
+    with open(snakemake.output[0], 'wb') as f:
+        pickle.dump(intensity_dict, f)
     
         
 

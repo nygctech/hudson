@@ -52,7 +52,7 @@ with Client(cluster) as client:
 
 
 section_info = {'nchunks_per_plane': ntiles,
-				'planesize':image.,
+				'planesize':image,
 				'path': snakemake.params.save_path,
 				'machine': image.machine,
 				'experiment': experiment_config['experiment']['experiment name']
