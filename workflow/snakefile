@@ -77,7 +77,7 @@ rule mean_intensity:
     input:
         directory('{output_dir}/final_zarr/{sections}.zarr'),
         '{output_dir}/masks/{sections}.tiff'
-    
+
     output:
         '{output_dir}/intensities/{sections}.pkl'
     resources:
@@ -86,47 +86,47 @@ rule mean_intensity:
         'envs/mean_intensity.yaml'
     script:
         'scripts/mean_intensity.py'
-        
-        
+
+
 
 
 rule anndata:
     input:
         '{output_dir}/masks/{sections}.tiff',
         '{output_dir}/intensities/{sections}.pkl'
-    
+
     output:
         '{output_dir}/anndata/{sections}.h5ad'
         '{output_dir}/centroid/{sections}.csv'
         '{output_dir}/uns/{sections}.npy'
-        
+
     resources:
         mem_mb = 32000
     conda:
         'envs/make_anndata.yaml'
     script:
         'scripts/make_anndata.py'
-        
-        
+
+
 
 
 #rule spatial_neighborhood:
 #    input:
 #        '{output_dir}/masks/{sections}.tiff'
 #        '{output_dir}/intensities/{sections}.pkl'
-#    
+#
 #    output:
 #       '{output_dir}/anndata/{sections}.h5ad'
 #       '{output_dir}/centroid/{sections}.csv')
 #       '{output_dir}/uns/{sections}.npy')
-#        
+#
 #    resources:
 #        mem_mb = 32000
 #    conda:
 #        'envs/spatial_neighborhood.yaml'
 #    script:
 #        'scripts/spatial_neighborhood.py'
-        
+
 
 # rule color unmixing
 
