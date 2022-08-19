@@ -215,4 +215,4 @@ dependencies:
     - urllib3==1.26.11
     - wrapt==1.14.1
     - yte==1.5.1
-    - git+https://github.com/nygctech/pyseq-image.git@a5b686e0ea9420f60c278d898e9fa904657a3ddb
+    - git+https://github.com/nygctech/pyseq-image.git@cfb29e912cc24d3500a75e06fbb1f3042e14ad50

@@ -1,10 +1,12 @@
 from pre import utils
 from pre import image_analysis as ia
-from os.path import join
+from os.path import join, isdir
+from os import makedirs
 #from utils.utils import get_cluster
 from utils import get_cluster
 from dask.distributed import Client, wait
 import dask
+from pathlib import Path
 
 experiment_config = utils.get_config(snakemake.input[0])
 exp_dir = snakemake.config['experiment_directory']
@@ -22,7 +24,7 @@ cluster = get_cluster(**winfo)
 print(cluster.dashboard_link)
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
-max_workers = 2*min_workers
+max_workers = 2*(2*ntiles*ntiles)
 
 # Print out info about section
 print('machine::', image.machine)
@@ -36,11 +38,19 @@ with Client(cluster) as client:
 	client.wait_for_workers(int(min_workers/2), 60*5)
 
 
+        # Write Raw Images
+	raw_path = Path(snakemake.params.save_path).parents[0] / 'raw_zarr'
+	if isdir(raw_path):
+		makedirs(raw_path, exist_ok = True)
+		delayed_store = image.save_zarr(raw_path)
+		dask.compute(delayed_store)
+		wait(delayed_store)
+
 	# Correct Background
 	print('Correcting background')
 	print('Pixel group adjustments')
-	for ch, values in image.config.items(image.machine+'background'):
-    		print(f'Channel {ch}::',values)
+#	for ch, values in image.config.items(image.machine+'background'):
+#    		print(f'Channel {ch}::',values)
 
 	image.correct_background()
 	image.register_channels()
