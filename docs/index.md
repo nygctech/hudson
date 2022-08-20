@@ -18,4 +18,6 @@ Following is an example of a multiplexed fluorescence image:
 ![Image](https://user-images.githubusercontent.com/42875353/185256327-27dfeb89-2cce-4bb7-b617-a434e7cf65dd.png){:height="50%" width="50%"}. 
 
 
-Analysing such images is computationally intensive thus pipeline has parallel compute capibility. It can be scaled over any cluster using the SLURM manager.Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next section.  
+Analysing such images is computationally intensive, thus the pipeline has parallel compute capibility. It can be scaled over any computer cluster using the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters
+
+Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next section.  
