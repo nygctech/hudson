@@ -20,12 +20,12 @@ conda activate snakemake
 See the example below to make a SLURM profile
 
 ## 4) Configure dask-jobqueue (optional)
-### 1) Create template config file
+### a) Create template config file
 import dask-jobqueue to create template config file at `~/.config/dask/`.
 ```
 python -c 'import dask_jobqueue'
 ```
-### 2) Configure for your cluster
+### b) Configure for your cluster
 See here https://jobqueue.dask.org/en/latest/configuration.html for details
 
 # Make a SLURM Profile
