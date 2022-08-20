@@ -8,7 +8,7 @@ nav_order: 1
 ## Overview
 
 
-hudson is a computational pipeline for spatial analysis of single cells in data obtained via multiplexed fluorescence imaging. It is developed by *Jagjit Singh, Kunal Pandit, and Rui Fu*. The pipeline can installed by following the steps [here](https://github.com/nygctech/hudson)
+hudson is a computational pipeline for spatial analysis of single cells in data obtained via multiplexed fluorescence imaging. It is developed by **Jagjit Singh, Kunal Pandit, and Rui Fu**. The pipeline can installed by following the steps [here](https://github.com/nygctech/hudson)
 
 Fluorescent Imaging, is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues. fluorescence microscopy. 
 
