@@ -6,7 +6,6 @@ has_children: true
 permalink: /docs/structure
 ---
 
-# UI Components
+# Structure
 
-To make it as easy as possible to write documentation in plain Markdown, most UI components are styled using default Markdown elements with few additional CSS classes needed.
-{: .fs-6 .fw-300 }
+This section dives into a detailed view of the pipeline and its individual components
