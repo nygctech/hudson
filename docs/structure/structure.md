@@ -1,6 +1,6 @@
 ---
 layout: default
-title: structure
+title: Structure
 nav_order: 3
 has_children: true
 permalink: /docs/structure
