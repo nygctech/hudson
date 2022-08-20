@@ -1,20 +1,91 @@
 ---
 layout: default
-title: Installation
+title: Install
 nav_order: 2
 ---
 
-## Installing Hudson
+# Steps to install hudson:
+## 1 Clone repository
+```
+git clone https://github.com/nygctech/hudson.git
+```
 
+## 2) Create snakemake environment from environment.yaml and activate
+```
+conda env create -f hudson/environment.yaml
+conda activate snakemake
+```
 
+## 3) Make a cluster profile
+See the example below to make a SLURM profile
 
+## 4) Configure dask-jobqueue (optional)
+### 1) Create template config file
+import dask-jobqueue to create template config file at `~/.config/dask/`.
+```
+python -c 'import dask_jobqueue'
+```
+### 2) Configure for your cluster
+See here https://jobqueue.dask.org/en/latest/configuration.html for details
 
-The pipiline uses the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow management system to unite all its differnet components into one single workflow that can be replicated over any machine or scaled over any cluster. The different sections being: 
+# Make a SLURM Profile
+## 1) Make profile from cookiecutter template
 
-1) **Fix Lighting** : Explanation. <br>
-2) **Unmix**: Explanation. <br>
-3) **Segmentation** : In the semgmenation step, the pipline performs instance segmentation on the image to generate a masks array of the same dimension as the input. The masks array is essentially the assignment of each pixel to a certain cell in the image. The users can select over which marker(LMN1b, GFAP, MBP, EVALV2,..) they want to segment on. Each cell is indexed as a label starting from 1 to the n'th cell that is segmented. <br>
-4) **Intensity Computation** : The next step is to compute the mean intensity per label using the masks array and the image. We need this to infer the cell types for the different labels that we got from the segmentation step. <br>
-5) **Cell Type Indentification** <br>
-6) **Annotation**: In the this we extract and condense the relevant image properties and cell type information in a single [anndata](https://anndata.readthedocs.io/en/latest/) object. This is very important to increase the efficieny, utility and scalability of the pipeline. <br>
-7) **Spatial Neighborhood**:  Following this the pipeline will fetch the cell centroids from the Anndata object and perform a Voronoi tessellation. It will then use the Voronoi tessellation to create a graph of all cells using the edges and nodes from the tessellation. This graph will then used to build spatial neighborhoods, perform spatial analysis and store neighborhood connections for each cell. <br>
+To receive emails with jobs or finished or an error occurs replace `mail-user=account@email.com` with your email address. If you do not want emails, leave `sbatch_defaults []:` blank.
+
+run:
+```
+cookiecutter https://github.com/Snakemake-Profiles/slurm.git
+```
+
+Example prompt
+```
+cookiecutter https://github.com/Snakemake-Profiles/slurm.git
+profile_name [slurm]: slurm
+sbatch_defaults []: mail-user=account@email.com mail-type=END,FAIL
+cluster_sidecar_help: [Use cluster sidecar. NB! Requires snakemake >= 7.0! Enter to continue...]
+Select cluster_sidecar:
+1 - yes
+2 - no
+Choose from 1, 2 [1]:
+cluster_name []:
+cluster_config_help: [The use of cluster-config is discouraged. Rather, set snakemake CLI options in the profile configuration file (see snakemake documentation on best practices). Enter to continue...]
+cluster_config []:
+```
+
+## 2) Edit profile config `slurm/config.yaml`
+
+Add default resources, for example:
+```
+restart-times: 1
+jobscript: "slurm-jobscript.sh"
+cluster: "slurm-submit.py"
+cluster-status: "slurm-status.py"
+cluster-sidecar: "slurm-sidecar.py"
+cluster-cancel: "scancel"
+max-jobs-per-second: 1
+max-status-checks-per-second: 10
+local-cores: 1
+latency-wait: 60
+
+# Example resource configuration
+default-resources:
+  - runtime=60
+  - mem_mb=8000
+  - tmpdir="/scratch"
+```
+
+## 2) Move the profile to the correct location
+```
+mkdir ~/.config/snakemake
+mv slurm ~/.config/snakemake/
+```
+
+# Running pipeline
+Replace `N` with number of sections defined in the config file.
+Mamba is the preferred package manager, if however you want to use conda add
+`--conda-frontend conda` to the snakemake command.
+
+```
+snakemake --configfile ../config/config.yaml --profile slurm --use-conda -j N
+```
