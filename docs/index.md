@@ -7,12 +7,13 @@ nav_order: 1
 
 ## Overview
 
-<p align="center">
+<p align="justify ">
+  
   hudson is a computational pipeline for spatial analysis of single cells in data obtained via multiplexed fluorescence imaging. It is developed by **Jagjit Singh, Kunal Pandit, and Rui Fu**.
   
-Fluorescent Imaging is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues.
+  Fluorescent Imaging is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues.
   
-Multiplexed imaging is an emerging and exciting way to extract information from human tissue samples by visualizing many more biomarkers than traditional microscopy. By observing many biomarkers simultaneously, biological pathways previously explored only in isolation can be explored in concert, and complex tissue and cell phenotypes can be identified and probed. 
+  Multiplexed imaging is an emerging and exciting way to extract information from human tissue samples by visualizing many more biomarkers than traditional microscopy. By observing many biomarkers simultaneously, biological pathways previously explored only in isolation can be explored in concert, and complex tissue and cell phenotypes can be identified and probed. 
 
 Following is an example of a multiplexed fluorescence image:
 
