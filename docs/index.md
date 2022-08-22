@@ -8,6 +8,7 @@ nav_order: 1
 ## Overview
 
 
+
  hudson is a computational pipeline for spatial analysis of single cells in data obtained via multiplexed fluorescence imaging. It is developed by **Jagjit Singh, Kunal Pandit, and Rui Fu**.
   
 <p align="justify ">
