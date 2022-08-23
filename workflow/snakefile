@@ -147,8 +147,7 @@ rule anndata:
 # rule clustering
 rule celltype:
   input:
-    '{output_dir}/tables/{sections}_prot.csv',
-    '{output_dir}/tables/{sections}_param.csv'
+    '{output_dir}/anndata/{sections}.h5ad'
   output:
     '{output_dir}/tables/{sections}.csv'
   resources:
@@ -158,10 +157,10 @@ rule celltype:
   shell:
     '''
     Rscript scripts/celltype.R \
-      --input_prot={input.prot} \
-      --input_param={input.param} \
+      --input_h5={input} \
       --output={output} \
-      --ref=config["reference"]["seurat"]
+      --ref=config["reference"]["seurat"] \
+      --typecol=config["reference"]["typecol"]
     '''
 # append cell types to ann_data
 
