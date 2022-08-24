@@ -2,6 +2,7 @@ library(Seurat)
 library(hdf5r)
 library(tidyverse)
 library(argparse)
+library(sva)
 # parse
 parser <- ArgumentParser(description= 'cluster and assign cell types')
 parser$add_argument('--input_h5', '-i', help = 'Input H5AD file containing protein intensity')
@@ -15,21 +16,36 @@ mat <- file_h5[["X"]][,]
 colnames(mat) <- file_h5[["obs/_index"]][]
 rownames(mat) <- file_h5[["var/_index"]][]
 prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
-#rownames(prot) <- str_remove(rownames(prot), "^[A-Z]")
 rownames(prot) <- rownames(prot) %>% str_to_title() %>%
   ifelse(. == "Lmn1b", "Lmnb1", .) %>%
   ifelse(. == "Iba1", "Aif1", .) %>%
   ifelse(. == "Nfh", "Nefh", .)
-param <- mat[!str_detect(rownames(mat), "_Intensity"),]
+param <- mat[!str_detect(rownames(mat), "^[A-Z]"),]
+# combat
+mod <- model.matrix(~as.factor(label), data = as.data.frame(t(param)))
+mod0 <- model.matrix(~1,data = as.data.frame(t(param)))
+svobj <- sva(prot, mod, mod0, n.sv = 1, method = "two-step")
+if (svobj$n.sv > 0) {
+  prot2 <- ComBat(prot, batch = svobj$sv)
+} else {
+  prot2 <- prot
+}
+svobj <- sva(param, mod, mod0, n.sv = 1, method = "two-step")
+if (svobj$n.sv > 0) {
+  param2 <- ComBat(param, batch = svobj$sv)
+} else {
+  param2 <- param
+}
 # prot
-so <- CreateSeuratObject(prot, assay = "prot")
+so <- CreateSeuratObject(prot2, assay = "prot")
 so <- NormalizeData(so, normalization.method = "CLR")
 so <- ScaleData(so) %>% RunPCA(features = rownames(so))
+# dr
 so <- FindNeighbors(so, dims = 1:ncol(so@reductions$pca@cell.embeddings))
 so <- RunUMAP(so, dims = 1:ncol(so@reductions$pca@cell.embeddings))
 so <- FindClusters(so, dims = 1:ncol(so@reductions$pca@cell.embeddings), resolution = 0.1, verbose = FALSE)
 # param
-so[["param"]] <- CreateAssayObject(param)
+so[["param"]] <- CreateAssayObject(param2)
 DefaultAssay(so) <- "param"
 so <- ScaleData(so, features = rownames(so))
 so <- so %>% RunPCA(features = rownames(so), reduction.name = 'ppca')
