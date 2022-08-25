@@ -15,6 +15,7 @@ file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
 mat <- file_h5[["X"]][,]
 colnames(mat) <- file_h5[["obs/_index"]][]
 rownames(mat) <- file_h5[["var/_index"]][]
+file_h5$close_all()
 prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
 rownames(prot) <- rownames(prot) %>% str_to_title() %>%
   ifelse(. == "Lmn1b", "Lmnb1", .) %>%
