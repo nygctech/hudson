@@ -39,6 +39,8 @@ nav_order: 1
   clusters.
 </p> 
   
+  ![async-embarrassing](https://user-images.githubusercontent.com/42875353/186717672-cb804a2f-f2a4-4e5d-ac2c-1f40b67d9ab1.gif)
+
 <p align="justify ">
   Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next
   section. 
