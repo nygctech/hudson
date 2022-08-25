@@ -75,7 +75,7 @@ def return_anndata(path):
         
     return adata
     
-
+    
 with open(Path(snakemake.input[1]), 'rb') as f:
     loaded_dict = pickle.load(f)
     
@@ -89,22 +89,35 @@ def del_nan(arr):
         
     arr = np.delete(arr,del_list)
     return(arr)
-
-
+    
+    
 for key in loaded_dict.keys():
     val = loaded_dict[key]
     val = del_nan(val)
-    #val = np.roll(val,-1)
     loaded_dict.update({key:val[1:]})
-    
-ad_object   = return_anndata(Path(snakemake.input[0]))
-
+        
+        
+ad_object = return_anndata(Path(snakemake.input[0]))
 
 mat = ad_object.X
 
 for key in loaded_dict.keys():
     mat = np.append(mat, np.asarray([loaded_dict[key]]).transpose(), axis = 1)
     
+x_centroid = []
+y_centroid = []
+for i in range(len(ad_object.uns['centroid'])):
+            x_centroid.append(ad_object.uns['centroid'][i][0])
+            y_centroid.append(ad_object.uns['centroid'][i][1])
+            
+
+xc = np.expand_dims(np.asarray(x_centroid), axis=1)
+yc = np.expand_dims(np.asarray(y_centroid), axis=1)
+
+mat = np.append(mat,xc, axis = 1)
+mat = np.append(mat,yc, axis = 1)
+  
+
 #remake new anndata object
 adt = ad.AnnData(mat)
 
@@ -112,19 +125,11 @@ lis = ad_object.var_names
 var = list(lis)
 post_var = list(loaded_dict.keys())
 var.extend(post_var)
+var.append('x_centroid')
+var.append('y_centroid')
 
 
 adt.var_names = var
 adt.obs_names = np.arange(1,np.shape(mat)[0] + 1,1)
 
-df = pd.DataFrame()
-for k in ad_object.uns.keys():
-    df[k] = ad_object.uns[k]
-    
-adt.write(snakemake.output[0])
-df.to_csv(snakemake.output[1])
-
-with open(Path(snakemake.output[2]), 'wb') as f:
-    np.save(f, ad_object.uns['centroid'])
-
-        
+adt.write(Path(snakemake.output[0]),compression = "gzip")

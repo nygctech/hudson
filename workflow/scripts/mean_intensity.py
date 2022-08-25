@@ -24,9 +24,16 @@ im_name = image_path.stem
 image = xr.open_zarr(image_path).to_array()
 image = image.squeeze().drop_vars('variable').rename(im_name)
 
-plane = image.sel(marker = 'LMN1b')
+marker_list = ['LMN1b', 'GFAP','ELAVL2','MBP','PVALB']
 
+plane_dict = {}
 
+for mark in marker_list:
+    try:
+        plane_dict.update({mark: image.sel(marker = mark)})
+    except:
+        pass
+    
 if torch.cuda.is_available() == False:
 
     def get_cluster(queue_name = 'pe2', log_dir=None):
@@ -40,7 +47,7 @@ if torch.cuda.is_available() == False:
                     cores = 6 ,
                     memory = '60G',
                     walltime='1:00:00')
-                    #extra=["--lifetime", "55m", "--lifetime-stagger", "4m"])
+                    
         client = Client(cluster, timeout="50s")
 
         return cluster, client
@@ -52,21 +59,24 @@ if torch.cuda.is_available() == False:
         return cluster.dashboard_link
     scale_cluster(5)
 
-    #Way 3: Computing the same using dask compute without persisting Data
-    val = np.max(labels)
-    def get_pixels(lab):
-        m = plane.values[labels == lab+1].mean()
-        return m
-
-    with parallel_backend('dask',scheduler_host=cluster.scheduler._address):
-        results = Parallel(n_jobs=-1)(delayed(get_pixels)(lab) for lab in range(val))
-        
-    print(results)
     
-    intensity_dict = {}
-    intensity_dict.update({'m1a':results})
+    val = np.max(labels)
+    
+    
+    def get_pixels(lab,pl):
+        m = plane_dict[pl].values[labels == lab+1].mean()
+        return m
+    
+    mean_intensity_per_marker = {}
+    for plane in plane_dict.keys():
+    
+        with parallel_backend('dask',scheduler_host=cluster.scheduler._address,wait_for_workers_timeout=20):
+            mean_int = Parallel(n_jobs=-1)(delayed(get_pixels)(lab, pl = plane) for lab in range(val))
+        mean_intensity_per_marker.update({plane:mean_int})
+    
+
     with open(Path(snakemake.output[0], 'wb')) as f:
-        pickle.dump(intensity_dict, f)
+        pickle.dump(mean_intensity_per_marker, f)
         
     client.close()
     cluster.close()
@@ -83,10 +93,15 @@ else:
 
     lab = torch.from_numpy(labels.astype('int'))
     mx = np.max(labels)
-    pl = plane.values
-    mean_int = get_mean_intensity(pl)
     
-    print(mean_int)
+    mean_intensity_per_marker = {}
+    for plane in plane_dict.keys():
+        pl = plane_dict[plane].values
+        mean_int = get_mean_intensity(pl)
+        mean_intensity_per_marker.update({plane:mean_int})
+    
+    with open(Path(snakemake.output[0], 'wb')) as f:
+        pickle.dump(mean_intensity_per_marker, f)
     
         
 
