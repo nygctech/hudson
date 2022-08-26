@@ -3,7 +3,6 @@ import xarray as xr
 import numpy as np
 import numpy as np
 import dask
-from pyseq import image_analysis as ia
 from dask.distributed import Client
 import torch
 import joblib
@@ -24,7 +23,7 @@ im_name = image_path.stem
 image = xr.open_zarr(image_path).to_array()
 image = image.squeeze().drop_vars('variable').rename(im_name)
 
-marker_list = ['LMN1b', 'GFAP','ELAVL2','MBP','PVALB']
+marker_list = ['LMN1b','GFAP','ELAVL2','MBP','PVALB','IBA1','PDGFRA','MAP2','NFH']
 
 plane_dict = {}
 
@@ -75,7 +74,7 @@ if torch.cuda.is_available() == False:
         mean_intensity_per_marker.update({plane:mean_int})
     
 
-    with open(Path(snakemake.output[0], 'wb')) as f:
+    with open(Path(snakemake.output[0]), 'wb') as f:
         pickle.dump(mean_intensity_per_marker, f)
         
     client.close()
@@ -100,7 +99,7 @@ else:
         mean_int = get_mean_intensity(pl)
         mean_intensity_per_marker.update({plane:mean_int})
     
-    with open(Path(snakemake.output[0], 'wb')) as f:
+    with open(Path(snakemake.output[0]), 'wb') as f:
         pickle.dump(mean_intensity_per_marker, f)
     
         
