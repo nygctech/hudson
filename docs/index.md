@@ -25,7 +25,7 @@ nav_order: 1
  Following is an example of a multiplexed fluorescence image:
   
 
-  ![Image](https://user-images.githubusercontent.com/42875353/185256327-27dfeb89-2cce-4bb7-b617-a434e7cf65dd.png){:height="50%" width="50%"}.
+  ![Image](spinal_tissue.png){:height="50%" width="50%"}.
  
 <p align="justify ">
   
@@ -39,7 +39,7 @@ nav_order: 1
   clusters.
 </p> 
   
-  ![async-embarrassing](https://user-images.githubusercontent.com/42875353/186717672-cb804a2f-f2a4-4e5d-ac2c-1f40b67d9ab1.gif)
+  ![async-embarrassing](async_embarrassing_main.gif)
 
 <p align="justify ">
   Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next
