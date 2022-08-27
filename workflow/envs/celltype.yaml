@@ -1,4 +1,4 @@
-name: testR
+name: celltype
 channels:
   - bioconda
   - conda-forge
@@ -87,7 +87,7 @@ dependencies:
   - idna=3.3
   - importlib-metadata=4.11.4
   - importlib_resources=5.9.0
-  - ipykernel=6.15.1
+  - ipykernel
   - ipython=8.4.0
   - ipython_genutils=0.2.0
   - jedi=0.18.1
@@ -480,4 +480,3 @@ dependencies:
   - zipp=3.8.1
   - zlib=1.2.12
   - zstd=1.5.2
-prefix: /nfs/home/rfu/anaconda3/envs/testR
