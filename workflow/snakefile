@@ -28,7 +28,9 @@ def get_gpu():
 
 rule all:
     input:
-        expand('{dir}/intensities/{s}.pkl', dir = output_dir, s = sections)
+        expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
+       
+               
 
 rule fix_lighting:
     input:
@@ -131,19 +133,20 @@ rule celltype:
       --typecol={params.typecol}
     '''
 
-#rule spatial_neighborhood:
-#    input:
-#         '{output_dir}/anndata/{sections}.h5ad'
-#         '{output_dir}/tables/{sections}.csv'
-# 
-#     output:
-#        '{output_dir}/cell_neighborhood/{sections}.pkl'
-#        '{output_dir}/net_neighborhood/{sections}.pkl'
-#        
-# 
-#     resources:
-#         mem_mb = 32000
-#     conda:
-#         'envs/spatial_neighborhood.yaml'
-#     script:
-#        'scripts/spatial_neighborhood.py'
+rule spatial_neighborhood:
+    input:
+       '{output_dir}/anndata/{sections}.h5ad',
+       '{output_dir}/tables/{sections}.csv'
+ 
+    output:
+       '{output_dir}/cell_neighborhood/{sections}.pkl',
+       '{output_dir}/net_neighborhood/{sections}.pkl'
+        
+ 
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/spatial_neighbor.yaml'
+    script:
+        'scripts/spatial_neighborhood.py'
+        

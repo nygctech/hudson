@@ -112,10 +112,10 @@ for g in range(len(v)):
     cell_type_per_node.update({g:sub_df})
    
 with open(Path(snakemake.output[0]), 'wb') as f:
-     pickle.dump(neighbor_dict, f)   
+     pickle.dump(cell_type_per_node, f)   
 
 with open(Path(snakemake.output[1]), 'wb') as f:
-    pickle.dump(cell_type_per_node, f)  
+    pickle.dump(neighbor_dict, f)  
         
         
     
