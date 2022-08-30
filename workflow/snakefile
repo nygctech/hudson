@@ -2,6 +2,7 @@
 from os.path import join
 import configparser
 import subprocess
+import yaml
 
 
 exp_dir = config['experiment_directory']
@@ -22,6 +23,12 @@ def get_gpu():
         gpu_available = 1
 
     return gpu_available
+    
+def get_section_info(section):
+    with open(join(output_dir,f'{section}.yaml'})) as f:
+        section_info = yaml.safe_load(f)
+        
+    return section_info
 
 rule all:
     input:
@@ -31,10 +38,13 @@ rule fix_lighting:
     input:
         {exp_conf_path},
     params:
+        raw_path = join(output_dir,'raw_zarr'),
         save_path = join(output_dir,'processed_zarr'),
         section = '{sections}'
     output:
-        directory('{output_dir}/processed_zarr/{sections}.zarr')
+        directory('{output_dir}/raw_zarr/{sections}.zarr'),
+        directory('{output_dir}/processed_zarr/{sections}.zarr'),
+        '{output_dir}/{sections}.yaml'
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -50,8 +60,9 @@ rule unmix:
         directory('{output_dir}/final_zarr/{sections}.zarr')
     params:
         max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
-#    resources:
-#        mem_mb = 32000
+    resources:
+        mem_mb = 16000 * get_section_info({sections})['chunks_per_plane']
+        cores = 2 * (mem_mb/16000)
     conda:
         'envs/unmix_gpu.yaml'
     script:

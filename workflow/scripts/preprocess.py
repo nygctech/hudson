@@ -7,6 +7,7 @@ from utils import get_cluster
 from dask.distributed import Client, wait
 import dask
 from pathlib import Path
+import yaml
 
 experiment_config = utils.get_config(snakemake.input[0])
 exp_dir = snakemake.config['experiment_directory']
@@ -28,44 +29,55 @@ min_workers = max(1,2*ntiles)
 max_workers = 2*(2*ntiles*ntiles)
 
 # Print out info about section
-print('machine::', image.machine)
 print('image path::',image_path)
-print('section::', section_name)
+print(image.im)
 
 # Start computation
 with Client(cluster) as client:
 
-	cluster.adapt(minimum = min_workers, maximum=max_workers)
-	client.wait_for_workers(int(min_workers/2), 60*5)
+    cluster.adapt(minimum = min_workers, maximum=max_workers)
+    client.wait_for_workers(int(min_workers/2), 60*5)
 
 
     # Write Raw Images
-	raw_path = Path(snakemake.params.save_path).parents[0] / 'raw_zarr'
-	if isdir(raw_path):
-		makedirs(raw_path, exist_ok = True)
-		delayed_store = image.save_zarr(raw_path, compute = False)
-		dask.compute(delayed_store)
-		wait(delayed_store)
+    if not isdir(snakemake.output[0]):
+        delayed_store = image.save_zarr(snakemake.params.raw_path, compute = False)
+        print('Start raw zarr write')
+        future_store = client.persist(delayed_store)
+        wait(future_store)
+        print('Finished raw zarr write')
+        
+    # Read from raw image zarr
+    image = ia.get_HiSeqImages(image_path = snakemake.output[0])
 
-	# Correct Background
-	print('Correcting background')
-	print('Pixel group adjustments')
-#	for ch, values in image.config.items(image.machine+'background'):
-#    		print(f'Channel {ch}::',values)
+    # Correct Background
+    print('Correcting background')
+    print('Pixel group adjustments')
+#     for ch, values in image.config.items(image.machine+'background'):
+#         print(f'Channel {ch}::',values)
 
-	image.correct_background()
-	image.register_channels()
+    image.correct_background()
+    image.register_channels()
 
-	delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
-	dask.compute(delayed_store)
-	wait(delayed_store)
+    # Write Processed Images
+    delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
+    print('Start processed zarr write')
+    client.persist(delayed_store)
+    wait(delayed_store)
+    print('Finished processed zarr write')
 
 
 
-
-section_info = {'nchunks_per_plane': ntiles,
+# write section info to file
+section_info = {'chunks_per_plane': ntiles,
 				'planesize':image.im.nbytes,
 				'path': snakemake.params.save_path,
 				'machine': image.machine,
 				'experiment': experiment_config['experiment']['experiment name']
 				}
+outputdir = Path(snakemake.params.save_path).parents[0]
+with open(outputdir / f'{section_name}.yaml') as f:
+    f.write(yaml.dump(section_info))
+    
+    
+

@@ -3,6 +3,7 @@ import xarray as xr
 import numpy as np
 from pathlib import Path
 import dask
+from math import log
 
 # Open image from zarr store
 image_path = Path(snakemake.input[0])
@@ -66,6 +67,20 @@ for cy , ch_stains in stains_config.items():
         print(f'Unmixing cycle {cy}')
         print('Removing fluorescence from channels', *sinks)
         model = PICASSOnn(cy_mm[cy][0])
+        
+        # DELETEME
+        test = image.sel(cycle=cy, channel=all_ch)
+        max_px = test.max().compute()
+        min_px = test.min().compute()
+        M = 1                                                                   # Max MINE model value
+        d = max_px - min_px                                                     # dimension of parameter space
+        K = 1                                                                   # Max MINE parameter value
+        L = 10                                                                  # Lipshitz constant, no idea just overestimate
+        e = 0.1                                                            # accuracy
+        c = 0.9                                                          # confidence
+
+        print(max_px, min_px)
+        print((2*M**2*(d*log(16*K*L*d**(0.5)/e) + 2*d*M + log(2/c)))/(e**2))
 
         # Fit alpha and background
         for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=snakemake.params.max_iter):
