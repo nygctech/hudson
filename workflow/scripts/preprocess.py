@@ -17,9 +17,10 @@ image_path = join(exp_dir, image_path)
 
 section_name = snakemake.params.section
 
-logger = utils.get_logger(section_name, filehandler = snakemake.log)
+logger = utils.get_logger(logname = section_name, filehandler = snakemake.log)
 
-image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name, filehandler = snakemake.log)
+image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
+                           logname = f'{section_name}.image')
 
 # Start dask cluster
 # specify default worker options in ~/.config/dask/jobqueue.yaml
@@ -65,9 +66,9 @@ with Client(cluster) as client:
 
 	delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
 	dask.compute(delayed_store)
-	logger.section_info('Correcting background')
+	logger.info('Processing images')
 	wait(delayed_store)
-	logger.section_info('Correcting background')
+	logger.info('Finished processing images')
 
 
 
