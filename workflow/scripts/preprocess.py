@@ -9,6 +9,8 @@ import dask
 from pathlib import Path
 import yaml
 
+
+
 experiment_config = utils.get_config(snakemake.input[0])
 exp_dir = snakemake.config['experiment_directory']
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
@@ -16,21 +18,25 @@ image_path = join(exp_dir, image_path)
 
 section_name = snakemake.params.section
 
-image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name)
+logger = utils.get_logger(logname = section_name, filehandler = snakemake.log)
+
+image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
+                           logname = f'{section_name}.image')
 
 # Start dask cluster
 # specify default worker options in ~/.config/dask/jobqueue.yaml
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
 cluster = get_cluster(**winfo)
-print(cluster.new_worker_spec())
-print(cluster.dashboard_link)
+logger.info(cluster.new_worker_spec())
+logger.info(cluster.dashboard_link)
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
-max_workers = 2*(2*ntiles*ntiles)
+max_workers = 2*ntiles*ntiles
 
 # Print out info about section
-print('image path::',image_path)
-print(image.im)
+logger.info('machine::', image.machine)
+logger.info('image path::',image_path)
+logger.info('section::', section_name)
 
 # Start computation
 with Client(cluster) as client:
@@ -42,10 +48,10 @@ with Client(cluster) as client:
     # Write Raw Images
     if not isdir(snakemake.output[0]):
         delayed_store = image.save_zarr(snakemake.params.raw_path, compute = False)
-        print('Start raw zarr write')
+        logger.info('Writing Raw Images')
         future_store = client.persist(delayed_store)
         wait(future_store)
-        print('Finished raw zarr write')
+        logger.info('Finished Writing Raw Images')
         
     # Read from raw image zarr
     image = ia.get_HiSeqImages(image_path = snakemake.output[0])
@@ -61,20 +67,20 @@ with Client(cluster) as client:
 
     # Write Processed Images
     delayed_store = image.save_zarr(snakemake.params.save_path, compute = False)
-    print('Start processed zarr write')
-    client.persist(delayed_store)
-    wait(delayed_store)
-    print('Finished processed zarr write')
+    logger.info('Processing images')
+    future_store = client.persist(delayed_store)
+    wait(future_store)
+    logger.info('Finished processing images')
 
 
 
 # write section info to file
 section_info = {'chunks_per_plane': ntiles,
-				'planesize':image.im.nbytes,
-				'path': snakemake.params.save_path,
-				'machine': image.machine,
-				'experiment': experiment_config['experiment']['experiment name']
-				}
+                'planesize':image.im.nbytes,
+                'path': snakemake.params.save_path,
+                'machine': image.machine,
+                'experiment': experiment_config['experiment']['experiment name']
+               }
 outputdir = Path(snakemake.params.save_path).parents[0]
 with open(outputdir / f'{section_name}.yaml') as f:
     f.write(yaml.dump(section_info))

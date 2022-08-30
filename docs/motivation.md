@@ -1,5 +1,5 @@
 ---
 layout: default
 title: Motivation
-nav_order: 5
+nav_order: 8
 ---
