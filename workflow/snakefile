@@ -15,6 +15,9 @@ output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
 sections = [s.replace('_','') for s in sections]
 
+ref = config["reference"]["seurat"]
+type = config["reference"]["typecol"]
+
 def get_gpu():
     result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
     gpu_available = 0
@@ -25,7 +28,9 @@ def get_gpu():
 
 rule all:
     input:
-        expand('{dir}/masks/{s}.tiff', dir = output_dir, s = sections)
+        expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
+       
+               
 
 rule fix_lighting:
     input:
@@ -85,7 +90,7 @@ rule mean_intensity:
     resources:
         mem_mb = 32000
     conda:
-        'envs/mean_intensity.yaml'
+        'envs/intensity.yaml'
     script:
         'scripts/mean_intensity.py'
 
@@ -99,9 +104,7 @@ rule anndata:
 
     output:
         '{output_dir}/anndata/{sections}.h5ad'
-        '{output_dir}/centroid/{sections}.csv'
-        '{output_dir}/uns/{sections}.npy'
-
+       
     resources:
         mem_mb = 32000
     conda:
@@ -111,48 +114,14 @@ rule anndata:
 
 
 
-
-#rule spatial_neighborhood:
-#    input:
-#        '{output_dir}/masks/{sections}.tiff'
-#        '{output_dir}/intensities/{sections}.pkl'
-#
-#    output:
-#       '{output_dir}/anndata/{sections}.h5ad'
-#       '{output_dir}/centroid/{sections}.csv')
-#       '{output_dir}/uns/{sections}.npy')
-#
-#    resources:
-#        mem_mb = 32000
-#    conda:
-#        'envs/spatial_neighborhood.yaml'
-#    script:
-#        'scripts/spatial_neighborhood.py'
-
-
-# rule color unmixing
-
-# final image object
-
-# append mean_intensity to ann_data; region props, ann_data
-# voronoi, graphs, spatial neighborhoods
-
-# clustering and celltypes
-
-# append cell types to ann_data
-# output cells colored by cell_type (if we can)
-
-########
-#spatial neighborhood analysis
-
-
-# rule clustering
 rule celltype:
   input:
-    '{output_dir}/tables/{sections}_prot.csv',
-    '{output_dir}/tables/{sections}_param.csv'
+    '{output_dir}/anndata/{sections}.h5ad'
   output:
     '{output_dir}/tables/{sections}.csv'
+  params:
+    ref = {ref},
+    typecol = {type}
   resources:
     mem_mb = 32000
   conda:
@@ -160,12 +129,26 @@ rule celltype:
   shell:
     '''
     Rscript scripts/celltype.R \
-      --input_prot={input.prot} \
-      --input_param={input.param} \
+      --input_h5={input} \
       --output={output} \
-      --ref=config["reference"]["seurat"]
+      --ref={params.ref} \
+      --typecol={params.typecol}
     '''
-# append cell types to ann_data
 
-
-# export image cells by ROI
+rule spatial_neighborhood:
+    input:
+       '{output_dir}/anndata/{sections}.h5ad',
+       '{output_dir}/tables/{sections}.csv'
+ 
+    output:
+       '{output_dir}/cell_neighborhood/{sections}.pkl',
+       '{output_dir}/net_neighborhood/{sections}.pkl'
+        
+ 
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/spatial_neighbor.yaml'
+    script:
+        'scripts/spatial_neighborhood.py'
+        
