@@ -29,7 +29,7 @@ nav_order: 1
  
 <p align="justify ">
   
-  We can see that the image has different colours which correspond to different..
+  
 </p> 
 
 <p align="justify ">
