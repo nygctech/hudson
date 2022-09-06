@@ -5,7 +5,6 @@ from os import makedirs
 #from utils.utils import get_cluster
 from utils import get_cluster
 from dask.distributed import Client, wait
-import dask
 from pathlib import Path
 import yaml
 
@@ -18,7 +17,7 @@ image_path = join(exp_dir, image_path)
 
 section_name = snakemake.params.section
 
-logger = utils.get_logger(logname = section_name, filehandler = snakemake.log)
+logger = utils.get_logger(logname = section_name, filehandler = snakemake.log[0])
 
 image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
                            logname = f'{section_name}.image')
@@ -27,16 +26,16 @@ image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
 # specify default worker options in ~/.config/dask/jobqueue.yaml
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
 cluster = get_cluster(**winfo)
-logger.info(cluster.new_worker_spec())
-logger.info(cluster.dashboard_link)
+logger.debug(cluster.new_worker_spec())
+logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
 ntiles = int(len(image.im.col)/2048)
 min_workers = max(1,2*ntiles)
-max_workers = 2*ntiles*ntiles
+max_workers = 4*min_workers
 
 # Print out info about section
-logger.info('machine::', image.machine)
-logger.info('image path::',image_path)
-logger.info('section::', section_name)
+logger.info(f'machine:: {image.machine}')
+logger.info(f'image path:: {image_path}')
+logger.info(f'section:: {section_name}')
 
 # Start computation
 with Client(cluster) as client:
@@ -55,12 +54,6 @@ with Client(cluster) as client:
         
     # Read from raw image zarr
     image = ia.get_HiSeqImages(image_path = snakemake.output[0])
-
-    # Correct Background
-    print('Correcting background')
-    print('Pixel group adjustments')
-#     for ch, values in image.config.items(image.machine+'background'):
-#         print(f'Channel {ch}::',values)
 
     image.correct_background()
     image.register_channels()
@@ -82,7 +75,7 @@ section_info = {'chunks_per_plane': ntiles,
                 'experiment': experiment_config['experiment']['experiment name']
                }
 outputdir = Path(snakemake.params.save_path).parents[0]
-with open(outputdir / f'{section_name}.yaml') as f:
+with open(outputdir / f'summary_{section_name}.yaml', 'w') as f:
     f.write(yaml.dump(section_info))
     
     

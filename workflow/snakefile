@@ -3,6 +3,7 @@ from os.path import join
 import configparser
 import subprocess
 import yaml
+from math import log, ceil
 
 
 exp_dir = config['experiment_directory']
@@ -16,8 +17,8 @@ output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
 sections = [s.replace('_','') for s in sections]
 
-ref = config["reference"]["seurat"]
-type = config["reference"]["typecol"]
+#ref = config["reference"]["seurat"]
+#type = config["reference"]["typecol"]
 
 def get_gpu():
     result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
@@ -27,11 +28,23 @@ def get_gpu():
 
     return gpu_available
     
-def get_section_info(section):
-    with open(join(output_dir,f'{section}.yaml'})) as f:
+def get_plane_mb(wildcards):
+    with open(join(output_dir,f'{wildcards.sections}.yaml')) as f:
         section_info = yaml.safe_load(f)
         
-    return section_info
+    mb = section_info['planesize']/(1024*1024)
+    mb = ceil(mb/8000)*8000
+    
+    return mb
+    
+def get_n_cores(wildcards):
+    with open(join(output_dir,f'{wildcards.sections}.yaml')) as f:
+        section_info = yaml.safe_load(f)
+    
+    chunks = section_info['chunks_per_plane']
+    
+    return chunks
+    
 
 rule all:
     input:
@@ -51,27 +64,43 @@ rule fix_lighting:
     output:
         directory('{output_dir}/raw_zarr/{sections}.zarr'),
         directory('{output_dir}/processed_zarr/{sections}.zarr'),
-        '{output_dir}/{sections}.yaml'
+        '{output_dir}/summary_{sections}.yaml'
     conda:
         'envs/pyseq-image.yaml'
     script:
         'scripts/preprocess.py'
 
 #if get_gpu():
-#    cluster_config.update({'unmix':config['gpu_spec']})
+#    cluster_config.update({'picasso':config['gpu_spec']})
+
+rule picasso:
+    input:
+        '{output_dir}/processed_zarr/{sections}.zarr',
+        '{output_dir}/{sections}.yaml'
+    output:
+        '{output_dir}/final_zarr/picasso_{sections}.yaml'
+    params:
+        max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
+    log:
+        '{output_dir}/logs/picasso_{sections}.log'
+    resources:
+        mem_mb = get_plane_mb,
+        cores = get_n_cores
+    conda:
+        'envs/unmix_gpu.yaml'
+    script:
+        'scripts/picasso.py'
 
 rule unmix:
     input:
-        directory('{output_dir}/processed_zarr/{sections}.zarr')
+        '{output_dir}/processed_zarr/{sections}.zarr',
+        '{output_dir}/final_zarr/picasso_{sections}.yaml'   
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
-    params:
-        max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
-    resources:
-        mem_mb = 16000 * get_section_info({sections})['chunks_per_plane']
-        cores = 2 * (mem_mb/16000)
+    log:
+        '{output_dir}/logs/unmix_{sections}.log'
     conda:
-        'envs/unmix_gpu.yaml'
+        'envs/pyseq-image.yaml'
     script:
         'scripts/unmix.py'
 
@@ -80,7 +109,7 @@ if get_gpu():
 
 rule segmentation:
     input:
-        directory('{output_dir}/final_zarr/{sections}.zarr')
+        '{output_dir}/final_zarr/{sections}.zarr'
     output:
        '{output_dir}/masks/{sections}.tiff'
     resources:
@@ -93,7 +122,7 @@ rule segmentation:
 
 rule mean_intensity:
     input:
-        directory('{output_dir}/final_zarr/{sections}.zarr'),
+        '{output_dir}/final_zarr/{sections}.zarr',
         '{output_dir}/masks/{sections}.tiff'
 
     output:
@@ -131,8 +160,8 @@ rule celltype:
   output:
     '{output_dir}/tables/{sections}.csv'
   params:
-    ref = {ref},
-    typecol = {type}
+    ref = config["reference"]["seurat"],
+    typecol = config["reference"]["typecol"]
   resources:
     mem_mb = 32000
   conda:
@@ -162,4 +191,3 @@ rule spatial_neighborhood:
         'envs/spatial_neighbor.yaml'
     script:
         'scripts/spatial_neighborhood.py'
-        
