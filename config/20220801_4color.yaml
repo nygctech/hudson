@@ -30,5 +30,7 @@ unmix:
 gpu_spec:
   partition: gpu
   gres: gpu:tesla:1
-#reference:
-#  seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
+reference:
+  seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
+  typecol: cell_type
+
