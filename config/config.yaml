@@ -2,11 +2,12 @@ experiment_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/p
 output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
 resources:
   dask_worker:
+    manager: SLURM
     # or specify in .config/dask/jobqueue.yaml
     queue: pe2
     cores: 2
-    memory: 16GB
-    # log_directory: None
+    memory: 16G
+    log_directory: dask_logs
 stains:
   # cycle:
   #   channel1: marker1
@@ -31,11 +32,8 @@ unmix:
 gpu_spec:
   partition: gpu
   gres: gpu:tesla:1
-resources:
-     log_directory: None
-  # or specify in .config/dask/jobqueue.yaml
-  # dask_worker:
 unmix:
   max_iter: 10               # Max iterations to optimize unmixing
 reference:
   seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
+  typecol: cell_type

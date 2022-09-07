@@ -104,4 +104,4 @@ dependencies:
   - zlib=1.2.12=h166bdaf_2
   - zstd=1.5.2=h8a70e8d_2
   - pip:
-    - git+https://github.com/nygctech/PICASSO.git@c86e4cc1d5e833769d994a795627d0441adfca95#egg=napari-picasso
+    - git+https://github.com/nygctech/PICASSO.git@97218dc6aa82261e9eae1df66f895b05f3d95a25#egg=napari-picasso
