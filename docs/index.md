@@ -39,7 +39,7 @@ nav_order: 1
   clusters.
 </p> 
   
-  ![async-embarrassing](async_embarrassing_main.gif){:height="70%" width="70%"}.
+  ![async-embarrassing](async_embarrassing_main.gif){:height="60%" width="60%"}.
 
 <p align="justify ">
   Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next
