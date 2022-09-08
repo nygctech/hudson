@@ -35,7 +35,7 @@ dims = ['channel','sink']
 with Client(cluster) as client:
     
     cluster.adapt(minimum = min_workers, maximum=max_workers)
-    client.wait_for_workers(int(min_workers/2), 60*5)
+    client.wait_for_workers(min_workers, 60*10)
     
     stain_stack = []
     stain_name = []
