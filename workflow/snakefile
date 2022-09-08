@@ -28,42 +28,50 @@ def get_gpu():
 
     return gpu_available
     
-def get_plane_mb(wildcards):
+def get_mem(wildcards):
     with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
         section_info = yaml.safe_load(f)
         
-    mb = section_info['planesize']/(1024*1024)
+    mb = section_info['planesizeMB']
     mb = ceil(mb/8000)*8000
     
     return mb
     
-def get_n_cores(wildcards):
+def get_n_tiles(wildcards):
     with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
         section_info = yaml.safe_load(f)
     
-    chunks = section_info['chunks_per_plane']
+    tiles = section_info['tiles']
     
-    return chunks
+    return tiles
     
 
 rule all:
     input:
         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
                
-
-rule fix_lighting:
+rule saveraw:
     input:
         {exp_conf_path},
     params:
-        raw_path = join(output_dir,'raw_zarr'),
-        save_path = join(output_dir,'processed_zarr'),
         section = '{sections}'
+    log:
+        '{output_dir}/logs/saveraw_{sections}.log'
+    output:
+        directory('{output_dir}/raw_zarr/{sections}.zarr'),
+        '{output_dir}/summary_{sections}.yaml'
+    conda:
+        'envs/pyseq-image.yaml'
+    script:
+        'scripts/save_raw.py'    
+
+rule fix_lighting:
+    input:
+        '{output_dir}/raw_zarr/{sections}.zarr',
     log:
         '{output_dir}/logs/fixlighting_{sections}.log'
     output:
-        directory('{output_dir}/raw_zarr/{sections}.zarr'),
         directory('{output_dir}/processed_zarr/{sections}.zarr'),
-        '{output_dir}/summary_{sections}.yaml'
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -83,8 +91,8 @@ rule picasso:
     log:
         '{output_dir}/logs/picasso_{sections}.log'
     resources:
-        mem_mb = get_plane_mb,
-        cores = get_n_cores
+        mem_mb = get_mem,
+        cores = get_n_tiles
     conda:
         'envs/unmix_gpu.yaml'
     script:
