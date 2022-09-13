@@ -7,7 +7,7 @@ nav_order: 5
 # Cell Type Identification
 ## Processing and clustering
 <p align="justify">
-We treat protein intensity measurements and scalar spatial parameters for each segmented cell as separate modes of data to be separatly arcsine transformed, scaled, and batch-corrected. Then, clustering is achieved through <a href="https://github.com/jacoblevine/PhenoGraph">Phenograph</a>. Alternatively, Seurat Weighed Nearest Neighbor Analysis <a href="https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis.html">(WNN)</a> can be used to cluster cells and project into two-dimensional space using both modalities, which also allows for flexibility in integrating multiple datasets.
+We treat protein intensity measurements and scalar spatial parameters for each segmented cell as separate modes of data to be separatly arcsine transformed, scaled, and batch-corrected (if needed). Then, clustering is achieved through <a href="https://github.com/jacoblevine/PhenoGraph">Phenograph</a>. Alternatively, Seurat Weighed Nearest Neighbor Analysis <a href="https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis.html">(WNN)</a> can be used to cluster cells and project into two-dimensional space using both modalities, which also allows for flexibility in integrating multiple datasets.
 </p>
 <img src="https://user-images.githubusercontent.com/22802886/189948188-03549a59-da7b-404b-a429-f130dcc439ef.png" width="400">
                                                                                                                            
