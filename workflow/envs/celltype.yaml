@@ -1,7 +1,7 @@
-name: testR
+name: celltype
 channels:
   - conda-forge
-  - bioconda
+  - bioconda  
   - defaults
 dependencies:
   - r-base
@@ -13,5 +13,8 @@ dependencies:
   - openssl
   - r-argparse
   - r-essentials
-  - r-hdf5r
+  - bioconductor-cytotree
   - bioconductor-sva
+  - bioconductor-genomeinfodbdata
+  - gcc
+  - r-hdf5r
