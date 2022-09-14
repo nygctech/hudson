@@ -15,7 +15,6 @@ file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
 mat <- file_h5[["X"]][,]
 colnames(mat) <- file_h5[["obs/_index"]][]
 rownames(mat) <- file_h5[["var/_index"]][]
-file_h5$close_all()
 prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
 rownames(prot) <- rownames(prot) %>% str_to_title() %>%
   ifelse(. == "Lmn1b", "Lmnb1", .) %>%
@@ -40,11 +39,15 @@ if (svobj$n.sv > 0) {
 # prot
 so <- CreateSeuratObject(prot2, assay = "prot")
 so <- NormalizeData(so, normalization.method = "CLR")
+so@assays$prot@data <- asinh(prot / 5)
 so <- ScaleData(so) %>% RunPCA(features = rownames(so))
 # dr
 so <- FindNeighbors(so, dims = 1:ncol(so@reductions$pca@cell.embeddings))
 so <- RunUMAP(so, dims = 1:ncol(so@reductions$pca@cell.embeddings))
 so <- FindClusters(so, dims = 1:ncol(so@reductions$pca@cell.embeddings), resolution = 0.1, verbose = FALSE)
+# pheno
+res <- CytoTree::Rphenograph(t(so@assays$prot@data))
+so$phenograph <- res[[2]]$membership
 # param
 so[["param"]] <- CreateAssayObject(param2)
 DefaultAssay(so) <- "param"
