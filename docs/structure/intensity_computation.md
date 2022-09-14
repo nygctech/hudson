@@ -1,6 +1,6 @@
 ---
 layout: default
 title: Intensity Computation
-parent: Structure 
-nav_order: 4
+parent: Structure
+nav_order: 5
 ---
