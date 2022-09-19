@@ -6,18 +6,13 @@ from dask.distributed import Client, wait, LocalCluster
 from math import log
 from utils import get_logger, open_zarr
 import yaml
-
-# if __name__ == '__main__':
-#     client = Client()
-
     
 # Open image from zarr store
 image = open_zarr(snakemake.input[0])
-logger.info(f'Opened {image.name}')
 
 # Start logger
 logger = get_logger(image.name, filehandler = snakemake.log[0])
-
+logger.info(f'Opened {image.name}')
 
 # Make sure only 1 objective step
 if 'obj_step' in image.dims:
