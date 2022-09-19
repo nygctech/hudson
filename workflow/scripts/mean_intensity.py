@@ -1,12 +1,11 @@
 import zarr
 import xarray as xr
 import numpy as np
-import numpy as np
 import dask
 from dask.distributed import Client
 import torch
 import joblib
-from dask_jobqueue import SLURMCluster
+#from dask_jobqueue import SLURMCluster
 import skimage
 import time
 import pickle
@@ -15,15 +14,25 @@ from joblib import Parallel, delayed
 from joblib import parallel_backend
 from dask.distributed import progress
 from pathlib import Path
+from utils import open_zarr, get_cluster, get_logger
 
 
+
+
+# open xarray image from zarr store
+image = open_zarr(snakemake.input[0])
+
+# Start logger
+logger = get_logger(image.name, filehandler = snakemake.log[0])
+logger.info(f'Opened {image.name}')
+
+# Open instance labels
 labels = skimage.io.imread(Path(snakemake.input[1]))
-image_path = Path(snakemake.input[0])
-im_name = image_path.stem
-image = xr.open_zarr(image_path).to_array()
-image = image.squeeze().drop_vars('variable').rename(im_name)
 
-marker_list = ['LMN1b','GFAP','ELAVL2','MBP','PVALB','IBA1','PDGFRA','MAP2','NFH']
+# Get markers
+marker_list = list(image.marker)
+for m in snakemake.config['mean_intensity'].get('exclude', []):
+    marker_list.remove(m)
 
 plane_dict = {}
 
@@ -35,28 +44,16 @@ for mark in marker_list:
     
 if torch.cuda.is_available() == False:
 
-    def get_cluster(queue_name = 'pe2', log_dir=None):
-        """ Make dask cluster w/ workers = 2 cores, 32 G mem, and 1 hr wall time.
-
-            return cluster, client
-        """
-
-        cluster = SLURMCluster(
-                    queue = queue_name, 
-                    cores = 6 ,
-                    memory = '60G',
-                    walltime='1:00:00')
-                    
-        client = Client(cluster, timeout="50s")
-
-        return cluster, client
-
-    cluster, client = get_cluster()
-
-    def scale_cluster(count): 
-        cluster.scale(count)
-        return cluster.dashboard_link
-    scale_cluster(5)
+    # Start dask cluster
+    # specify default worker options in ~/.config/dask/jobqueue.yaml
+    winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
+    cluster = get_cluster(**winfo)
+    logger.debug(cluster.new_worker_spec())
+    logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
+    nworkers = snakemake.params.tiles*2
+    logger.info(f'Scale dask cluster to {nworkers}')
+    cluster.scale(nworkers)
+    client = Client(cluster)
 
     
     val = np.max(labels)

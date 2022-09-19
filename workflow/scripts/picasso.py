@@ -21,19 +21,19 @@ logger = get_logger(image.name, filehandler = snakemake.log[0])
 
 # Make sure only 1 objective step
 if 'obj_step' in image.dims:
-    if len(image.obj_step) > 1:
+    if image.obj_step.size > 1:
         mid_step = image.obj_step[image.obj_step.size//2]
         image = image.sel(obj_step = mid_step)
 
 # Get config data
-stains_config = snakemake.config.get('stains')
+markers_config = snakemake.config.get('markers')
 sink_source_ch = snakemake.config.get('unmixing', {610:[558], 740:[687]})
 logger.debug(f'sink source channels:: {sink_source_ch}')
 
 # See if background or autofluorescence image exists
 AF = ()
-for cy, ch_stains in stains_config.items():
-    for ch, marker in ch_stains.items():
+for cy, ch_markers in markers_config.items():
+    for ch, marker in ch_markers.items():
         if marker in ['background', 'autofluorescence', 'af', 'AF', 'bg', 'BG']:
             AF = (cy,ch)
             logger.info(f'Autofluoresence reference :: cycle {cy} :: channel {ch}')
@@ -44,14 +44,14 @@ for cy, ch_stains in stains_config.items():
 # Find which channels to unmix
 cy_mm = {}
 picasso_params = {}
-for cy, ch_stains in stains_config.items():
+for cy, ch_markers in markers_config.items():
     si_so = {}                                                                  # sink channel : [source channels]
     all_ch = []                                                                 # all channels that need to be used for unmixing
 
     # Get dictionary of sink channels that need source channels removed
-    for ch in ch_stains.keys():                                                 # loop over channels used in cycle
+    for ch in ch_markers.keys():                                                 # loop over channels used in cycle
         for source_ch in sink_source_ch.get(ch,[]):                             # loop over source channels if a channel has spillover fluorescence
-            if source_ch in ch_stains.keys():                                   # add source channel to sink_source dict (si_so)
+            if source_ch in ch_markers.keys():                                   # add source channel to sink_source dict (si_so)
                 si_so.setdefault(ch,[]).append(source_ch)
                 all_ch.append(source_ch)
     all_ch += si_so.keys()
@@ -70,11 +70,11 @@ for cy, ch_stains in stains_config.items():
     cy_mm[cy] = [mm, all_ch, sinks]                          # {cycle: [mixing matrix, all images, sinks]}
     picasso_params[cy] = {'sinks': sinks, 'channels':all_ch.tolist()}
     
-# Unmix images and stack by stain instead of cycle > channel
-stain_stack = []
-stain_name = []
+# Unmix images and stack by marker instead of cycle > channel
+marker_stack = []
+marker_name = []
 dims = ['channel','sink']
-for cy , ch_stains in stains_config.items():
+for cy , ch_markers in markers_config.items():
     mm, all_ch, sinks = cy_mm.get(cy)
 
     if len(sinks) > 0:

@@ -148,3 +148,12 @@ slurm-*.out
 
 # dask stuff
 workflow/dask*/
+
+#logs
+workflow/logs/
+
+#configs
+config/mouse_genotype*
+
+#bash scripts
+workflow/*.sh
