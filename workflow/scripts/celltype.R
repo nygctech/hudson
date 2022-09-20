@@ -15,6 +15,8 @@ file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
 mat <- file_h5[["X"]][,]
 colnames(mat) <- file_h5[["obs/_index"]][]
 rownames(mat) <- file_h5[["var/_index"]][]
+file_h5$close_all()
+
 prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
 rownames(prot) <- rownames(prot) %>% str_to_title() %>%
   ifelse(. == "Lmn1b", "Lmnb1", .) %>%
@@ -71,5 +73,11 @@ anchors <- suppressWarnings(FindTransferAnchors(reference = ref,
 pred <- TransferData(anchors, ref@meta.data[[cell_type]], k.weight = 10, weight.reduction = so[["pca"]], dims = 1:ncol(so@reductions$pca@cell.embeddings))
 so$type <- pred$predicted.id
 write_csv(so@meta.data %>% rownames_to_column("id") %>% select(id, type), xargs$output)
+file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
+dtype_string_utf8 <- H5T_STRING$new()$set_size(Inf)$set_cset("UTF-8")
+#file_h5[["obs"]][["celltype"]] <- as.character(so$type)
+file_h5[["obs"]]$create_dataset(so$type, name = "celltype", dtype = dtype_string_utf8)
+h5attr(file_h5[["obs"]], "column-order") <- c("celltype")
+file_h5$close_all()
 
 }
