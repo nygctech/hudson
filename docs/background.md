@@ -22,3 +22,10 @@ in a localized shape-preserving manner. To help researchers achieve this goal, w
  experimental observations including the location and dynamics of gene expression, protein expression and molecular interactions in cells and tissues.
 
 </p>
+
+<p align="justify ">
+ 
+ Given the computationally intense and programmatically advanced nature of analyzing highly multiplexed images, Hudson saves significant time for
+ researchers wanting to incorporate spatial information and serves the overarching goal of making spatial analysis more accessible.
+ 
+</p>
