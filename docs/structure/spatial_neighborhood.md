@@ -2,7 +2,7 @@
 layout: default
 title: Spatial Neighborhood
 parent: Structure
-nav_order: 8
+nav_order: 9
 ---
 
 # Spatial Neighborhood
@@ -14,7 +14,7 @@ nav_order: 8
 Now, that all our essential data is condensed into a single object, we extract the centroids from our anndata object, using these centroid, we create a voronoi tessalation/diagram. In simple terms a voronoi tessellation is ... . More information on Voronoi transformations can be found here. Below is a diagram of the voronoi tessalation, of create from the mouse spinal section shown on the overview page.
 </p>
 
-![voronoi](voronoi.png){:height="60%" width="60%"}
+
 
 <p align="justify ">
 
@@ -38,11 +38,3 @@ Now that the voronoi diagram in place, hudson uses the voronoi vertices and edge
 And finally, hudson then analysis the neighboring nodes which are essentially the cells for every node in the graph. Hudson is hard set to study the second order nodes, i.e neighbor's neighbor. This is done by makes an ego-groph of the a set radius. The user can go the source file change radius, and selection setting to their own use case.
 </p>
 
-
-## Other Methodologies
-
-<p align="justify ">
-
-Another method to build the graph is from a KNN weights matrix. Currently, this is not a part of the hudson pipeline, however the script is provided with the repository and and the user can test and edit it.
-
-</p>
