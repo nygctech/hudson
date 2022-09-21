@@ -6,7 +6,6 @@ nav_order: 2
 
 ## Background
 
-
 <p align="justify ">
 
 Multiplexed imaging technologies are amongst the fastest growing areas of multi-omics. These technologies capture many parameters of single 
