@@ -2,7 +2,7 @@
 layout: default
 title: Cell Type Identification
 parent: Structure
-nav_order: 7
+nav_order: 8
 ---
 # Cell Type Identification
 ## Processing and clustering
