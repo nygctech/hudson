@@ -30,7 +30,7 @@ nav_order: 1
 </p>
 
 <p align="center ">
-  ![Image](spinal_tissue.png){:height="50%" width="50%"}.
+  ![Image](https://github.com/nygctech/hudson/blob/docs/docs/spinal_tissue.png){:height="50%" width="50%"}.
 </p>
 
 <p align="justify ">
