@@ -8,8 +8,10 @@ nav_order: 1
 ## Overview
 
 
-
- hudson is a computational pipeline for spatial analysis of tissue sections from multiplexed fluorescence imaging obtained from a converted Illumina HiSeq2500 sequencing system. It is developed by **Jagjit Singh, Kunal Pandit, Rui Fu, and Sanja Vickovic**.
+<p align="justify ">
+ hudson is a computational pipeline for spatial analysis of tissue sections from multiplexed fluorescence imaging obtained from a converted Illumina
+ HiSeq2500 sequencing system. It is developed by **Jagjit Singh, Kunal Pandit, Rui Fu, and Sanja Vickovic**.
+</p>
 
 <p align="justify ">
  Fluorescent Imaging is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of
@@ -22,26 +24,20 @@ nav_order: 1
  complex tissue and cell phenotypes can be identified and probed.
 </p>
 
+ 
+<p align="justify ">
  Following is an example of a multiplexed fluorescence image:
-
+</p>
 
   ![Image](spinal_tissue.png){:height="50%" width="50%"}.
 
 <p align="justify ">
-
-
+ Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
+ the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux
+ clusters. Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the
+ next section.
 </p>
 
-<p align="justify ">
+  ![Image](banner.png)
 
-  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
-  the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux
-  clusters.
-</p>
 
-  ![async-embarrassing](async_embarrassing_main.gif){:height="60%" width="60%"}.
-
-<p align="justify ">
-  Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the next
-  section.
-</p>
