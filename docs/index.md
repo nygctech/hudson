@@ -7,6 +7,7 @@ nav_order: 1
 
 ## Overview
 
+            
 
 <p align="justify ">
  Hudson is a computational pipeline for spatial analysis of tissue sections from multiplexed fluorescence imaging obtained from a converted Illumina
@@ -21,7 +22,6 @@ nav_order: 1
  Following is an example of a multiplexed fluorescence image:
 </p>
 
-  ![Image](spinal_tissue.png){:height="50%" width="50%"}.
 
 <p align="center">
   <img width="50%" height="50%" src="https://github.com/nygctech/hudson/blob/docs/docs/spinal_tissue.png">
