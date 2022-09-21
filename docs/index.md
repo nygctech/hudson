@@ -23,6 +23,8 @@ nav_order: 1
 </p>
 
 
+![Image](spinal_tissue.png){:height="50%" width="50%" align = "center"}
+
 <p align="center">
   <img width="50%" height="50%" src="https://github.com/nygctech/hudson/blob/docs/docs/spinal_tissue.png">
 </p>
@@ -30,9 +32,8 @@ nav_order: 1
 
 <p align="justify ">
  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
- the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux
- clusters. Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the
- next section.
+ the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for Linux
+ clusters. 
 </p>
 
   ![Image](banner.png)
