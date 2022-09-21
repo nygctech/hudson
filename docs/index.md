@@ -23,6 +23,10 @@ nav_order: 1
 
   ![Image](spinal_tissue.png){:height="50%" width="50%"}.
 
+<p align="center">
+  <img width="50%" height="50%" src="https://github.com/nygctech/hudson/blob/docs/docs/spinal_tissue.png">
+</p>
+
 
 <p align="justify ">
  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
