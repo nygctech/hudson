@@ -29,7 +29,7 @@ nav_order: 1
  Following is an example of a multiplexed fluorescence image:
 </p>
 
-![Image](https://github.com/nygctech/hudson/blob/docs/docs/spinal_tissue.png){:height="50%" width="50%"}.
+  ![Image](spinal_tissue.png){:height="50%" width="50%"}.
 
 
 <p align="justify ">
