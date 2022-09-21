@@ -25,7 +25,7 @@ nav_order: 1
 </p>
 
  
-  ![Image](spinal_tissue.png){:.centered height="50%" width="50%"}.
+  ![Image](spinal_tissue.png){:height="50%" width="50%"}
 
 
 <p align="justify ">
