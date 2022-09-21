@@ -8,10 +8,10 @@ nav_order: 1
 ## Overview
 
 
-<p align="justify ">
+
  hudson is a computational pipeline for spatial analysis of tissue sections from multiplexed fluorescence imaging obtained from a converted Illumina
  HiSeq2500 sequencing system. It is developed by **Jagjit Singh, Kunal Pandit, Rui Fu, and Sanja Vickovic**.
-</p>
+
 
 <p align="justify ">
  Fluorescent Imaging is the visualization of fluorescent dyes or proteins as labels for molecular processes or structures. It enables a wide range of
@@ -29,7 +29,9 @@ nav_order: 1
  Following is an example of a multiplexed fluorescence image:
 </p>
 
+<p align="center ">
   ![Image](spinal_tissue.png){:height="50%" width="50%"}.
+</p>
 
 <p align="justify ">
  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
