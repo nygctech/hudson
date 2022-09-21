@@ -10,7 +10,7 @@ nav_order: 1
 
 <p align="justify ">
  Hudson is a computational pipeline for spatial analysis of tissue sections from multiplexed fluorescence imaging obtained from a converted Illumina
- HiSeq2500 sequencing system. It is developed by <b> Jagjit Singh, Kunal Pandit, Rui Fu, and Sanja Vickovic. <b>
+ HiSeq2500 sequencing system. It is developed by <b> Jagjit Singh, Kunal Pandit, Rui Fu, and Sanja Vickovic. </b>
 </p>
  
 <p align="justify ">
