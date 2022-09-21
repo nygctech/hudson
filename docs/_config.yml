@@ -1,1 +1,6 @@
 remote_theme: just-the-docs/just-the-docs
+
+# Aux links for the upper right navigation
+aux_links:
+  "Hudson on GitHub":
+    - "https://github.com/nygctech/hudson"
