@@ -15,7 +15,7 @@ nav_order: 1
 
 <p align="justify ">
  Please follow the steps on the left for an indepth view of Hudson. This documentation also includes examples for users to test on their own systems. The
- preprint will be released soon. Below is an example of a highly multiplexed flourensce image. 
+ preprint will be released soon. Below is an example of a highly multiplexed fluorescence image. 
 </p>
  
   ![Image](spinal_tissue.png){:height="50%" width="50%"}
