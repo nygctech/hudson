@@ -25,6 +25,7 @@ nav_order: 1
  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
  the Slurm Workload Manager and a MPI (Message Passing Interface).
 </p>
+
   ![Image](banner.png)
 
 
