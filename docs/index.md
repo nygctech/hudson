@@ -23,9 +23,7 @@ nav_order: 1
 
 <p align="justify ">
  Analysing such images is computationally intensive, thus the pipeline has parallel compute capability. It can be scaled over any computer cluster using
- the Slurm manager. Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux
- clusters. Additionally, It makes use of GPUs or GPU nodes if avaiable for even quicker image processing and computation. The structure is defined in the
- next section.
+ the Slurm Workload Manager and a MPI (Message Passing Interface).
 </p>
 
   ![Image](banner.png)
