@@ -11,30 +11,14 @@ nav_order: 9
 
 <p align="justify ">
 
-Now, that all our essential data is condensed into a single object, we extract the centroids from our anndata object, using these centroid, we create a voronoi tessalation/diagram. In simple terms a voronoi tessellation is ... . More information on Voronoi transformations can be found here. Below is a diagram of the voronoi tessalation, of create from the mouse spinal section shown on the overview page.
+Now, that all our essential data is condensed into a single object, we extract the centroids from our anndata object, using these centroids, we create a voronoi tessalation/diagram. More information on Voronoi transformations can be found here. The purpose of the voronoi tessellation is to form localized regions over tissue section. This lets us build micro-environments for localized spatial analysis of cell type compositions. 
 </p>
 
-
-
-<p align="justify ">
-
-As we see, the cell centroids are now vertices of the diagrams connected by their edge connections. This in turn also forms neighborhood regions, which will be used for local spatial and analysis builing micro environments in downstream analysis.
-</p>
 
 ## Graph Network
 
 <p align="justify ">
 
-Now that the voronoi diagram in place, hudson uses the voronoi vertices and edges to build a network of all the cells that it has identified in the tissue section. Below is an image of the graph subset to just couple hundred nodes. Additionally, we can see that the regions are vornoi like in their shape.
-</p>
-
-![voronoi](voronoi_graph.png){:height="60%" width="60%"}
-
-
-## Neighborhood Cell Type Composition
-
-<p align="justify ">
-
-And finally, hudson then analysis the neighboring nodes which are essentially the cells for every node in the graph. Hudson is hard set to study the second order nodes, i.e neighbor's neighbor. This is done by makes an ego-groph of the a set radius. The user can go the source file change radius, and selection setting to their own use case.
-</p>
-
+Hudson also builds a network of cell connectivities using a K-Nearest-Neighbor approach. This graph can then be used for local spatial autocorrelation analysis of the nuclei or cell marker based labels. It also stores the KNN graph network and the user can fetch neighboring connections for any cell and neighborhood order. Furthermore, the 2nd order neighborhood connections are pickled as a dictionary, for quick analysis. 
+ 
+</p>=
