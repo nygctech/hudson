@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Netowork Graph
+title: Network Graph
 parent: Structure
 nav_order: 9
 ---
