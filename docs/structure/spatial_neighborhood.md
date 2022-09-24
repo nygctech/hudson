@@ -7,7 +7,7 @@ nav_order: 9
 
 # Spatial Neighborhood
 
-## Voronoi Diagram
+## Micro Environment Compositions
 
 <p align="justify ">
 
@@ -15,7 +15,7 @@ Now, that all our essential data is condensed into a single object, we extract t
 </p>
 
 
-## Graph Network
+## Cell Network Graph
 
 <p align="justify ">
 
