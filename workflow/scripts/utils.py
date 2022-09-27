@@ -2,18 +2,31 @@ def get_cluster(manager='SLURM', **winfo):
 
     import re
 
-    assert manager.upper() in ['SLURM']
-
     if re.search(manager, 'SLURM', re.IGNORECASE):
-        from dask_jobqueue import SLURMCluster
-        cluster = SLURMCluster(**winfo)
+        from dask_jobqueue import SLURMCluster as Cluster
+    elif re.search(manager, 'HTCondor', re.IGNORECASE):
+        from dask_jobqueue import HTCondorCluster as Cluster
+    elif re.search(manager, 'LSF', re.IGNORECASE):
+        from dask_jobqueue import LSFCluster as Cluster
+    elif re.search(manager, 'MOAB', re.IGNORECASE):
+        from dask_jobqueue import MOABCluster as Cluster
+    elif re.search(manager, 'OAR', re.IGNORECASE):
+        from dask_jobqueue import OARCluster as Cluster
+    elif re.search(manager, 'PBS', re.IGNORECASE):
+        from dask_jobqueue import PBSCluster as Cluster
+    elif re.search(manager, 'SGE', re.IGNORECASE):
+        from dask_jobqueue import SGECluster as Cluster
+    else:
+        raise ValueError(f'{manager} not recognized, see https://jobqueue.dask.org/en/latest/api.html')
+
+    cluster = Cluster(**winfo)
 
     return cluster
 
 
 def get_logger(logname = None, filehandler = None):
     '''Get logger.'''
-    
+
     import logging
 
     if logname is  None:
@@ -43,7 +56,7 @@ def get_logger(logname = None, filehandler = None):
 
 def open_zarr(image_path):
     '''Open xarray image from zarr store.'''
-    
+
     import xarray as xr
     from pathlib import Path
 
@@ -51,5 +64,5 @@ def open_zarr(image_path):
     im_name = image_path.stem
     image = xr.open_zarr(image_path).to_array()
     image = image.squeeze().drop_vars('variable').rename(im_name)
-    
+
     return image
