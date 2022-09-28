@@ -3,6 +3,9 @@ library(hdf5r)
 library(tidyverse)
 library(argparse)
 library(sva)
+library(futile.logger)
+layout <- layout.format('~t - ~n - ~l - ~m')
+#flog.layout(layout)
 # parse
 parser <- ArgumentParser(description= 'cluster and assign cell types')
 parser$add_argument('--input_h5', '-i', help = 'Input H5AD file containing protein intensity')
@@ -11,7 +14,9 @@ parser$add_argument('--ref', '-r', help = 'reference object')
 parser$add_argument('--typecol', '-c', help = 'celltype column in reference metadata')
 parser$add_argument('--genedict', '-d', help = 'gene dictionary if protein/antibody name is different in reference')
 xargs <- parser$parse_args()
+
 # load
+flog.info("Reading h5ad")
 file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
 mat <- file_h5[["X"]][,]
 colnames(mat) <- file_h5[["obs/_index"]][]
@@ -19,6 +24,7 @@ rownames(mat) <- file_h5[["var/_index"]][]
 file_h5$close_all()
 
 # convert names
+flog.info("Converting matrices")
 prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
 if (!is.null(xargs$genedict)) {
   genedict <- read_csv(xargs$genedict) %>% column_to_rownames("prot")
@@ -52,7 +58,9 @@ param <- mat[!str_detect(rownames(mat), "^[A-Z]"),]
 #} else {
   param2 <- param
 #}
+
 # prot
+flog.info("Clustering protein data")
 so <- CreateSeuratObject(prot2, assay = "prot")
 so <- NormalizeData(so, normalization.method = "CLR")
 so@assays$prot@data <- asinh(prot / 5)
@@ -71,6 +79,7 @@ so <- ScaleData(so, features = rownames(so))
 so <- so %>% RunPCA(features = rownames(so), reduction.name = 'ppca')
 DefaultAssay(so) <- "prot"
 # celltype
+flog.info("Cell type classification from reference")
 if (!file.exists(xargs$ref)) {
   write_csv(so@meta.data %>% rownames_to_column("id") %>% select(id, seurat_clusters), xargs$output)
   #blankMsg <- sprintf("\r%s\r", paste(rep(" ", getOption("width")-1L), collapse=" "))
@@ -89,6 +98,7 @@ so$type <- pred$predicted.id
 write_csv(so@meta.data %>% rownames_to_column("id") %>% select(id, type), xargs$output)
 
 # write h5ad
+flog.info("Writing cell type info to h5ad")
 file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
 dtype_string_utf8 <- H5T_STRING$new()$set_size(Inf)$set_cset("UTF-8")
 #file_h5[["obs"]][["celltype"]] <- as.character(so$type)

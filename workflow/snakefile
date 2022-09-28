@@ -183,7 +183,7 @@ rule celltype:
       --output={output} \
       --ref={params.ref} \
       --typecol={params.typecol} \
-      --genedict={params.genedict}
+      --genedict={params.genedict} > {log}
     '''
 
 rule spatial_neighborhood:
