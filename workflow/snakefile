@@ -166,9 +166,12 @@ rule celltype:
     '{output_dir}/anndata/{sections}.h5ad'
   output:
     '{output_dir}/tables/{sections}.csv'
+  log:
+    '{output_dir}/logs/cell_type_{sections}.log'
   params:
     ref = config["reference"]["seurat"],
-    typecol = config["reference"]["typecol"]
+    typecol = config["reference"]["typecol"],
+    genedict = config["reference"]["genedict"]
   resources:
     mem_mb = 32000
   conda:
@@ -179,7 +182,8 @@ rule celltype:
       --input_h5={input} \
       --output={output} \
       --ref={params.ref} \
-      --typecol={params.typecol}
+      --typecol={params.typecol} \
+      --genedict={params.genedict}
     '''
 
 rule spatial_neighborhood:
