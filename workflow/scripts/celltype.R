@@ -5,7 +5,7 @@ library(argparse)
 library(sva)
 library(futile.logger)
 layout <- layout.format('~t - ~n - ~l - ~m')
-#flog.layout(layout)
+setlayout <- flog.layout(layout)
 # parse
 parser <- ArgumentParser(description= 'cluster and assign cell types')
 parser$add_argument('--input_h5', '-i', help = 'Input H5AD file containing protein intensity')
