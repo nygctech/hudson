@@ -36,6 +36,14 @@ for m in snakemake.config['mean_intensity'].get('exclude', []):
 
 plane_dict = {}
 
+# Make sure only 1 objective step
+if 'obj_step' in image.dims and 'obj_step' not in snakemake.config.get('segmentation',{}):
+    if image.obj_step.size > 1:
+        mid_step = image.obj_step[image.obj_step.size//2]
+        image = image.sel(obj_step = mid_step)
+        smk_logger.debug(image)
+
+
 for mark in marker_list:
     try:
         plane_dict.update({mark: image.sel(marker = mark)})
