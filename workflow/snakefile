@@ -151,7 +151,8 @@ if get_gpu():
 
 rule segmentation:
     input:
-        '{output_dir}/final_zarr/{sections}.zarr'
+        '{output_dir}/final_zarr/{sections}.zarr',
+        '{output_dir}/summary_{sections}.yaml'
     output:
        '{output_dir}/masks/{sections}.tiff'
     resources:
