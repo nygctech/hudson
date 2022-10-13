@@ -38,6 +38,7 @@ client = Client(cluster)
 
 # Process Image    
 image.correct_background()
+image.focus_projection()
 image.register_channels()
 if snakemake.params.overlap:
     overlap = int(snakemake.params.overlap)
