@@ -1,3 +1,6 @@
+# Documentation
+https://nygctech.github.io/hudson/
+
 # Steps to install hudson:
 ## 1 Clone repository
 ```
