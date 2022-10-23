@@ -17,6 +17,8 @@ output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
 sections = [s.replace('_','') for s in sections]
 
+#TODO check cell and nuclei markers listed in marker list
+
 #ref = config["reference"]["seurat"]
 #type = config["reference"]["typecol"]
 
@@ -27,29 +29,29 @@ def get_gpu():
         gpu_available = 1
 
     return gpu_available
-    
+
 def get_mem(wildcards):
     with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
         section_info = yaml.safe_load(f)
-        
+
     mb = section_info['planesizeMB']
     mb = ceil(mb/8000)*8000
-    
+
     return mb
-    
+
 def get_n_tiles(wildcards):
     with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
         section_info = yaml.safe_load(f)
-    
+
     tiles = section_info['tiles']
-    
+
     return tiles
-    
+
 
 rule all:
     input:
         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
-               
+
 rule saveraw:
     input:
         {exp_conf_path},
@@ -63,7 +65,7 @@ rule saveraw:
     conda:
         'envs/pyseq-image.yaml'
     script:
-        'scripts/save_raw.py'    
+        'scripts/save_raw.py'
 
 rule fix_lighting:
     input:
@@ -72,6 +74,7 @@ rule fix_lighting:
         '{output_dir}/logs/fixlighting_{sections}.log'
     output:
         directory('{output_dir}/processed_zarr/{sections}.zarr'),
+        '{output_dir}/processed_zarr/{sections}_focusmap.npz')
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -101,7 +104,7 @@ rule picasso:
 rule unmix:
     input:
         '{output_dir}/processed_zarr/{sections}.zarr',
-        '{output_dir}/final_zarr/picasso_{sections}.yaml'   
+        '{output_dir}/final_zarr/picasso_{sections}.yaml'
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
     log:
@@ -110,6 +113,21 @@ rule unmix:
         'envs/pyseq-image.yaml'
     script:
         'scripts/unmix.py'
+
+if snakmake.config.get('segmentation',{}).get('train images', False):
+    rule train_images:
+    input:
+        '{output_dir}/final_zarr/{sections}.zarr',
+        '{output_dir}/processed_zarr/{sections}_focusmap.npz'
+    output:
+        directory('{output_dir}/train_images/{sections}')
+    log:
+        '{output_dir}/logs/trainimages_{sections}.log'
+    conda:
+        'envs/pyseq-image.yaml'
+    script:
+        'scripts/train_images.py'
+
 
 if get_gpu():
     cluster_config.update({'segmentation':config['gpu_spec']})
@@ -151,7 +169,7 @@ rule anndata:
 
     output:
         '{output_dir}/anndata/{sections}.h5ad'
-       
+
     resources:
         mem_mb = 32000
     conda:
@@ -186,12 +204,12 @@ rule spatial_neighborhood:
     input:
        '{output_dir}/anndata/{sections}.h5ad',
        '{output_dir}/tables/{sections}.csv'
- 
+
     output:
        '{output_dir}/cell_neighborhood/{sections}.pkl',
        '{output_dir}/net_neighborhood/{sections}.pkl'
-        
- 
+
+
     resources:
         mem_mb = 32000
     conda:
