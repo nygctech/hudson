@@ -27,40 +27,41 @@ core_limit = cluster_config.get('nodes')
 
 def get_gpu():
     result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
+    print(result)
     gpu_available = 0
     if 'pe2dg2' in result.stdout:
         gpu_available = 1
 
     return gpu_available
     
-
-    
-
-    
 def get_tiles(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)  
-    tiles = section_info['tiles']     
+    try: 
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)  
+        tiles = section_info['tiles']     
+    except FileNotFoundError:
+        tiles = 1   
     return tiles
     
 def get_cycles(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)
-    cycles = section_info['cycles']
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)
+        cycles = section_info['cycles']
+    except FileNotFoundError:
+        cycles = 1   
     return cycles
     
 def get_mem(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)    
-    mb = section_info['planesizeMB']
-    mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    try: 
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)    
+        mb = section_info['planesizeMB']
+        mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    except FileNotFoundError:
+        mb = 32000   
     return mb
 
-def get_cores(section):
-    with open(join(output_dir,f'summary_{section}.yaml')) as f:
-        section_info = yaml.safe_load(f)  
-    tiles = section_info['tiles']     
-    return tiles
 
 def get_picasso_time(wildcards):
     return get_cycles(wildcards)*60 # minutes
@@ -69,23 +70,24 @@ def get_picasso_time(wildcards):
 rule all:
     input:
         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
-               
-rule saveraw:
-    input:
-        {exp_conf_path},
-    params:
-        section = '{sections}'
-    log:
-        '{output_dir}/logs/saveraw_{sections}.log', 
-        '{output_dir}/logs/saveraw_{sections}.html'
-    output:
-        directory('{output_dir}/raw_zarr/{sections}.zarr'),
-        '{output_dir}/summary_{sections}.yaml',
-        '{output_dir}/exp_conf/{sections}.cfg'
-    conda:
-        'envs/pyseq-image.yaml'
-    script:
-        'scripts/save_raw.py'   
+
+if config.get('raw', True):
+    rule saveraw:
+        input:
+            {exp_conf_path},
+        params:
+            section = '{sections}'
+        log:
+            '{output_dir}/logs/saveraw_{sections}.log', 
+            '{output_dir}/logs/saveraw_{sections}.html'
+        output:
+            directory('{output_dir}/raw_zarr/{sections}.zarr'),
+            '{output_dir}/summary_{sections}.yaml',
+            '{output_dir}/exp_conf/{sections}.cfg'
+        conda:
+            'envs/pyseq-image.yaml'
+        script:
+            'scripts/save_raw.py'   
 
 
 rule fix_lighting:
@@ -212,7 +214,7 @@ rule celltype:
   params:
     ref = config["reference"]["seurat"],
     typecol = config["reference"]["typecol"],
-    genedict = config["reference"]["genedict"]
+    genedict = config.get('reference',{}).get('genedict', None)
   resources:
     mem_mb = 32000
   conda:
