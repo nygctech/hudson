@@ -7,17 +7,23 @@ from math import log, ceil
 
 
 exp_dir = config['experiment_directory']
-exp_conf_path = config.get('experiment_config','logs/config.cfg')
-exp_conf_path = join(exp_dir, exp_conf_path)
+#exp_conf_path = config.get('experiment_config','logs/config.cfg')
+exp_conf_path = config.get('experiment_config')
+if exp_conf_path is None:
+    exp_conf_path = join(exp_dir, 'logs/config.cfg')
 exp_conf = configparser.ConfigParser()
 exp_conf.read(exp_conf_path)
 
 experiment_name = exp_conf.get('experiment','experiment name')
+method = exp_conf.get('experiment','method')
 output_dir = join(config['output_directory'], experiment_name)
 sections = exp_conf.options('sections')
 sections = [s.replace('_','') for s in sections]
 
+
 #TODO check cell and nuclei markers listed in marker list
+
+core_limit = cluster_config.get('nodes')
 
 #ref = config["reference"]["seurat"]
 #type = config["reference"]["typecol"]
@@ -48,6 +54,36 @@ def get_n_tiles(wildcards):
     return tiles
 
 
+
+def get_tiles(wildcards):
+    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+        section_info = yaml.safe_load(f)
+    tiles = section_info['tiles']
+    return tiles
+
+def get_cycles(wildcards):
+    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+        section_info = yaml.safe_load(f)
+    cycles = section_info['cycles']
+    return cycles
+
+def get_mem(wildcards):
+    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+        section_info = yaml.safe_load(f)
+    mb = section_info['planesizeMB']
+    mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    return mb
+
+def get_cores(section):
+    with open(join(output_dir,f'summary_{section}.yaml')) as f:
+        section_info = yaml.safe_load(f)
+    tiles = section_info['tiles']
+    return tiles
+
+def get_picasso_time(wildcards):
+    return get_cycles(wildcards)*60 # minutes
+
+
 rule all:
     input:
         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
@@ -58,10 +94,12 @@ rule saveraw:
     params:
         section = '{sections}'
     log:
-        '{output_dir}/logs/saveraw_{sections}.log'
+        '{output_dir}/logs/saveraw_{sections}.log',
+        '{output_dir}/logs/saveraw_{sections}.html'
     output:
         directory('{output_dir}/raw_zarr/{sections}.zarr'),
-        '{output_dir}/summary_{sections}.yaml'
+        '{output_dir}/summary_{sections}.yaml',
+        '{output_dir}/exp_conf/{sections}.cfg'
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -70,8 +108,12 @@ rule saveraw:
 rule fix_lighting:
     input:
         '{output_dir}/raw_zarr/{sections}.zarr',
+    params:
+        overlap = exp_conf.get(method,'overlap', fallback = False),
+        direction = exp_conf.get(method,'overlap direction', fallback = False)
     log:
-        '{output_dir}/logs/fixlighting_{sections}.log'
+        '{output_dir}/logs/fixlighting_{sections}.log',
+        '{output_dir}/logs/fixlighting_{sections}.html'
     output:
         directory('{output_dir}/processed_zarr/{sections}.zarr'),
         '{output_dir}/processed_zarr/{sections}_focusmap.npz')
@@ -83,6 +125,7 @@ rule fix_lighting:
 #if get_gpu():
 #    cluster_config.update({'picasso':config['gpu_spec']})
 
+
 rule picasso:
     input:
         '{output_dir}/processed_zarr/{sections}.zarr',
@@ -93,22 +136,29 @@ rule picasso:
         max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
     log:
         '{output_dir}/logs/picasso_{sections}.log'
+    threads: 8
     resources:
         mem_mb = get_mem,
-        cores = get_n_tiles
+        runtime = get_picasso_time
     conda:
         'envs/unmix_gpu.yaml'
     script:
         'scripts/picasso.py'
+# Reset nodes to core_limit after specifying cores in rule
+cluster_config.update({'nodes':core_limit})
+
 
 rule unmix:
     input:
         '{output_dir}/processed_zarr/{sections}.zarr',
         '{output_dir}/final_zarr/picasso_{sections}.yaml'
+    params:
+        tiles = get_tiles
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
     log:
-        '{output_dir}/logs/unmix_{sections}.log'
+        '{output_dir}/logs/unmix_{sections}.log',
+        '{output_dir}/logs/unmix_{sections}.html'
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -134,11 +184,14 @@ if get_gpu():
 
 rule segmentation:
     input:
-        '{output_dir}/final_zarr/{sections}.zarr'
+        '{output_dir}/final_zarr/{sections}.zarr',
+        '{output_dir}/summary_{sections}.yaml'
     output:
        '{output_dir}/masks/{sections}.tiff'
     resources:
-        mem_mb = 32000
+        mem_mb = get_mem
+    log:
+        '{output_dir}/logs/segment_{sections}.log',
     conda:
         'envs/segmentation.yaml'
     script:
@@ -149,9 +202,12 @@ rule mean_intensity:
     input:
         '{output_dir}/final_zarr/{sections}.zarr',
         '{output_dir}/masks/{sections}.tiff'
-
+    params:
+        tiles = get_tiles
     output:
         '{output_dir}/intensities/{sections}.pkl'
+    log:
+        '{output_dir}/logs/intensity_{sections}.log'
     resources:
         mem_mb = 32000
     conda:
@@ -184,9 +240,12 @@ rule celltype:
     '{output_dir}/anndata/{sections}.h5ad'
   output:
     '{output_dir}/tables/{sections}.csv'
+  log:
+    '{output_dir}/logs/cell_type_{sections}.log'
   params:
     ref = config["reference"]["seurat"],
-    typecol = config["reference"]["typecol"]
+    typecol = config["reference"]["typecol"],
+    genedict = config["reference"]["genedict"]
   resources:
     mem_mb = 32000
   conda:
@@ -197,7 +256,8 @@ rule celltype:
       --input_h5={input} \
       --output={output} \
       --ref={params.ref} \
-      --typecol={params.typecol}
+      --typecol={params.typecol} \
+      --genedict={params.genedict} > {log}
     '''
 
 rule spatial_neighborhood:

@@ -8,7 +8,7 @@ resources:
     #cores: 2
     memory: 32G
     log_directory: dask_logs
-stains:
+markers:
   # cycle:
   #   channel1: marker1
   #   channel2: marker2
@@ -23,6 +23,7 @@ stains:
     610: IBA1
     687: GFAP
     740: NeuN
+
 #segmentation:
 #  marker: LMN1b_5
 unmix:

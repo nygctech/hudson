@@ -8,7 +8,7 @@ resources:
     cores: 2
     memory: 16G
     log_directory: dask_logs
-stains:
+markers:
   # cycle:
   #   channel1: marker1
   #   channel2: marker2
@@ -37,3 +37,4 @@ unmix:
 reference:
   seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
   typecol: cell_type
+  genedict: /nfs/home/rfu/hudson_misc/v2/genedict.csv 
