@@ -66,3 +66,26 @@ def open_zarr(image_path):
     image = image.squeeze().drop_vars('variable').rename(im_name)
 
     return image
+
+
+def get_markers(config):
+    nuclei = snakemake.config.get('segmentation', {}).get('nuclei', [])
+    cells = snakemake.config.get('segmentation', {}).get('cells', [])
+    marker_dict = snakemake.config.get('markers')
+
+    if isinstance(nuclei, str):
+        nuclei = list(nuclei)
+    if isinstance(cells, str):
+        cells = list(cells)
+
+    markers = []
+    for cy, chs in marker_dict.items():
+        for ch, m in chs.items():
+            markers.append(m)
+
+    for m in nuclei:
+        assert m in markers, f'nuclei marker, {m}, not listed as a marker'
+    for m in cells:
+        assert m in markers, f'cell marker, {m}, not listed as a marker'
+
+    return nuclei, cells

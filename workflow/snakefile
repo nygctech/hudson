@@ -4,7 +4,7 @@ import configparser
 import subprocess
 import yaml
 from math import log, ceil
-
+from utils import get_markers
 
 exp_dir = config['experiment_directory']
 #exp_conf_path = config.get('experiment_config','logs/config.cfg')
@@ -21,7 +21,9 @@ sections = exp_conf.options('sections')
 sections = [s.replace('_','') for s in sections]
 
 
-#TODO check cell and nuclei markers listed in marker list
+# check cell/nuclei markers make sense
+get_markers()
+
 
 core_limit = cluster_config.get('nodes')
 
@@ -173,6 +175,7 @@ if snakmake.config.get('segmentation',{}).get('train images', False):
         directory('{output_dir}/train_images/{sections}')
     log:
         '{output_dir}/logs/trainimages_{sections}.log'
+        '{output_dir}/logs/trainimages_{sections}.html'
     conda:
         'envs/pyseq-image.yaml'
     script:
