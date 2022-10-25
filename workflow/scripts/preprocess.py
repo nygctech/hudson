@@ -18,7 +18,7 @@ image = ia.get_HiSeqImages(image_path = snakemake.input[0], logname = f'{section
 sel = {}
 for key, value in  image.im.coords.items():
     sel[key] = value[0]
-plane = image.im.sel(sel) 
+plane = image.im.sel(sel)
 mean_test = plane.mean().values
 logger.debug(f'Plane mean = {mean_test}')
 assert mean_test > 0
@@ -36,16 +36,17 @@ cluster.scale(nworkers)
 client = Client(cluster)
 
 
-# Process Image    
+# Process Image
 image.correct_background()
-image.focus_projection()
+focus_map = image.focus_projection()
+np.savez(snakemake.output[1], focus_map)
 image.register_channels()
 if snakemake.params.overlap:
     overlap = int(snakemake.params.overlap)
     direction = snakemake.params.direction
     logger.info(f'Remove {overlap} px {direction} overlap')
     image.remove_overlap(overlap = overlap, direction = direction)
-# TODO :: FIX IN pyseq_image 
+# TODO :: FIX IN pyseq_image
 image.im.name = section_name
 
 # Write Processed Images
@@ -60,7 +61,7 @@ with performance_report(filename=snakemake.log[1]):
     wait(futures)
 
 
-    
+
 # Double check no errors
 futures_done = [f.done() for f in futures]
 if all(futures_done):
@@ -68,14 +69,8 @@ if all(futures_done):
 else:
     logger.info('Error processing images')
 
-    
+
 
 
 
     ## some dask computation
-
-
-
-
-    
-

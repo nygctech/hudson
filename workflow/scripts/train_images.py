@@ -48,10 +48,10 @@ logger.debug(f'Window size: {window_size}')
 # Save windows in tile chunk that have tissue
 @delayed
 def save_windows(image, col_map, c_ind):
-    '''Save windows in image coressponding to col_mask of nuclei and cell markers.
+    '''Save windows in image coresponding to col_map.
 
         image = marker and column selected image, ie one chunk
-        col_mask = masked numpy array, masked values are windows without tissue
+        col_map = masked numpy array, masked values are windows without tissue
         col_ind = column index used for naming images
     '''
 
