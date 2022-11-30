@@ -36,5 +36,6 @@ unmix:
   max_iter: 10               # Max iterations to optimize unmixing
 reference:
   seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
-  typecol: cell_type
+  stellar: /gpfs/commons/groups/nygcfaculty/PySeq/spatial_analysis/tonsil_codex/stellar/data/B004_r    eg3_small.csv
+  typecol: cell_type_A
   genedict: /nfs/home/rfu/hudson_misc/v2/genedict.csv 
