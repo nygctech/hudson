@@ -44,22 +44,31 @@ def get_tiles(wildcards):
     return tiles
     
 def get_cycles(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)
-    cycles = section_info['cycles']
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)
+        cycles = section_info['cycles']
+    except:
+        cycles = exp_conf.get('experiment', 'cycles')
     return cycles
     
 def get_mem(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)    
-    mb = section_info['planesizeMB']
-    mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)    
+        mb = section_info['planesizeMB']
+        mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    except:
+        mb = 1000
     return mb
 
 def get_cores(section):
-    with open(join(output_dir,f'summary_{section}.yaml')) as f:
-        section_info = yaml.safe_load(f)  
-    tiles = section_info['tiles']     
+    try:
+        with open(join(output_dir,f'summary_{section}.yaml')) as f:
+            section_info = yaml.safe_load(f)  
+        tiles = section_info['tiles']     
+    except:
+        tiles = 8
     return tiles
 
 def get_picasso_time(wildcards):
