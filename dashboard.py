@@ -15,8 +15,8 @@ server = app.server
 
 
 # point Dash to image directory of interest here
-image_directory = '/Users/tinam/Desktop/images'
-list_of_images = [f for f in os.listdir(image_directory) if '.png' in f]
+image_directory = '/commons/groups/nygcfaculty/PySeq/20210505_mouse_genotype_3/tiffs'
+list_of_images = [f for f in os.listdir(image_directory) if '.tiff' in f]
 static_image_route = '/static/'
 
 # locate folder of interest
