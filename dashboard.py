@@ -1,5 +1,4 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
+# Run this app with `python app.py` 
 
 import pandas as pd
 import os
@@ -122,8 +121,14 @@ def display_image(image,image_names,next,prev):
 
 
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
+# get host name
+import socket
+
+hostn = (socket.gethostname())
+
+# run app from nygc cluster and specify port
+if __name__ == '__main__':
+    app.run_server(debug=True, host = hostn, port = 8080)
 
 '''
 OLD CODE FOR BACKUP 
