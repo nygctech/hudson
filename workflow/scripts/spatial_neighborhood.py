@@ -1,26 +1,24 @@
 import numpy as np
 import skimage
 import pandas as pd
-import anndata as ad
 from collections import namedtuple
 import networkx as nx
 import math
 import sys
 import getopt
-import anndata as ad
 from voronoi import *
 import pickle
 from pathlib import Path
+import mudata as md
 
-
-adata = ad.read(Path(snakemake.input[0]))
-x_coord = adata.X[:,-2]
-y_coord = adata.X[:,-1]
+mdata = md.read(Path(snakemake.input[0]))
+x_coord = mdata['morphological'].obsm['spatial'][:,0]
+y_coord = mdata['morphological'].obsm['spatial'][:,1]
 
 Point = namedtuple('Point', ['x','y'])
 point_list = []
-for i,y in zip(x_coord,y_coord):
-    point_list.append(Point(i,y))
+for x,y in zip(x_coord,y_coord):
+    point_list.append(Point(x,y))
 v,l,e = computeVoronoiDiagram(point_list)
 
 #Building Graph
