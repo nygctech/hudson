@@ -18,14 +18,19 @@ xargs <- parser$parse_args()
 # load
 flog.info("Reading h5ad")
 file_h5 <- H5File$new(xargs$input_h5, mode = "r+")
-mat <- file_h5[["X"]][,]
-colnames(mat) <- file_h5[["obs/_index"]][]
-rownames(mat) <- file_h5[["var/_index"]][]
+p_mat <- file_h5[["mod"]][["protein"]][["X"]][,]
+colnames(p_mat) <- file_h5[["mod"]][["protein"]][["obs/_index"]][]
+rownames(p_mat) <- file_h5[["mod"]][["protein"]][["var/_index"]][]
+m_mat <- file_h5[["mod"]][["morphological"]][["X"]][,]
+colnames(m_mat) <- file_h5[["mod"]][["morphological"]][["obs/_index"]][]
+rownames(m_mat) <- file_h5[["mod"]][["morphological"]][["var/_index"]][]
 file_h5$close_all()
+
+prot <- p_mat
+param <- m_mat
 
 # convert names
 flog.info("Converting matrices")
-prot <- mat[str_detect(rownames(mat), "^[A-Z]"),]
 if (!is.null(xargs$genedict)) {
   genedict <- read_csv(xargs$genedict) %>% column_to_rownames("prot")
   rownames(prot) <- sapply(rownames(prot), function(x) {
@@ -37,12 +42,6 @@ if (!is.null(xargs$genedict)) {
   })
 }
 
-#rownames(prot) <- rownames(prot) %>% str_to_title() %>%
-#  ifelse(. == "Lmn1b", "Lmnb1", .) %>%
-#  ifelse(. == "Iba1", "Aif1", .) %>%
-#  ifelse(. == "Nfh", "Nefh", .)
-
-param <- mat[!str_detect(rownames(mat), "^[A-Z]"),]
 # combat
 #mod <- model.matrix(~as.factor(label), data = as.data.frame(t(param)))
 #mod0 <- model.matrix(~1,data = as.data.frame(t(param)))
@@ -50,13 +49,13 @@ param <- mat[!str_detect(rownames(mat), "^[A-Z]"),]
 #if (svobj$n.sv > 0) {
 #  prot2 <- ComBat(prot, batch = svobj$sv)
 #} else {
-  prot2 <- prot
+prot2 <- prot
 #}
 #svobj <- sva(param, mod, mod0, n.sv = 1, method = "two-step")
 #if (svobj$n.sv > 0) {
 #  param2 <- ComBat(param, batch = svobj$sv)
 #} else {
-  param2 <- param
+param2 <- param
 #}
 
 # prot
