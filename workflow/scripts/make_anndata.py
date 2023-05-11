@@ -1,135 +1,54 @@
-import dask.dataframe as dd
-import dask.array as da
-import dask.bag as db
+import pickle 
+from pathlib import Path
+
 import numpy as np
 import skimage
 import anndata as ad
 import pandas as pd
-import pickle 
-from pathlib import Path
+import squidpy as sq
+import muon as mu
 
 
-def return_anndata(path):
-    
-    img = skimage.io.imread(path)
-    ski_img = skimage.measure.regionprops(img)
-    df = pd.DataFrame(ski_img)
-    var_array = df.head(1).values
-    list_var = list(var_array.flatten())
-    labels = len(ski_img)
-    df = pd.DataFrame(index = list_var, columns = np.arange(1,labels,1))
 
-    
-    for ind in df.index:
-        for val in df.columns:
-            df.loc[ind,val] = getattr(ski_img[val],ind)
-            
-    for val in df.columns:
-        df.loc['bbox',val] = np.asarray(df.loc['bbox',val]).reshape(1,4)
-        
-        
-    for val in df.columns:
-        df.loc['centroid',val] = np.asarray(df.loc['centroid',val]).reshape(1,2)
-        
-        
-    for ind in df.index:
-        for val in df.columns:
-            if type(df.loc[ind,val]) == np.ndarray:
-                df.loc[ind,val] = df.loc[ind,val][~np.isnan(df.loc[ind,val])].flatten()
-                
-                
-                
-    scalar_list = ['area','area_bbox','area_convex','area_filled','axis_major_length','axis_minor_length',
+label_im_input = snakemake.input[0]
+intensity_pkl = snakemake.input[1]
+
+# Get Morphological Features
+features = ('area','area_bbox','area_convex','area_filled','axis_major_length','axis_minor_length',
             'eccentricity', 'equivalent_diameter_area','euler_number','extent','feret_diameter_max',
-              'label','orientation','perimeter','perimeter_crofton','solidity'] 
-    scalar_df = df.loc[['area','area_bbox','area_convex','area_filled','axis_major_length','axis_minor_length',
-            'eccentricity', 'equivalent_diameter_area','euler_number','extent','feret_diameter_max',
-              'label','orientation','perimeter','perimeter_crofton','solidity']]
-                   
-    multidim_list = ['bbox','centroid','centroid_local', 'coords', 'image', 'image_convex', 'image_filled',
-                'inertia_tensor', 'inertia_tensor_eigvals', 'moments', 'moments_central' ,'moments_hu',
-                'moments_normalized']
-    multidim_df = df.loc[['bbox','centroid','centroid_local', 'coords', 'image', 'image_convex', 'image_filled',
-                'inertia_tensor', 'inertia_tensor_eigvals', 'moments', 'moments_central' ,'moments_hu',
-                'moments_normalized']]
-    
-    
+            'orientation','perimeter','perimeter_crofton','solidity', 'label', 'centroid')
+label_im = skimage.io.imread(label_im_input)
+feature_table = skimage.measure.regionprops_table(label_im, properties=features)
 
-    mt = multidim_df.transpose()
-    
-    X = scalar_df.T.values
-    adata = ad.AnnData(X)
-    adata.var_names = scalar_df.index
-    adata.obs_names = scalar_df.columns
-    adata.var = pd.DataFrame(index = scalar_list, columns = scalar_list)
-    adata.obs = pd.DataFrame(index = scalar_df.columns, columns = scalar_df.columns)
-    for col in mt.columns:
-        adata.obsm[col] = mt[col].values
-        
-    i = 0
-    for row in multidim_list:
-        adata.uns[row] = multidim_df.iloc[[i]].values.flatten()
-        i = i+1
-        
-                
-        
-    return adata
-    
-    
-with open(Path(snakemake.input[1]), 'rb') as f:
-    loaded_dict = pickle.load(f)
-    
-    
-def del_nan(arr):
-    del_list = []
-    mask = np.isnan(arr)
-    for m,v in zip(mask, range(len(mask))):
-        if m == True:
-            del_list.append(v)
-        
-    arr = np.delete(arr,del_list)
-    return(arr)
-    
-    
-for key in loaded_dict.keys():
-    val = loaded_dict[key]
-    val = del_nan(val)
-    loaded_dict.update({key:val[1:]})
-        
-        
-ad_object = return_anndata(Path(snakemake.input[0]))
+# Organize Morphological Features
+coords = np.vstack([feature_table['centroid-0'], feature_table['centroid-1']]).T
+ind = feature_table['label']
+del feature_table['centroid-0']
+del feature_table['centroid-1']
+del feature_table['label']
 
-mat = ad_object.X
-
-for key in loaded_dict.keys():
-    mat = np.append(mat, np.asarray([loaded_dict[key]]).transpose(), axis = 1)
-    
-x_centroid = []
-y_centroid = []
-for i in range(len(ad_object.uns['centroid'])):
-            x_centroid.append(ad_object.uns['centroid'][i][0])
-            y_centroid.append(ad_object.uns['centroid'][i][1])
-            
-
-xc = np.expand_dims(np.asarray(x_centroid), axis=1)
-yc = np.expand_dims(np.asarray(y_centroid), axis=1)
-
-mat = np.append(mat,xc, axis = 1)
-mat = np.append(mat,yc, axis = 1)
-  
-
-#remake new anndata object
-adt = ad.AnnData(mat)
-
-lis = ad_object.var_names
-var = list(lis)
-post_var = list(loaded_dict.keys())
-var.extend(post_var)
-var.append('x_centroid')
-var.append('y_centroid')
+# Make Morphological AnnData object
+morph_df = pd.DataFrame(data = feature_table, index = ind)
+morph_ad = ad.AnnData(X = morph_df, obsm = {'spatial':coords})
 
 
-adt.var_names = var
-adt.obs_names = np.arange(1,np.shape(mat)[0] + 1,1)
+# Add graph
+radius = None # get from config file
+if radius is None:
+    radius = (feature_table['feret_diameter_max'].mean()+feature_table['feret_diameter_max'].std())*3/2
+print(f'used radius {radius} px')
+sq.gr.spatial_neighbors(morph_ad, n_neighs = True, delaunay=True, radius=(0,radius), coord_type = 'generic')
 
-adt.write(Path(snakemake.output[0]),compression = "gzip")
+
+# Make Protein Intensities AnnData Object
+with open(Path(intensity_pkl), 'rb') as f:
+    protein_dict = pickle.load(f)
+protein_df = pd.DataFrame(data = protein_dict, index = ind)
+protein_ad = ad.AnnData(X = protein_df)     
+          
+
+# Combine into muon object
+mdata = mu.MuData({'protein': protein_ad, 'morphological': morph_ad})
+# h5 can't save radius parameter as tuple, so save as float
+mdata['morphological'].uns['spatial_neighbors']['params']['radius'] = radius
+mdata.write(snakemake.output[0])

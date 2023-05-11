@@ -31,45 +31,61 @@ def get_gpu():
     if 'pe2dg2' in result.stdout:
         gpu_available = 1
 
-    return gpu_available
-    
-
-    
+    return gpu_available  
 
     
 def get_tiles(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)  
-    tiles = section_info['tiles']     
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)  
+        tiles = section_info['tiles'] 
+    except:
+        tiles = 1
+    return tiles
+
+def get_cores(section):
+    try:
+        with open(join(output_dir,f'summary_{section}.yaml')) as f:
+            section_info = yaml.safe_load(f)  
+        tiles = section_info['tiles']     
+    except:
+        tiles = 8
     return tiles
     
 def get_cycles(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)
-    cycles = section_info['cycles']
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)
+        cycles = section_info['cycles']
+    except:
+        cycles = exp_conf.get('experiment', 'cycles')
     return cycles
     
 def get_mem(wildcards):
-    with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
-        section_info = yaml.safe_load(f)    
-    mb = section_info['planesizeMB']
-    mb = ceil(mb/8000)*8000 * get_tiles(wildcards)
+    try:
+        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+            section_info = yaml.safe_load(f)    
+        mb = section_info['planesizeMB']
+        mb = ceil(mb/8000)*8000 * get_cores(wildcards)
+    except:
+        mb = 1000
     return mb
 
-def get_cores(section):
-    with open(join(output_dir,f'summary_{section}.yaml')) as f:
-        section_info = yaml.safe_load(f)  
-    tiles = section_info['tiles']     
-    return tiles
+
 
 def get_picasso_time(wildcards):
     return get_cycles(wildcards)*60 # minutes
    
-    
+print(sections)
+  
 rule all:
     input:
         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
-               
+
+# rule all:
+#     input:
+#         expand('{dir}/tables/{s}.csv', dir = output_dir, s = sections)
+
 rule saveraw:
     input:
         {exp_conf_path},
@@ -191,10 +207,9 @@ rule anndata:
     input:
         '{output_dir}/masks/{sections}.tiff',
         '{output_dir}/intensities/{sections}.pkl'
-
+        
     output:
-        '{output_dir}/anndata/{sections}.h5ad'
-       
+        '{output_dir}/anndata/{sections}.h5mu'
     resources:
         mem_mb = 32000
     conda:
@@ -205,40 +220,37 @@ rule anndata:
 
 
 rule celltype:
-  input:
-    '{output_dir}/anndata/{sections}.h5ad'
-  output:
-    '{output_dir}/tables/{sections}.csv'
-  log:
-    '{output_dir}/logs/cell_type_{sections}.log'
-  params:
-    ref = config["reference"]["seurat"],
-    typecol = config["reference"]["typecol"],
-    genedict = config["reference"].get("genedict", {})
-  resources:
-    mem_mb = 32000
-  conda:
-    'envs/celltype.yaml'
-  shell:
-    '''
-    Rscript scripts/celltype.R \
-      --input_h5={input} \
-      --output={output} \
-      --ref={params.ref} \
-      --typecol={params.typecol} \
-      --genedict={params.genedict} > {log}
-    '''
+    input:
+        '{output_dir}/anndata/{sections}.h5mu'
+    output:
+        '{output_dir}/tables/{sections}.csv'
+    log:
+        '{output_dir}/logs/cell_type_{sections}.log'
+    params:
+        ref = config["reference"]["seurat"],
+        typecol = config["reference"]["typecol"],
+        genedict = config["reference"].get("genedict", {})
+    resources:
+        mem_mb = 32000
+    conda:
+        'envs/celltype.yaml'
+    shell:
+        '''
+            Rscript scripts/celltype.R \
+              --input_h5={input} \
+              --output={output} \
+              --ref={params.ref} \
+              --typecol={params.typecol} \
+              --genedict={params.genedict} > {log}
+        '''
 
 rule spatial_neighborhood:
     input:
-       '{output_dir}/anndata/{sections}.h5ad',
+       '{output_dir}/anndata/{sections}.h5mu',
        '{output_dir}/tables/{sections}.csv'
- 
     output:
        '{output_dir}/cell_neighborhood/{sections}.pkl',
        '{output_dir}/net_neighborhood/{sections}.pkl'
-        
- 
     resources:
         mem_mb = 32000
     conda:
