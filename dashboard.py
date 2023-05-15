@@ -9,14 +9,23 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_canvas import DashCanvas
 import flask
+import argparse
+from pathlib import Path
 
 app = dash.Dash(__name__)
 server = app.server
 
+parser = argparse.ArgumentParser(description='hudson pipeline dashboard')
+parser.add_argument('-d', '--directory', metavar='PATH', type=str, default = '.',
+                    help='hudson pipeline output directory')
+args = parser.parse_args()
+
 
 # point Dash to image directory of interest here
-image_directory = '/gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline/20210323_4i4color/dashboard'
+# image_directory = '/gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline/20210323_4i4color/dashboard'
+image_directory = f'{args.directory}/dashboard'
 list_of_images = [f for f in os.listdir(image_directory) if '.png' in f]
+#print(list_of_images)
 
 #image_directory = '/commons/groups/nygcfaculty/PySeq/20210505_mouse_genotype_3/tiffs'
 #list_of_images = [f for f in os.listdir(image_directory) if '.tiff' in f]
