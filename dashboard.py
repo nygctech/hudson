@@ -15,7 +15,7 @@ server = app.server
 
 
 # point Dash to image directory of interest here
-image_directory = '/Users/tinam/Desktop/images'
+image_directory = '/gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline/20210323_4i4color/dashboard'
 list_of_images = [f for f in os.listdir(image_directory) if '.png' in f]
 
 #image_directory = '/commons/groups/nygcfaculty/PySeq/20210505_mouse_genotype_3/tiffs'
