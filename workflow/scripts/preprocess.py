@@ -7,6 +7,9 @@ from pathlib import Path
 # Get section name
 section_name = Path(snakemake.input[0]).stem
 
+# Get Processing Options
+focus_projection = exp_dir = snakemake.config.get('preprocess',{}).get('focus projection',False)
+
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
 
@@ -14,10 +17,14 @@ logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
 image = ia.get_HiSeqImages(image_path = snakemake.input[0], logname = f'{section_name}.image')
 
 # Check Raw Store saved correctly
-# get 1 plane
+# get 1 plane   
 sel = {}
 for key, value in  image.im.coords.items():
-    sel[key] = value[0]
+    try:
+        sel[key] = value[0]
+    except IndexError:
+        logger.debug(f'Only 1 {key}')
+        pass
 plane = image.im.sel(sel) 
 mean_test = plane.mean().values
 logger.debug(f'Plane mean = {mean_test}')
@@ -38,7 +45,8 @@ client = Client(cluster)
 
 # Process Image    
 image.correct_background()
-image.focus_projection()
+if focus_projection:
+    image.focus_projection()
 image.register_channels()
 if snakemake.params.overlap:
     overlap = int(snakemake.params.overlap)
