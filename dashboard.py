@@ -3,33 +3,42 @@
 import pandas as pd
 import os
 import dash
-from dash import dcc, ctx
-from dash import html, Dash 
-from dash.dependencies import Input, Output, State
+from dash import dcc, ctx, html
+from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
-from dash_canvas import DashCanvas
+#from dash_canvas import DashCanvas
 import flask
 import argparse
 from pathlib import Path
 
-app = dash.Dash(__name__)
-server = app.server
-
+# parse experiment directory argument
 parser = argparse.ArgumentParser(description='hudson pipeline dashboard')
 parser.add_argument('-d', '--directory', metavar='PATH', type=str, default = '.',
                     help='hudson pipeline output directory')
 args = parser.parse_args()
+exp_dir = Path(args.directory)
 
+
+# Initialize dashboard
+app = dash.Dash(__name__, use_pages = True)
+server = app.server
+dcc.Store('exp_dir',data=args.directory, storage_type='session') 
+
+# dash.register_page(__name__, exp_dir = args.directory)
+
+# Get sections in experiment
+# sections = [f for f in os.scandir(exp_dir/'dashboard'/'preview') if f.is_dir()]
+# # Preview Images
+# preview_ims  = []
+# for s in sections:
+#     preview_ims += [s+'/'+f for f in os.scandir(exp_dir/'dashboard'/'preview'/s) if f.name[-4:] == '.jpg']
+
+# print(len(preview_ims))
 
 # point Dash to image directory of interest here
-# image_directory = '/gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline/20210323_4i4color/dashboard'
-image_directory = f'{args.directory}/dashboard'
-list_of_images = [f for f in os.listdir(image_directory) if '.png' in f]
-#print(list_of_images)
-
-#image_directory = '/commons/groups/nygcfaculty/PySeq/20210505_mouse_genotype_3/tiffs'
-#list_of_images = [f for f in os.listdir(image_directory) if '.tiff' in f]
-static_image_route = '/static/'
+# image_directory = f'{args.directory}/dashboard/preview/m387ntga1'
+# list_of_images = [f for f in os.listdir(image_directory) if '.jpg' in f]
+# static_image_route = '/static/'
 
 # locate folder of interest
 # folders = [f for f in os.listdir('.') if os.path.isdir(f)]
@@ -41,32 +50,45 @@ static_image_route = '/static/'
 ### !!! for the future: test data dir - write automated tests to test components
 ### !!! ^ pytest
 
+
 app.layout = html.Div([
-    html.H1("Image Thumbnails - 2 May"), 
-    html.Div(["Folder being served: ", image_directory]),
-    html.Div([
-        "Select the image you want to display",
-        dcc.Dropdown(
-            id="image-dropdown",
-            options=list_of_images,
-            placeholder="Select the image you want to display",
-        ),
+    html.H1('Dash Tabs demo'),
+    dcc.Store(id="exp_dir", data=args.directory),   
+    dcc.Tabs(id="hudson-tabs", value='hudson-tabs', children=[
+        dcc.Tab(label='Preview', value='preview'),
+        dcc.Tab(label='Tab Two', value='tab2'),
     ]),
-    html.Button('Previous Image', id='prev',n_clicks=0),
-    html.Button('Next Image', id='next',n_clicks=0),
-    html.Div(
-        #html.Img(src=image_paths[0]),
-        id='container-image'
-    ),
-    html.Div([
-        DashCanvas(id='canvas-image',
-            tool='line',
-            lineWidth=5,
-            lineColor='red',
-            image_content=static_image_route+list_of_images[0]
-            ),
-    ]),           
+    html.Div(id='hudson-tab-content'),
+    dash.page_container
 ])
+
+
+# app.layout = html.Div([
+#     html.H1("Image Thumbnails - 2 May"), 
+#     html.Div(["Folder being served: ", image_directory]),
+#     html.Div([
+#         "Select the image you want to display",
+#         dcc.Dropdown(
+#             id="image-dropdown",
+#             options=list_of_images,
+#             placeholder="Select the image you want to display",
+#         ),
+#     ]),
+#     html.Button('Previous Image', id='prev',n_clicks=0),
+#     html.Button('Next Image', id='next',n_clicks=0),
+#     html.Div(
+#         #html.Img(src=image_paths[0]),
+#         id='container-image'
+#     ),
+#     html.Div([
+#         DashCanvas(id='canvas-image',
+#             tool='line',
+#             lineWidth=5,
+#             lineColor='red',
+#             image_content=static_image_route+list_of_images[0]
+#             ),
+#     ]),           
+# ])
 '''
     # folder dropdown 
         html.Div([
@@ -91,45 +113,53 @@ def update_image_dropdown(folder_name):
     #file_list = html.Ul([html.Li(file) for file in file_names])
     return images
 '''
-# Serve static images
-@app.server.route('{}<image_path>.png'.format(static_image_route))
-def serve_image(image_path):
-    image_name = '{}.png'.format(image_path)
-    if image_name not in list_of_images:
-        raise Exception('"{}" is excluded from the allowed static files'.format(image_path))
-    return flask.send_from_directory(image_directory, image_name)
+# Serve marker images
+@app.server.route('/static/<resource>')
+def serve_resource(resource):
+    basedir = exp_dir / 'dashboard'
+    return flask.send_from_directory(str(basedir), resource)
 
-# Update canvas image based on image selected in image-dropdown
-@app.callback(
-    Output("canvas-image", "image_content"), 
-    Output("image-dropdown","value"),
-    #Input("folder-dropdown","value"),
-    Input("image-dropdown", "value"),
-    Input("image-dropdown","options"),
-    Input("next","n_clicks"),
-    Input("prev","n_clicks"),
-)
-def display_image(image,image_names,next,prev):
-    if image is None:
-        raise PreventUpdate
+@app.callback(Output('hudson-tab-content', 'children'),
+              Input('hudson-tabs', 'value'))
+def render_content(tab):
+    basedir = exp_dir / 'dashboard'
+    print(str(basedir))
+    if tab == 'preview':
+        return dash.page_registry['pages.preview']['layout']
+    elif tab == 'tab2':
+        return dash.page_registry['pages.tab2']['layout']
 
-    if "image-dropdown" == ctx.triggered_id:
-        return static_image_route+image,image
-    # !! add cases for pressing next/prev when no image is selected    
-    elif "next" == ctx.triggered_id:
-        index = image_names.index(image)
-        if index < len(image_names)-1:
-            index += 1
-            return static_image_route+image_names[index],image_names[index]
-        else:
-            return static_image_route+image_names[0],image_names[0]
-    elif "prev" == ctx.triggered_id:
-        index = image_names.index(image)
-        if index > 0:
-            index -= 1
-            return static_image_route+image_names[index],image_names[index]
-        else:
-            return static_image_route+image_names[len(image_names)-1],image_names[len(image_names)-1]
+# # Update canvas image based on image selected in image-dropdown
+# @app.callback(
+#     Output("canvas-image", "image_content"), 
+#     Output("image-dropdown","value"),
+#     #Input("folder-dropdown","value"),
+#     Input("image-dropdown", "value"),
+#     Input("image-dropdown","options"),
+#     Input("next","n_clicks"),
+#     Input("prev","n_clicks"),
+# )
+# def display_image(image,image_names,next,prev):
+#     if image is None:
+#         raise PreventUpdate
+
+#     if "image-dropdown" == ctx.triggered_id:
+#         return static_image_route+image,image
+#     # !! add cases for pressing next/prev when no image is selected    
+#     elif "next" == ctx.triggered_id:
+#         index = image_names.index(image)
+#         if index < len(image_names)-1:
+#             index += 1
+#             return static_image_route+image_names[index],image_names[index]
+#         else:
+#             return static_image_route+image_names[0],image_names[0]
+#     elif "prev" == ctx.triggered_id:
+#         index = image_names.index(image)
+#         if index > 0:
+#             index -= 1
+#             return static_image_route+image_names[index],image_names[index]
+#         else:
+#             return static_image_route+image_names[len(image_names)-1],image_names[len(image_names)-1]
 
 
 
