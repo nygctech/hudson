@@ -26,10 +26,17 @@ image = open_zarr(snakemake.input[0])
 logger = get_logger(image.name, filehandler = snakemake.log[0])
 logger.info(f'Opened {image.name} zarr')
 
+
+# Make sure only 1 objective step
+if 'obj_step' in image.dims and 'obj_step' not in snakemake.config.get('segmentation',{}):
+    if image.obj_step.size > 1:
+        mid_step = image.obj_step[image.obj_step.size//2]
+        image = image.sel(obj_step = mid_step)
+logger.debug(image)
+
 # Open instance labels
 labels = skimage.io.imread(Path(snakemake.input[1]))
 logger.info(f'Opened {image.name} labels')
-
 
 # Get markers
 marker_list = list(image.marker.values)

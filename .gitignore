@@ -154,6 +154,7 @@ workflow/logs/
 
 #configs
 config/mouse_genotype*
+config/*
 
 #bash scripts
 workflow/*.sh
