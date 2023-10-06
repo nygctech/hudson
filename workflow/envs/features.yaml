@@ -1,0 +1,21 @@
+name: features
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - dask
+  - scikit-image
+  - numpy
+  - xarray
+  - zarr
+  - pytorch
+  - torchvision
+  - cudatoolkit=11.3
+  - joblib
+  - dask-jobqueue
+  - timm
+  - torchvision
+  - anndata
+  - mudata
+  - squidpy

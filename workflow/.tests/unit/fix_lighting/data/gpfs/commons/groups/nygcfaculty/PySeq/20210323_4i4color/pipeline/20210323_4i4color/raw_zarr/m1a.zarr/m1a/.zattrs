@@ -1,0 +1,14 @@
+{
+    "_ARRAY_DIMENSIONS": [
+        "channel",
+        "cycle",
+        "obj_step",
+        "row",
+        "col"
+    ],
+    "first_group": 0,
+    "fixed_bg": 0,
+    "machine": "Origin",
+    "overlap": 0,
+    "scale": 1
+}
