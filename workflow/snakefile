@@ -244,6 +244,23 @@ rule celltype:
               --genedict={params.genedict} > {log}
         '''
 
+rule run_stellar:
+  input:
+    '{output_dir}/anndata/{sections}.csv'
+  output:
+    '{output_dir}/tables/{sections}_stellar.csv'
+  log:
+    '{output_dir}/logs/stellar_{sections}.log'
+  resources:
+    mem_mb = get_mem
+  conda:
+    'envs/stellar.yaml'
+  params:
+    ref = config["reference"]["stellar"],
+    typecol = config["reference"]["typecol"],
+  script:
+    'run_stellar.py'
+
 rule spatial_neighborhood:
     input:
        '{output_dir}/anndata/{sections}.h5mu',
