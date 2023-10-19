@@ -23,7 +23,7 @@ static_image_route = '/static/'
 
 
 layout = html.Div([
-    html.H1("Image Thumbnails - 2 May"), 
+    html.H1("Image Thumbnails"), 
     #html.Div(["Folder being served: ", image_directory]),
     html.Div([
         "Select the image you want to display",
@@ -155,4 +155,4 @@ def display_image(section,marker,marker_,next,prev, exp_dir):
     else:
         m = marker
 
-    return f'/static/{section}_{m}.jpg', m
+    return f'{exp_dir}/dashboard/{section}_{m}.jpg', m

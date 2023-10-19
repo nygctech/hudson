@@ -54,11 +54,11 @@ dcc.Store('exp_dir',data=args.directory, storage_type='session')
 app.layout = html.Div([
     html.H1('Dash Tabs demo'),
     dcc.Store(id="exp_dir", data=args.directory),   
-    dcc.Tabs(id="hudson-tabs", value='hudson-tabs', children=[
-        dcc.Tab(label='Preview', value='preview'),
-        dcc.Tab(label='Tab Two', value='tab2'),
+    html.Div([
+        html.Div(
+            dcc.Link(f"{page['name']} - {page['path']}", href=page["relative_path"])
+        ) for page in dash.page_registry.values()
     ]),
-    html.Div(id='hudson-tab-content'),
     dash.page_container
 ])
 
@@ -119,15 +119,15 @@ def serve_resource(resource):
     basedir = exp_dir / 'dashboard'
     return flask.send_from_directory(str(basedir), resource)
 
-@app.callback(Output('hudson-tab-content', 'children'),
-              Input('hudson-tabs', 'value'))
-def render_content(tab):
-    basedir = exp_dir / 'dashboard'
-    print(str(basedir))
-    if tab == 'preview':
-        return dash.page_registry['pages.preview']['layout']
-    elif tab == 'tab2':
-        return dash.page_registry['pages.tab2']['layout']
+# @app.callback(Output('hudson-tab-content', 'children'),
+#               Input('hudson-tabs', 'value'))
+# def render_content(tab):
+#     basedir = exp_dir / 'dashboard'
+#     print(str(basedir))
+#     if tab == 'preview':
+#         return dash.page_registry['pages.preview']['layout']
+#     elif tab == 'tab2':
+#         return dash.page_registry['pages.tab2']['layout']
 
 # # Update canvas image based on image selected in image-dropdown
 # @app.callback(
@@ -170,7 +170,7 @@ hostn = (socket.gethostname())
 
 # run app from nygc cluster and specify port
 if __name__ == '__main__':
-    app.run_server(debug=True, host = hostn, port = 8080)
+    app.run_server(debug=True, host = hostn, port = 8081)
 
 '''
 OLD CODE FOR BACKUP 
