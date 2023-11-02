@@ -4,17 +4,14 @@ import plotly.express as px
 import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
+from pathlib import Path
+import os
+from dash.exceptions import PreventUpdate
 
-dash.register_page(__name__)
+dash.register_page(__name__,name = 'Channel Mixing Analysis')
 
 import yaml
 
-# Specify the path to your YAML file
-yaml_file_path = '/commons/groups/nygcfaculty/PySeq/mouse_genotype/20210428_mouse_genotype_2/final_zarr/picasso_m387ntga1.yaml'
-
-# Open and read the YAML file
-with open(yaml_file_path, 'r') as file:
-    yaml_data = yaml.safe_load(file)
     
 def wavelength_to_rgb(wavelength):
     """
@@ -72,59 +69,181 @@ def wavelength_to_rgb(wavelength):
 
 layout = html.Div([
             html.H3('Channel Mixing Analysis'),
-            "Select cycle",
+            dcc.Dropdown(
+                id="section-yaml",
+                placeholder='Section',
+            ),
             dcc.Dropdown(
                 id="cycle-dropdown",
-                options=list(yaml_data.keys()),
+                placeholder='Cycle',
             ),
             dcc.Graph(id='square-plot'),
 ])
 
+#dropdown to select section of interest
+@callback(Output('section-yaml','options'),
+          Input('exp_dir','data'))
+def update_section_yaml(exp_dir):
+    yaml_files = [f.name for f in os.scandir(Path(exp_dir)/'final_zarr') if f.name[-5:] == '.yaml']
+    
+    return yaml_files
+
+@callback(Output('cycle-dropdown','options'),
+          Input('section-yaml','value'),
+          Input('exp_dir','data'))
+def update_cycle_dropdown(section,exp_dir):
+    if section is None:
+        raise PreventUpdate
+        
+    yaml_file_path = f'{exp_dir}/final_zarr/{section}'
+    with open(yaml_file_path, 'r') as file:
+        yaml_data = yaml.safe_load(file)
+    return list(yaml_data.keys())
+
 @callback(
     Output('square-plot', 'figure'),
-    Input('cycle-dropdown', 'value')
+    Input('cycle-dropdown', 'value'),
+    Input('section-yaml','value'),
+    Input('exp_dir','data'),
 )
-def update_square_plot(cycle):
-    # Create traces for the two squares
-    overlap = yaml_data[cycle]['alpha'][0][0]
-    offset = 1-abs(overlap)
+def update_square_plot(cycle,section,exp_dir):
+    if section is None:
+        raise PreventUpdate
+    elif cycle is None:
+        raise PreventUpdate
     
-    square1_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][0]))
-    square2_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][1]))
+    # Specify the path to your YAML file
+    yaml_file_path = Path(exp_dir)/'final_zarr'/section
     
-    square1 = go.Scatter(
-        x=[-0.5, 0.5, 0.5, -0.5, -0.5],
-        y=[-0.5, -0.5, 0.5, 0.5, -0.5],
-        mode='lines',
-        text='Channel 1',
-        name='Channel 1',
-        line=dict(color=square1_color),
-        fill='toself', 
-        fillcolor=square1_color,
-        opacity=0.8
-    )
-    square2 = go.Scatter(
-        x=[-0.5 + offset, 0.5 + offset, 0.5 + offset, -0.5 + offset, -0.5 + offset],
-        y=[-0.5, -0.5, 0.5, 0.5, -0.5],
-        mode='lines',
-        text='Channel 2',
-        name='Channel 2',
-        line=dict(color=square2_color),
-        fill='toself', 
-        fillcolor=square2_color,
-        opacity=0.8
-    )
+    # Open and read the YAML file
+    with open(yaml_file_path, 'r') as file:
+        yaml_data = yaml.safe_load(file)
+    
+    # Read how many channels are in the selected cycle 
+    channels = len(yaml_data[cycle]['channels'])
+    
+    # Create different cases for 2 or 4 channels 
+  
+    if channels == 2:
 
-    # Create the figure
-    figure = {
-        'data': [square1, square2],
-        'layout': go.Layout(
-            title=f'Channel overlap: {overlap:.2f}',
-            xaxis=dict(range=[-8, 8]),
-            yaxis=dict(range=[-2, 2]),
-            showlegend=True
+        # Create traces for the two squares
+        overlap = yaml_data[cycle]['alpha'][0][0]
+        offset = 1-abs(overlap)
+        
+        bg = yaml_data[cycle]['background'][0][0] * overlap / 100
+        # proxy for % area to subtract from square 
+        
+
+        square1_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][0]))
+        square2_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][1]))
+
+        square1 = go.Scatter(
+            x=[-0.5, 0.5, 0.5, -0.5, -0.5],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 1',
+            name='Channel 1',
+            line=dict(color=square1_color),
+            fill='toself', 
+            fillcolor=square1_color,
+            opacity=0.8
         )
-    }
+        square2 = go.Scatter(
+            x=[-0.5 + offset, 0.5 + offset, 0.5 + offset, -0.5 + offset, -0.5 + offset],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 2',
+            name='Channel 2',
+            line=dict(color=square2_color),
+            fill='toself', 
+            fillcolor=square2_color,
+            opacity=0.8
+        )
+
+        # Create the figure
+        figure = {
+            'data': [square1, square2],
+            'layout': go.Layout(
+                title=f'Channel overlap: {overlap:.2f}',
+                xaxis=dict(range=[-8, 8]),
+                yaxis=dict(range=[-2, 2]),
+                showlegend=True
+            )
+        }
+        return figure
+    elif channels == 4:
+        
+        # Create traces for the first two channels
+        overlap = yaml_data[cycle]['alpha'][0][0]
+        offset = 1-abs(overlap)
+
+        square1_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][0]))
+        square2_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][1]))
+
+        square1 = go.Scatter(
+            x=[-0.5, 0.5, 0.5, -0.5, -0.5],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 1',
+            name='Channel 1',
+            line=dict(color=square1_color),
+            fill='toself', 
+            fillcolor=square1_color,
+            opacity=0.8
+        )
+        square2 = go.Scatter(
+            x=[-0.5 + offset, 0.5 + offset, 0.5 + offset, -0.5 + offset, -0.5 + offset],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 2',
+            name='Channel 2',
+            line=dict(color=square2_color),
+            fill='toself', 
+            fillcolor=square2_color,
+            opacity=0.8
+        )
+        
+        # Create traces for the third and fourth channels
+        overlap2 = yaml_data[cycle]['alpha'][2][1]
+        offset2 = 1-abs(overlap2)
+
+        square3_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][2]))
+        square4_color = 'rgb'+str(wavelength_to_rgb(yaml_data[cycle]['channels'][3]))
+
+        square3 = go.Scatter(
+            x=[2, 3, 3, 2, 2],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 3',
+            name='Channel 3',
+            line=dict(color=square3_color),
+            fill='toself', 
+            fillcolor=square3_color,
+            opacity=0.8
+        )
+        square4 = go.Scatter(
+            x=[2+offset2, 3+offset2, 3+offset2, 2+offset2, 2+offset2],
+            y=[-0.5, -0.5, 0.5, 0.5, -0.5],
+            mode='lines',
+            text='Channel 4',
+            name='Channel 4',
+            line=dict(color=square4_color),
+            fill='toself', 
+            fillcolor=square4_color,
+            opacity=0.8
+        )
+
+
+        # Create the figure
+        figure = {
+            'data': [square1, square2, square3, square4],
+            'layout': go.Layout(
+                title=f'Channel 1 & 2 overlap: {overlap:.2f}; Channel 3 & 4 overlap: {overlap2:.2f}',
+                xaxis=dict(range=[-8, 8]),
+                yaxis=dict(range=[-2, 2]),
+                showlegend=True
+            )
+        }
 
     return figure
 

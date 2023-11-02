@@ -6,7 +6,7 @@ from dash.exceptions import PreventUpdate
 import os
 from pathlib import Path
 
-dash.register_page(__name__)
+dash.register_page(__name__, order = 2, name = 'Image Preview')
 
 # point Dash to image directory of interest here
 # image_directory = '/nethome/kpandit/hudson/images'
@@ -15,15 +15,11 @@ dash.register_page(__name__)
 # point Dash to image directory of interest here
 # image_directory = f'{args.directory}/dashboard/preview/m387ntga1'
 # list_of_images = [f for f in os.listdir(image_directory) if '.jpg' in f]
-# static_image_route = '/static/'
-
-#image_directory = '/commons/groups/nygcfaculty/PySeq/20210505_mouse_genotype_3/tiffs'
-#list_of_images = [f for f in os.listdir(image_directory) if '.tiff' in f]
 static_image_route = '/static/'
 
 
 layout = html.Div([
-    html.H1("Image Thumbnails"), 
+    html.H3("Image Thumbnails"), 
     #html.Div(["Folder being served: ", image_directory]),
     html.Div([
         "Select the image you want to display",
@@ -38,10 +34,6 @@ layout = html.Div([
     ]),
     html.Button('Previous Image', id='prev',n_clicks=0),
     html.Button('Next Image', id='next',n_clicks=0),
-    html.Div(
-        #html.Img(src=image_paths[0]),
-        id='container-image'
-    ),
     html.Div([
         DashCanvas(id='canvas-image',
             tool='line',
@@ -51,30 +43,7 @@ layout = html.Div([
             ),
     ]),           
 ])
-'''
-    # folder dropdown 
-        html.Div([
-        "Select the folder with your images:",
-        dcc.Dropdown(
-            id="folder-dropdown",
-            options=[{"label": x, "value": x} for x in folders],
-            #value=folders[0],
-            placeholder="Select the folder with your images"
-        ),
-    ]), 
-    #list files in selected folder in a bulleted list
-    #html.Div(id="folder-files"),
-'''
 
-'''
-# Update image-dropdown depending on folder selected 
-@app.callback(Output("image-dropdown", "options"), Input("folder-dropdown", "value"))
-def update_image_dropdown(folder_name):
-    images = [x for x in os.listdir(folder_name) if ".jpg" in x or ".jpeg" in x]
-    #list all files in bulleted list
-    #file_list = html.Ul([html.Li(file) for file in file_names])
-    return images
-'''
 # # Serve static images
 # @layout.server.route('{}<image_path>.png'.format(static_image_route))
 # def serve_image(image_path):
@@ -89,7 +58,7 @@ def update_image_dropdown(folder_name):
 def set_sections(exp_dir):
     return [f.name for f in os.scandir(Path(exp_dir)/'dashboard'/'preview') if f.is_dir()]
 
-
+#sets marker dropdown options & automatically chooses first marker as dropdown value
 @callback(Output("marker-dropdown","options"),
           Output("marker-dropdown","value"),
           Input('exp_dir', 'data'),
@@ -155,4 +124,30 @@ def display_image(section,marker,marker_,next,prev, exp_dir):
     else:
         m = marker
 
-    return f'{exp_dir}/dashboard/{section}_{m}.jpg', m
+    return f'/static/{section}_{m}.jpg', m
+
+
+'''
+    # folder dropdown 
+        html.Div([
+        "Select the folder with your images:",
+        dcc.Dropdown(
+            id="folder-dropdown",
+            options=[{"label": x, "value": x} for x in folders],
+            #value=folders[0],
+            placeholder="Select the folder with your images"
+        ),
+    ]), 
+    #list files in selected folder in a bulleted list
+    #html.Div(id="folder-files"),
+'''
+
+'''
+# Update image-dropdown depending on folder selected 
+@app.callback(Output("image-dropdown", "options"), Input("folder-dropdown", "value"))
+def update_image_dropdown(folder_name):
+    images = [x for x in os.listdir(folder_name) if ".jpg" in x or ".jpeg" in x]
+    #list all files in bulleted list
+    #file_list = html.Ul([html.Li(file) for file in file_names])
+    return images
+'''

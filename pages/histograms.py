@@ -7,14 +7,21 @@ import cv2
 import os
 from pathlib import Path
 from dash.exceptions import PreventUpdate
+import numpy as np
 
 dash.register_page(__name__)
 
-def calculate_histogram(image_path):
-    image = cv2.imread(image_path)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    hist = cv2.calcHist([gray_image], [0], None, [256], [0, 256])
-    return hist.ravel()
+def calculate_histogram(image_path, bins=256):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Calculate the histogram
+    hist, bins = np.histogram(image, bins=bins, range=(0, 256))
+
+    # Apply a logarithmic scale to the histogram
+    hist = np.log1p(hist)
+
+    return hist
 
 
 layout = html.Div([
@@ -140,9 +147,9 @@ def display_image(section,marker,marker_,next,prev, exp_dir):
             {'x': list(range(256)), 'y': hist, 'type': 'bar', 'name': 'Intensity'},
         ],
         'layout': {
-            'title': 'Histogram of Intensity Values',
+            'title': f'Histogram of Intensity Values for {section}_{m}',
             'xaxis': {'title': 'Intensity Value'},
-            'yaxis': {'title': 'Frequency'}
+            'yaxis': {'title': 'log(Frequency)'}
         }
     }, m
 
