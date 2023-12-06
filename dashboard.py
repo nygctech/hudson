@@ -30,6 +30,14 @@ dcc.Store('exp_dir',data=args.directory, storage_type='session')
 
 
 app.layout = html.Div([
+    html.Div([
+        # HTML Image for the GIF source
+        html.Img(
+            src='https://media.tenor.com/3xbwDublXW4AAAAC/parrot-science.gif', 
+            height = 50,
+            width = 50,
+        )
+    ], style={'position': 'absolute', 'top': 0, 'right': 0, 'padding': '10px'}),
     html.H1('Hudson Dashboard'),
     dcc.Store(id="exp_dir", data=args.directory),   
     html.Div([
@@ -75,7 +83,6 @@ def serve_resource(resource):
     basedir = exp_dir / 'dashboard'
     return flask.send_from_directory(str(basedir), resource)
 
-
 '''
 @app.server.route('{}<image_path>.jpg'.format(static_image_route))
 def serve_image(image_path):
@@ -93,7 +100,7 @@ hostn = (socket.gethostname())
 
 # run app from nygc cluster and specify port
 if __name__ == '__main__':
-    app.run_server(debug=True, host = hostn, port = 8081)
+    app.run_server(debug=True, host = hostn, port = 8063)
 
 '''
 OLD CODE FOR BACKUP 
