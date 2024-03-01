@@ -19,6 +19,29 @@ layout = html.Div([
     html.Div(id = "log-file"),
     html.H3("Experiment Duration"),
     html.Div(id = "exp-duration",style={'whiteSpace': 'pre-line'}),
+    html.H3("Imaging Time"),
+    dash_table.DataTable(
+        id='img-time',
+        fill_width=False,
+        style_table={'overflowX': 'auto'},
+        style_cell={
+            'height': 'auto',
+            # all three widths are needed
+            'minWidth': '300px', 'width': '300px', 'maxWidth': '300px',
+            'whiteSpace': 'normal'},
+    ),
+    html.H3("Autofocus Info"),
+    html.Div(id = "autofocus-time"),
+    dash_table.DataTable(
+        id='autofocus-pts',
+        fill_width=False,
+        style_table={'overflowX': 'auto'},
+        style_cell={
+            'height': 'auto',
+            # all three widths are needed
+            'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
+            'whiteSpace': 'normal'},
+    ),
     html.H3("Experiment Priming"),
     dash_table.DataTable(
         id='priming',
@@ -237,3 +260,76 @@ def laser_power_graph(log_file_path):
                       yaxis_title='Temperature (°C)')
 
     return fig
+
+def parse_imgtime_log(log_file_path):
+    with open(log_file_path, 'r', encoding='iso-8859-1') as file:
+        lines = file.readlines()
+
+    data = []
+    for line in lines:
+        match = re.search(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}),.*?cycle(\d+)::m(\d+)::Imaging completed in (\d+) minutes', line)
+        if match:
+            cycle_number = match.group(3)
+            m_number = match.group(4)
+            imaging_time = int(match.group(5))
+            data.append({'Cycle': cycle_number,'Imaging Time (minutes)': imaging_time})
+
+    df = pd.DataFrame(data)
+    return df
+
+@callback(Output('img-time','data'),
+          Output('img-time','columns'),
+          Input('log-file','children'))
+def img_time(log_file_path):
+    # Function to parse log file and extract information
+    if log_file_path is not None:
+        df = parse_imgtime_log(log_file_path)
+        avg_imaging_time = df.groupby('Cycle')['Imaging Time (minutes)'].mean().reset_index().round(2)
+        
+       # avg_imaging_time.drop(columns=['M Number'])
+        overall_avg = df['Imaging Time (minutes)'].mean()
+        
+        # Row to append
+        new_row = {'Cycle': 'Average', 'Imaging Time (minutes)': overall_avg}
+
+        # Append the row
+        avg_imaging_time.append(new_row, ignore_index=True).round(2)
+
+        return avg_imaging_time.to_dict('records'), [{"name": i, "id": i} for i in avg_imaging_time.columns]
+    
+@callback(Output('autofocus-time','children'),
+          Output('autofocus-pts','data'),
+          Output('autofocus-pts','columns'),
+          Input('log-file','children'))
+def autofocus_time(log_file_path):
+    with open(log_file_path, 'r', encoding='iso-8859-1') as file:
+        lines = file.readlines()
+
+    data = []
+    total_minutes = 0
+    autofocus_completed_count = 0
+    for line in lines:
+        match_time = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),.*?Completed in (\d+) minutes', line)
+        match_pt = re.search(r'Autofocus::GetFocusData:: (Good|Bad)\s+point:: \[\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\]', line)
+    
+        if match_time:
+            minutes = int(match_time.group(2))
+            if minutes > 0:
+                total_minutes += minutes
+                autofocus_completed_count += 1
+        elif match_pt:
+            point_type = match_pt.group(1)
+            x = int(match_pt.group(2))
+            y = int(match_pt.group(3))
+            median_focus_step = int(match_pt.group(4))
+            index = int(match_pt.group(5))
+            data.append({'Index': index, 'Point Type': point_type, 'X': x, 'Y': y, 'Median Focus Step': median_focus_step})
+    # Convert dictionary to DataFrame
+    df = pd.DataFrame.from_dict(data)
+    
+    # Drop duplicates to keep only the latest entry for each index
+    df = df.drop_duplicates(subset='Index', keep='last')
+    
+    return f'Total time taken to autofocus: {total_minutes} minutes. \n\nNumber of autofocus attempts: {autofocus_completed_count}', df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
+    
+    
