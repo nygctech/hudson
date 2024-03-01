@@ -3,17 +3,19 @@ import cellpose
 from cellpose import core, models, io
 from pathlib import Path
 import imageio
-from utils import get_logger, open_zarr
+from utils import get_logger, HiSeqImage
 
 
-
-
-# Open image from zarr store
-image = open_zarr(snakemake.input[0])
+section_name = snakemake.params.section
 
 # Start logger
-smk_logger = get_logger(image.name, filehandler = snakemake.log[0])
+smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+image = hs_image.im
 smk_logger.debug(image)
+
 
 # Make sure only 1 objective step
 if 'obj_step' in image.dims and 'obj_step' not in snakemake.config.get('segmentation',{}):

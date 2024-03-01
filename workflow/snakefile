@@ -1,4 +1,3 @@
-#from pre import utils
 from os.path import join
 import configparser
 import subprocess
@@ -7,7 +6,6 @@ from math import log, ceil
 
 
 exp_dir = config['experiment_directory']
-#exp_conf_path = config.get('experiment_config','logs/config.cfg')
 exp_conf_path = config.get('experiment_config')
 if exp_conf_path is None:
     exp_conf_path = join(exp_dir, 'logs/config.cfg')
@@ -22,8 +20,6 @@ sections = [s.replace('_','') for s in sections]
 
 core_limit = cluster_config.get('nodes')
 
-#ref = config["reference"]["seurat"]
-#type = config["reference"]["typecol"]
 
 def get_gpu():
     result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
@@ -76,7 +72,6 @@ def get_mem(wildcards):
 def get_picasso_time(wildcards):
     return get_cycles(wildcards)*60 # minutes
    
-print(sections)
   
 rule all:
     input:
@@ -132,6 +127,7 @@ rule picasso:
         '{output_dir}/final_zarr/picasso_{sections}.yaml'
     params:
         max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
+        section = '{sections}'
     log:
         '{output_dir}/logs/picasso_{sections}.log'
     threads: 8
@@ -169,6 +165,8 @@ rule segmentation:
     input:
         '{output_dir}/final_zarr/{sections}.zarr',
         '{output_dir}/summary_{sections}.yaml'
+    params:
+        section = '{sections}'
     output:
        '{output_dir}/masks/{sections}.tiff'
     resources:
@@ -187,6 +185,7 @@ rule feature_extraction:
         '{output_dir}/masks/{sections}.tiff'
     params:
         tiles = get_tiles
+        section = '{sections}'
     output:
         '{output_dir}/features/{sections}.h5mu'
     log: 

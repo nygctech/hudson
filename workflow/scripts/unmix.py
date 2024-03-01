@@ -1,4 +1,4 @@
-from utils import open_zarr, get_cluster, get_logger
+from utils import open_zarr, get_cluster, get_logger, HiSeqImage
 import yaml
 import xarray as xr
 import dask.array as da
@@ -74,7 +74,9 @@ for cy, ch_markers in markers_config.items():
 unmixed = xr.concat(marker_stack, dim='marker').assign_coords({'marker':marker_name})
 #unmixed = unmixed.chunk({'row': len(image.row)})
 logger.debug(unmixed)
-delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
+#delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
+unmixed = HiSeqImage(im = unmixed, logger = logger)
+delayed_store = unmixed.write_ome_zarr(snakemake.output[0])
 logger.info('Unmixing images')
 with performance_report(filename=snakemake.log[1]):
     future_store = client.persist(delayed_store, retries = 10)

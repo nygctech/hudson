@@ -9,7 +9,7 @@ import pickle
 from os.path import exists, join
 from joblib import Parallel, delayed
 from joblib import parallel_backend
-from utils import open_zarr, get_cluster, get_logger
+from utils import get_cluster, get_logger, HiSeqImage
 from skimage.measure import regionprops_table
 import anndata as ad
 import mudata as md
@@ -21,12 +21,17 @@ import squidpy as sq
 
 ### Morphological features computed when making muon object !!!
 
-# open xarray image from zarr store
-image = open_zarr(snakemake.input[0])
+section_name = snakemake.params.section
 
 # Start logger
-logger = get_logger(image.name, filehandler = snakemake.log[0])
-logger.info(f'Opened {image.name} zarr')
+smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+image = hs_image.im
+smk_logger.debug(image)
+
+
 
 # Open instance labels
 labels = imread(snakemake.input[1])
