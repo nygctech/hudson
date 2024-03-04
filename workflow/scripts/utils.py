@@ -1,3 +1,10 @@
+import xarray as xr
+from pathlib import Path
+from ome_zarr.io import parse_url
+from ome_zarr.reader import Reader
+
+
+
 def get_cluster(manager='SLURM', **winfo):
     '''Create dask cluster
     
@@ -86,6 +93,8 @@ class HiSeqImage():
 
         """
         
+	import zarr
+  
         if logger is None:
             logger = get_logger(**kwargs)
         self.logger = logger
@@ -153,6 +162,8 @@ class HiSeqImage():
 
         """
         
+	from ome_types.models import Instrument, Microscope, Objective, Channel, Pixels, TiffData, OME, Image
+
         if isinstance(dir_path, str):
             dir_path = Path(dir_path)
 
