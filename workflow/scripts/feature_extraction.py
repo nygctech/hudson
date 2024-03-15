@@ -35,7 +35,7 @@ smk_logger.debug(image)
 
 # Open instance labels
 labels = imread(snakemake.input[1])
-logger.info(f'Opened {image.name} labels')
+smk_logger.info(f'Opened {image.name} labels')
 
 
 ##########################################################################################
@@ -45,7 +45,7 @@ logger.info(f'Opened {image.name} labels')
 
 
 # Get Morphological Features
-logger.info(f'Measuring morphological features')
+smk_logger.info(f'Measuring morphological features')
 features = ('area','area_bbox','area_convex','area_filled','axis_major_length','axis_minor_length',
             'eccentricity', 'equivalent_diameter_area','euler_number','extent','feret_diameter_max',
             'orientation','perimeter','perimeter_crofton','solidity', 'label', 'centroid')
@@ -68,7 +68,7 @@ morph_ad = ad.AnnData(X = morph_df, obsm = {'spatial':coords})
 radius = None # get from config file
 if radius is None:
     radius = (morph_table['feret_diameter_max'].mean()+morph_table['feret_diameter_max'].std())*3/2
-logger.info(f'Used {radius} px radius for delaunay graph')
+smk_logger.info(f'Used {radius} px radius for delaunay graph')
 sq.gr.spatial_neighbors(morph_ad, n_neighs = True, delaunay=True, radius=(0,radius), coord_type = 'generic')
 # h5 can't save radius parameter as tuple, so save as float
 morph_ad.uns['spatial_neighbors']['params']['radius'] = radius
@@ -81,17 +81,17 @@ feat_dict = {'morphological': morph_ad}
 
 # Max project if Z dimension still present
 if 'obj_step' in image.dims:
-    logger.info(f'Projecting Z max')
+    smk_logger.info(f'Projecting Z max')
     image = image.max(dim = 'obj_step')
     
 # Get markers
-marker_list = list(image.marker.values)
+marker_list = list(image.channel.values)
 for m in snakemake.config.get('feature extraction',{}).get('exclude', []):
     marker_list.remove(m)
 msg = 'Intensity features: '
 for m in marker_list:
     msg += f' {m}'
-logger.info(msg)
+smk_logger.info(msg)
 
 # plane_dict = {}
 
@@ -111,9 +111,9 @@ if torch.cuda.is_available() == False:
     
     ##TODO: measure texture / intensity quartiles
     mean_intensity_per_marker = {}
-    for m in image.marker.values:
+    for m in image.channel.values:
         logger.info(f'Measuring {m}')
-        props = regionprops_table(labels, intensity_image = image.sel(marker = m).values, 
+        props = regionprops_table(labels, intensity_image = image.sel(channel = m).values, 
                                   properties = ('intensity_mean',))
         mean_intensity_per_marker.update({m:props['intensity_mean']})
 
