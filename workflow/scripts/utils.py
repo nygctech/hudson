@@ -2,6 +2,32 @@ import xarray as xr
 from pathlib import Path
 from ome_zarr.io import parse_url
 from ome_zarr.reader import Reader
+import yaml
+
+def get_machine_config(machine):
+    '''Get machine config yaml from ~/.config/pyseq2500/machine_settings.yaml.'''
+
+    if isinstance(config_path, str):
+        config_path = Path(config_path)
+
+    if not config_path.exists():
+        raise OSError(f'{config_path} does not exist')
+
+#    if config_path.suffix == '.cfg':
+#        # Create and read experiment config
+#        config = configparser.ConfigParser()
+#        config.read(config_path)
+#
+#        return config
+
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+    
+    machine_config = config.get(machine, None)
+    if machine_config is None:
+        raise KeyError(f'{machine} does not exist in {config_path}')
+    
+    return machine_config
 
 
 
@@ -162,7 +188,7 @@ class HiSeqImage():
 
         """
         
-	from ome_types.models import Instrument, Microscope, Objective, Channel, Pixels, TiffData, OME, Image
+	from ome_types.model import Instrument, Microscope, Objective, Channel, Pixels, TiffData, OME, Image
 
         if isinstance(dir_path, str):
             dir_path = Path(dir_path)
@@ -253,6 +279,9 @@ def read_xr_zarr(image_path):
        xarray DataArray backed by dask arrays
     
     '''
+    
+    if isinstance(image_path, str):
+        image_path = Path(image_path)
     
     # Read zarr written by xarray
     im_name = image_path.stem.split('.')[0]
