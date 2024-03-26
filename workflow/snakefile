@@ -73,13 +73,13 @@ def get_picasso_time(wildcards):
     return get_cycles(wildcards)*60 # minutes
    
   
-rule all:
-    input:
-        expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
-
 # rule all:
 #     input:
-#         expand('{dir}/tables/{s}.csv', dir = output_dir, s = sections)
+#         expand('{dir}/net_neighborhood/{s}.pkl', dir = output_dir, s = sections)
+
+rule all:
+    input:
+        expand('{dir}/tables/{s}.csv', dir = output_dir, s = sections)
 
 rule saveraw:
     input:
@@ -126,7 +126,7 @@ rule picasso:
     output:
         '{output_dir}/final_zarr/picasso_{sections}.yaml'
     params:
-        max_iter = config.get('unmix',{'max_iter':100}).get('max_iter')
+        max_iter = config.get('unmix',{'max_iter':100}).get('max_iter'),
         section = '{sections}'
     log:
         '{output_dir}/logs/picasso_{sections}.log'
@@ -147,14 +147,15 @@ rule unmix:
         '{output_dir}/processed_zarr/{sections}.zarr',
         '{output_dir}/final_zarr/picasso_{sections}.yaml'  
     params:
-        tiles = get_tiles
+        tiles = get_tiles,
+        section = '{sections}'
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
     log:
         '{output_dir}/logs/unmix_{sections}.log',
         '{output_dir}/logs/unmix_{sections}.html'
     conda:
-        'envs/pyseq-image.yaml'
+        'envs/unmix.yaml'
     script:
         'scripts/unmix.py'
 
@@ -184,7 +185,7 @@ rule feature_extraction:
         '{output_dir}/final_zarr/{sections}.zarr',
         '{output_dir}/masks/{sections}.tiff'
     params:
-        tiles = get_tiles
+        tiles = get_tiles,
         section = '{sections}'
     output:
         '{output_dir}/features/{sections}.h5mu'
@@ -243,16 +244,16 @@ rule celltype:
               --genedict={params.genedict} > {log}
         '''
 
-rule spatial_neighborhood:
-    input:
-       '{output_dir}/anndata/{sections}.h5mu',
-       '{output_dir}/tables/{sections}.csv'
-    output:
-       '{output_dir}/cell_neighborhood/{sections}.pkl',
-       '{output_dir}/net_neighborhood/{sections}.pkl'
-    resources:
-        mem_mb = 32000
-    conda:
-        'envs/spatial_neighbor.yaml'
-    script:
-        'scripts/spatial_neighborhood.py'
+# rule spatial_neighborhood:
+#     input:
+#        '{output_dir}/anndata/{sections}.h5mu',
+#        '{output_dir}/tables/{sections}.csv'
+#     output:
+#        '{output_dir}/cell_neighborhood/{sections}.pkl',
+#        '{output_dir}/net_neighborhood/{sections}.pkl'
+#     resources:
+#         mem_mb = 32000
+#     conda:
+#         'envs/spatial_neighbor.yaml'
+#     script:
+#         'scripts/spatial_neighborhood.py'

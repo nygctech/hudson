@@ -213,9 +213,10 @@ dependencies:
     - docstring-parser==0.15
     - magicgui==0.7.3
     - mypy-extensions==1.0.0
-    - napari-picasso==0.3.1.dev4+g97218dc
+    - git+https://github.com/nygctech/PICASSO.git@97218dc6aa82261e9eae1df66f895b05f3d95a25#egg=napari-picasso
     - psygnal==0.9.4
     - pygments==2.16.1
     - qtpy==2.4.0
     - superqt==0.6.0
+    - ome-types==0.5.0
 prefix: /gpfs/commons/home/kpandit/mambaforge/envs/unmix

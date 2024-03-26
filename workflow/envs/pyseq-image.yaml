@@ -119,6 +119,7 @@ dependencies:
   - notebook=6.4.12=pyha770c72_0
   - numcodecs=0.10.0=py39h5a03fae_1
   - numpy=1.23.1=py39hba7629e_0
+  - ome-zarr=0.8.3=pyhd8ed1ab_0
   - openjpeg=2.4.0=hb52868f_1
   - openssl=3.0.5=h166bdaf_0
   - packaging=21.3=pyhd8ed1ab_0
