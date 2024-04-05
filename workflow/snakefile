@@ -91,13 +91,16 @@ rule saveraw:
         {exp_conf_path},
     params:
         section = '{sections}'
+        exp_name = '{experiment_name}'
     log:
         '{output_dir}/logs/saveraw_{sections}.log', 
         '{output_dir}/logs/saveraw_{sections}.html'
     output:
         directory('{output_dir}/raw_zarr/{sections}.zarr'),
         '{output_dir}/summary_{sections}.yaml',
-        '{output_dir}/exp_conf/{sections}.cfg'
+        '{output_dir}/exp_conf/{sections}.cfg',
+        '{output_dir}/exp_conf/{experiment_name}.log',
+        directory('{output_dir}/focus_data/{sections}')
     conda:
         'envs/pyseq-image.yaml'
     script:

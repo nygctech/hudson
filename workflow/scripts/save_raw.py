@@ -5,6 +5,7 @@ from dask.distributed import Client, wait, performance_report
 from pathlib import Path
 import yaml
 from math import ceil
+from shutil import copyfile
 
 # Find raw image path
 experiment_config = get_config(snakemake.input[0])
@@ -85,3 +86,12 @@ if all(futures_done):
    
     with open(snakemake.output[2], 'w') as f:
         experiment_config.write(f)
+
+    # Copy Experiment Log, TODO: copy over flowcell.logs
+    log_file = Path(exp_dir) / 'logs' / f'{snakemake.params.exp_name}.log'
+    copyfile(log_file, snakemake.output[3])
+
+    # Copy over autofocus data for the section
+    with open(snakemake.output[3], 'w') as f:
+        experiment_config.write(f)
+
