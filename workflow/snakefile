@@ -98,9 +98,8 @@ rule saveraw:
     output:
         directory('{output_dir}/raw_zarr/{sections}.zarr'),
         '{output_dir}/summary_{sections}.yaml',
-        '{output_dir}/exp_conf/{sections}.cfg',
-        '{output_dir}/exp_conf/{experiment_name}.log',
-        directory('{output_dir}/focus_data/{sections}')
+        directory('{output_dir}/exp_conf'),
+        directory('{output_dir}/exp_conf/{sections}')
     conda:
         'envs/pyseq-image.yaml'
     script:

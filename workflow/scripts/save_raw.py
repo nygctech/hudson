@@ -1,17 +1,19 @@
 from pre.utils import get_config
 from pre import image_analysis as ia
-from utils import get_cluster, get_logger
+from utils import get_cluster, get_logger, position
 from dask.distributed import Client, wait, performance_report
 from pathlib import Path
 import yaml
 from math import ceil
-from shutil import copyfile
+from shutil import copy2
+from os import makedirs
+from glob import iglob
 
 # Find raw image path
 experiment_config = get_config(snakemake.input[0])
-exp_dir = snakemake.config['experiment_directory']
+exp_dir = Path(snakemake.config['experiment_directory'])
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
-image_path = Path(exp_dir) / Path(image_path)
+image_path = exp_dir / image_path
 
 # Get section name
 section_name = snakemake.params.section
@@ -83,15 +85,24 @@ if all(futures_done):
     with open(snakemake.output[1], 'w') as f:
         f.write(yaml.dump(section_info))
         
-   
-    with open(snakemake.output[2], 'w') as f:
-        experiment_config.write(f)
+    # Copy Experiment Config     
+    log_dir = Path(snakemake.output[2])
+    os.makedirs(log_dir, exist_ok = True) 
+    if not (log_dir / 'config.cfg').exists():
+        copy2(snakemake.input[0], log_dir / 'config.cfg')
 
-    # Copy Experiment Log, TODO: copy over flowcell.logs
-    log_file = Path(exp_dir) / 'logs' / f'{snakemake.params.exp_name}.log'
-    copyfile(log_file, snakemake.output[3])
+    # Copy Experiment and flowcell logs
+    for f in iglob(str(exp_dir / 'logs' /'*.log'):
+        if not (log_dir / f.name).exists():
+            copy2(f, log_dir / f.name)
 
     # Copy over autofocus data for the section
-    with open(snakemake.output[3], 'w') as f:
-        experiment_config.write(f)
-
+    focus_config = exp_dir / 'logs' / exp_name / 'focus_config.cfg'
+    if not (log_dir / 'focus_config.cfg').exists():
+	copy2(focus_config, exp_dir / 'focus_config.cfg')
+    focus_dir = Path(snakemake.output[3])
+    os.makedirs(focus_dir, exist_ok = True)
+    pos_dict = position(experiment_config.get('section', section_name))
+    section_id = str(pos_dict['x_center'])+str(pos_dict['y_center'])
+    for f in iglob(str(focus_dir / section_id + '*')):
+        copy2(f, focus_dir / f.name)
