@@ -33,6 +33,12 @@ layout = html.Div([
     dcc.Dropdown(id = 'focus-section',placeholder="Choose a section"),
     html.P("Double click a series number to isolate a curve."), 
     dcc.Graph(id='focus-data-plot'),
+    html.Div([
+        DashCanvas(id='autofocus-image',
+            tool='line',
+            lineWidth=5,
+            lineColor='red',
+            ),
     
 
 ])
@@ -79,6 +85,51 @@ def read_data_from_files(file_pattern):
         all_data.append(df)
     return pd.concat(all_data, ignore_index=True),focus_nps
 
+
+
+### Kunal's code to plot FOVs on round 1 image ###
+
+def get_fovs(exp_dir, section_name):
+    files = os.listdir(Path(exp_dir) / 'exp_conf' / section_name)
+    fovs_ = []
+    for f in files: 
+        id_, r, c = _.split('_')
+        r = int(r[1:])/scale
+        c = (int(c.split('.')[0][1:]))/scale
+        fovs_.append((r,c))
+
+     return fovs_
+
+def focus_position_map(exp_dir, section_name):
+    #fig2 = px.imshow(image_small**gamma, width=len(image_small.col), height = len(image_small.row), aspect = 'equal', color_continuous_scale = 'magma', zmin = 125**gamma, zmax = 3000**gamma)
+    # TODO
+    # get preview image from 1st cycle and plot
+    # get how much the preview image was downscaled
+
+    scale = 4
+    width = 2048 / scale
+    height = 16 / scale
+    r_offset = 64 / scale
+    c_offset = 0 / scale
+    # Add rectangles to the figure
+    for r, c in get_fovs(exp_dir, section_name):
+
+    fig2.add_shape(
+        type="rect",
+        x0=c+c_offset, y0=r+r_offset, x1=(c+c_offset+width), y1=(r+r_offset+height),
+        #line=rect['line']
+    )
+
+    # Configure layout
+    fig2.update_layout(
+        title=section_name,
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        showlegend=False
+    )
+
+
+### End of Kunal's code #####
 
 # define mixed gaussian func
 from scipy.optimize import least_squares
