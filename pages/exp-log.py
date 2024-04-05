@@ -30,18 +30,18 @@ layout = html.Div([
             'minWidth': '300px', 'width': '300px', 'maxWidth': '300px',
             'whiteSpace': 'normal'},
     ),
-    html.H3("Autofocus Info"),
-    html.Div(id = "autofocus-time"),
-    dash_table.DataTable(
-        id='autofocus-pts',
-        fill_width=False,
-        style_table={'overflowX': 'auto'},
-        style_cell={
-            'height': 'auto',
+    #html.H3("Autofocus Info"),
+    #html.Div(id = "autofocus-time"),
+    #dash_table.DataTable(
+    #    id='autofocus-pts',
+     #   fill_width=False,
+     #   style_table={'overflowX': 'auto'},
+      #  style_cell={
+      #      'height': 'auto',
             # all three widths are needed
-            'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
-            'whiteSpace': 'normal'},
-    ),
+      #      'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
+      #      'whiteSpace': 'normal'},
+    #),
     html.H3("Experiment Priming"),
     dash_table.DataTable(
         id='priming',
@@ -296,7 +296,7 @@ def img_time(log_file_path):
         avg_imaging_time.append(new_row, ignore_index=True).round(2)
 
         return avg_imaging_time.to_dict('records'), [{"name": i, "id": i} for i in avg_imaging_time.columns]
-    
+'''    
 @callback(Output('autofocus-time','children'),
           Output('autofocus-pts','data'),
           Output('autofocus-pts','columns'),
@@ -331,5 +331,5 @@ def autofocus_time(log_file_path):
     df = df.drop_duplicates(subset='Index', keep='last')
     
     return f'Total time taken to autofocus: {total_minutes} minutes. \n\nNumber of autofocus attempts: {autofocus_completed_count}', df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
-    
+    '''
     
