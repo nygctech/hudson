@@ -1,0 +1,6 @@
+cycles: 5
+experiment: 20210323_4i4color
+machine: Origin
+planesizeMB: 8
+rawpath: /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/raw_zarr
+tiles: 1

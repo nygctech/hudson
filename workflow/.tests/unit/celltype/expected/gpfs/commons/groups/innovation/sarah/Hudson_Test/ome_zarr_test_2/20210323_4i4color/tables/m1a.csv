@@ -1,0 +1,605 @@
+id,type
+1,Oligodendrocytes
+2,Oligodendrocytes
+3,Excitatory neurons
+4,Oligodendrocytes
+5,Inhibitory neurons
+6,Oligodendrocytes
+7,Astrocytes
+8,Cholinergic neurons
+9,Cholinergic neurons
+10,Oligodendrocytes
+11,Oligodendrocytes
+12,Oligodendrocytes
+13,Cholinergic neurons
+14,Endothelial cells
+15,Oligodendrocytes
+16,Astrocytes
+17,Astrocytes
+18,Oligodendrocytes
+19,Excitatory neurons
+20,Oligodendrocytes
+21,Astrocytes
+22,Oligodendrocytes
+23,Oligodendrocytes
+24,Oligodendrocytes
+25,Inhibitory neurons
+26,Excitatory neurons
+27,Cholinergic neurons
+28,Astrocytes
+29,Astrocytes
+30,Astrocytes
+31,Astrocytes
+32,Astrocytes
+33,Astrocytes
+34,Cholinergic neurons
+35,Astrocytes
+36,Oligodendrocytes
+37,Oligodendrocytes
+38,Astrocytes
+39,Cholinergic neurons
+40,Inhibitory neurons
+41,Inhibitory neurons
+42,Excitatory neurons
+43,Astrocytes
+44,Endothelial cells
+45,Oligodendrocytes
+46,Oligodendrocytes
+47,Astrocytes
+48,Microglia/Macrophages
+49,Oligodendrocytes
+50,Oligodendrocytes
+51,Astrocytes
+52,Oligodendrocytes
+53,Oligodendrocytes
+54,Inhibitory neurons
+55,Astrocytes
+56,Cholinergic neurons
+57,Cholinergic neurons
+58,Astrocytes
+59,Cholinergic neurons
+60,Oligodendrocytes
+61,Astrocytes
+62,Oligodendrocytes
+63,Cholinergic neurons
+64,Cholinergic neurons
+65,Oligodendrocytes
+66,Inhibitory neurons
+67,Cholinergic neurons
+68,Excitatory neurons
+69,Oligodendrocytes
+70,Oligodendrocytes
+71,Endothelial cells
+72,Oligodendrocytes
+73,Excitatory neurons
+74,Cholinergic neurons
+75,Inhibitory neurons
+76,Inhibitory neurons
+77,Excitatory neurons
+78,Inhibitory neurons
+79,Astrocytes
+80,Excitatory neurons
+81,Oligodendrocytes
+82,Astrocytes
+83,Inhibitory neurons
+84,Oligodendrocytes
+85,Cholinergic neurons
+86,Oligodendrocytes
+87,Endothelial cells
+88,Oligodendrocytes
+89,Inhibitory neurons
+90,Oligodendrocytes
+91,Astrocytes
+92,Inhibitory neurons
+93,Astrocytes
+94,Astrocytes
+95,Astrocytes
+96,Astrocytes
+97,Astrocytes
+98,Cholinergic neurons
+99,Cholinergic neurons
+100,Inhibitory neurons
+101,Astrocytes
+102,Astrocytes
+103,Endothelial cells
+104,Inhibitory neurons
+105,Astrocytes
+106,Oligodendrocytes
+107,Astrocytes
+108,Oligodendrocytes
+109,Cholinergic neurons
+110,Inhibitory neurons
+111,Inhibitory neurons
+112,Oligodendrocytes
+113,Cholinergic neurons
+114,Astrocytes
+115,Oligodendrocytes
+116,Excitatory neurons
+117,Oligodendrocytes
+118,Inhibitory neurons
+119,Oligodendrocytes
+120,Oligodendrocytes
+121,Astrocytes
+122,Oligodendrocytes
+123,Oligodendrocytes
+124,Oligodendrocytes
+125,Endothelial cells
+126,Oligodendrocytes
+127,Inhibitory neurons
+128,Cholinergic neurons
+129,Oligodendrocytes
+130,Oligodendrocytes
+131,Astrocytes
+132,Astrocytes
+133,Cholinergic neurons
+134,Cholinergic neurons
+135,Inhibitory neurons
+136,Astrocytes
+137,Oligodendrocytes
+138,Astrocytes
+139,Cholinergic neurons
+140,Excitatory neurons
+141,Excitatory neurons
+142,Astrocytes
+143,Cholinergic neurons
+144,Cholinergic neurons
+145,Microglia/Macrophages
+146,Excitatory neurons
+147,Oligodendrocytes
+148,Oligodendrocytes
+149,Astrocytes
+150,Astrocytes
+151,Oligodendrocytes
+152,Astrocytes
+153,Oligodendrocytes
+154,Inhibitory neurons
+155,Excitatory neurons
+156,Oligodendrocytes
+157,Oligodendrocytes
+158,Inhibitory neurons
+159,Inhibitory neurons
+160,Astrocytes
+161,Cholinergic neurons
+162,Cholinergic neurons
+163,Oligodendrocytes
+164,Excitatory neurons
+165,Cholinergic neurons
+166,Astrocytes
+167,Oligodendrocytes
+168,Excitatory neurons
+169,Excitatory neurons
+170,Inhibitory neurons
+171,Cholinergic neurons
+172,Astrocytes
+173,Endothelial cells
+174,Astrocytes
+175,Astrocytes
+176,Oligodendrocytes
+177,Astrocytes
+178,Oligodendrocytes
+179,Oligodendrocytes
+180,Oligodendrocytes
+181,Oligodendrocytes
+182,Astrocytes
+183,Astrocytes
+184,Astrocytes
+185,Astrocytes
+186,Oligodendrocytes
+187,Astrocytes
+188,Inhibitory neurons
+189,Inhibitory neurons
+190,Cholinergic neurons
+191,Astrocytes
+192,Inhibitory neurons
+193,Oligodendrocytes
+194,Oligodendrocytes
+195,Endothelial cells
+196,Oligodendrocytes
+197,Excitatory neurons
+198,Astrocytes
+199,Oligodendrocytes
+200,Oligodendrocytes
+201,Oligodendrocytes
+202,Astrocytes
+203,Inhibitory neurons
+204,Excitatory neurons
+205,Cholinergic neurons
+206,Astrocytes
+207,Astrocytes
+208,Astrocytes
+209,Oligodendrocytes
+210,Cholinergic neurons
+211,Cholinergic neurons
+212,Oligodendrocytes
+213,Oligodendrocytes
+214,Endothelial cells
+215,Excitatory neurons
+216,Oligodendrocytes
+217,Astrocytes
+218,Inhibitory neurons
+219,Oligodendrocytes
+220,Astrocytes
+221,Inhibitory neurons
+222,Oligodendrocytes
+223,Inhibitory neurons
+224,Oligodendrocytes
+225,Astrocytes
+226,Oligodendrocytes
+227,Inhibitory neurons
+228,Cholinergic neurons
+229,Astrocytes
+230,Endothelial cells
+231,Excitatory neurons
+232,Oligodendrocytes
+233,Oligodendrocytes
+234,Inhibitory neurons
+235,Oligodendrocytes
+236,Inhibitory neurons
+237,Oligodendrocytes
+238,Endothelial cells
+239,Astrocytes
+240,Excitatory neurons
+241,Excitatory neurons
+242,Cholinergic neurons
+243,Inhibitory neurons
+244,Cholinergic neurons
+245,Inhibitory neurons
+246,Astrocytes
+247,Astrocytes
+248,Astrocytes
+249,Cholinergic neurons
+250,Astrocytes
+251,Cholinergic neurons
+252,Astrocytes
+253,Astrocytes
+254,Astrocytes
+255,Excitatory neurons
+256,Inhibitory neurons
+257,Endothelial cells
+258,Inhibitory neurons
+259,Astrocytes
+260,Endothelial cells
+261,Cholinergic neurons
+262,Endothelial cells
+263,Oligodendrocytes
+264,Oligodendrocytes
+265,Oligodendrocytes
+266,Oligodendrocytes
+267,Astrocytes
+268,Astrocytes
+269,Oligodendrocytes
+270,Excitatory neurons
+271,Astrocytes
+272,Astrocytes
+273,Excitatory neurons
+274,Astrocytes
+275,Cholinergic neurons
+276,Oligodendrocytes
+277,Microglia/Macrophages
+278,Astrocytes
+279,Oligodendrocytes
+280,Oligodendrocytes
+281,Endothelial cells
+282,Microglia/Macrophages
+283,Astrocytes
+284,Astrocytes
+285,Astrocytes
+286,Oligodendrocytes
+287,Cholinergic neurons
+288,Excitatory neurons
+289,Inhibitory neurons
+290,Cholinergic neurons
+291,Oligodendrocytes
+292,Astrocytes
+293,Cholinergic neurons
+294,Oligodendrocytes
+295,Oligodendrocytes
+296,Astrocytes
+297,Cholinergic neurons
+298,Oligodendrocytes
+299,Astrocytes
+300,Cholinergic neurons
+301,Astrocytes
+302,Oligodendrocytes
+303,Astrocytes
+304,Astrocytes
+305,Inhibitory neurons
+306,Oligodendrocytes
+307,Astrocytes
+308,Astrocytes
+309,Oligodendrocytes
+310,Astrocytes
+311,Cholinergic neurons
+312,Inhibitory neurons
+313,Astrocytes
+314,Cholinergic neurons
+315,Oligodendrocytes
+316,Oligodendrocytes
+317,Inhibitory neurons
+318,Astrocytes
+319,Oligodendrocytes
+320,Oligodendrocytes
+321,Astrocytes
+322,Cholinergic neurons
+323,Inhibitory neurons
+324,Endothelial cells
+325,Inhibitory neurons
+326,Oligodendrocytes
+327,Cholinergic neurons
+328,Oligodendrocytes
+329,Oligodendrocytes
+330,Inhibitory neurons
+331,Inhibitory neurons
+332,Astrocytes
+333,Inhibitory neurons
+334,Cholinergic neurons
+335,Cholinergic neurons
+336,Oligodendrocytes
+337,Astrocytes
+338,Oligodendrocytes
+339,Excitatory neurons
+340,Astrocytes
+341,Oligodendrocytes
+342,Cholinergic neurons
+343,Excitatory neurons
+344,Astrocytes
+345,Astrocytes
+346,Oligodendrocytes
+347,Astrocytes
+348,Oligodendrocytes
+349,Astrocytes
+350,Inhibitory neurons
+351,Astrocytes
+352,Astrocytes
+353,Astrocytes
+354,Oligodendrocytes
+355,Cholinergic neurons
+356,Astrocytes
+357,Astrocytes
+358,Astrocytes
+359,Astrocytes
+360,Cholinergic neurons
+361,Astrocytes
+362,Astrocytes
+363,Oligodendrocytes
+364,Astrocytes
+365,Cholinergic neurons
+366,Astrocytes
+367,Astrocytes
+368,Oligodendrocytes
+369,Astrocytes
+370,Oligodendrocytes
+371,Astrocytes
+372,Oligodendrocytes
+373,Excitatory neurons
+374,Astrocytes
+375,Cholinergic neurons
+376,Astrocytes
+377,Astrocytes
+378,Oligodendrocytes
+379,Astrocytes
+380,Cholinergic neurons
+381,Cholinergic neurons
+382,Oligodendrocytes
+383,Astrocytes
+384,Astrocytes
+385,Cholinergic neurons
+386,Oligodendrocytes
+387,Cholinergic neurons
+388,Cholinergic neurons
+389,Endothelial cells
+390,Astrocytes
+391,Excitatory neurons
+392,Excitatory neurons
+393,Oligodendrocytes
+394,Oligodendrocytes
+395,Astrocytes
+396,Cholinergic neurons
+397,Inhibitory neurons
+398,Endothelial cells
+399,Excitatory neurons
+400,Excitatory neurons
+401,Excitatory neurons
+402,Astrocytes
+403,Oligodendrocytes
+404,Oligodendrocytes
+405,Astrocytes
+406,Cholinergic neurons
+407,Cholinergic neurons
+408,Astrocytes
+409,Oligodendrocytes
+410,Inhibitory neurons
+411,Excitatory neurons
+412,Cholinergic neurons
+413,Astrocytes
+414,Excitatory neurons
+415,Inhibitory neurons
+416,Excitatory neurons
+417,Astrocytes
+418,Endothelial cells
+419,Astrocytes
+420,Astrocytes
+421,Oligodendrocytes
+422,Astrocytes
+423,Astrocytes
+424,Oligodendrocytes
+425,Excitatory neurons
+426,Inhibitory neurons
+427,Cholinergic neurons
+428,Astrocytes
+429,Astrocytes
+430,Cholinergic neurons
+431,Astrocytes
+432,Astrocytes
+433,Astrocytes
+434,Astrocytes
+435,Cholinergic neurons
+436,Astrocytes
+437,Astrocytes
+438,Astrocytes
+439,Astrocytes
+440,Astrocytes
+441,Astrocytes
+442,Inhibitory neurons
+443,Excitatory neurons
+444,Inhibitory neurons
+445,Astrocytes
+446,Inhibitory neurons
+447,Inhibitory neurons
+448,Endothelial cells
+449,Excitatory neurons
+450,Cholinergic neurons
+451,Oligodendrocytes
+452,Oligodendrocytes
+453,Oligodendrocytes
+454,Oligodendrocytes
+455,Oligodendrocytes
+456,Astrocytes
+457,Excitatory neurons
+458,Astrocytes
+459,Oligodendrocytes
+460,Astrocytes
+461,Oligodendrocytes
+462,Oligodendrocytes
+463,Oligodendrocytes
+464,Cholinergic neurons
+465,Excitatory neurons
+466,Excitatory neurons
+467,Excitatory neurons
+468,Oligodendrocytes
+469,Oligodendrocytes
+470,Astrocytes
+471,Oligodendrocytes
+472,Oligodendrocytes
+473,Inhibitory neurons
+474,Oligodendrocytes
+475,Cholinergic neurons
+476,Oligodendrocytes
+477,Oligodendrocytes
+478,Inhibitory neurons
+479,Astrocytes
+480,Astrocytes
+481,Oligodendrocytes
+482,Oligodendrocytes
+483,Oligodendrocytes
+484,Astrocytes
+485,Oligodendrocytes
+486,Oligodendrocytes
+487,Astrocytes
+488,Astrocytes
+489,Astrocytes
+490,Oligodendrocytes
+491,Inhibitory neurons
+492,Oligodendrocytes
+493,Oligodendrocytes
+494,Inhibitory neurons
+495,Cholinergic neurons
+496,Astrocytes
+497,Oligodendrocytes
+498,Oligodendrocytes
+499,Oligodendrocytes
+500,Astrocytes
+501,Astrocytes
+502,Oligodendrocytes
+503,Inhibitory neurons
+504,Astrocytes
+505,Oligodendrocytes
+506,Oligodendrocytes
+507,Inhibitory neurons
+508,Astrocytes
+509,Astrocytes
+510,Astrocytes
+511,Astrocytes
+512,Astrocytes
+513,Cholinergic neurons
+514,Oligodendrocytes
+515,Oligodendrocytes
+516,Oligodendrocytes
+517,Oligodendrocytes
+518,Astrocytes
+519,Inhibitory neurons
+520,Cholinergic neurons
+521,Inhibitory neurons
+522,Cholinergic neurons
+523,Oligodendrocytes
+524,Cholinergic neurons
+525,Astrocytes
+526,Inhibitory neurons
+527,Astrocytes
+528,Cholinergic neurons
+529,Oligodendrocytes
+530,Astrocytes
+531,Astrocytes
+532,Astrocytes
+533,Endothelial cells
+534,Astrocytes
+535,Endothelial cells
+536,Oligodendrocytes
+537,Astrocytes
+538,Astrocytes
+539,Oligodendrocytes
+540,Excitatory neurons
+541,Inhibitory neurons
+542,Oligodendrocytes
+543,Astrocytes
+544,Oligodendrocytes
+545,Oligodendrocytes
+546,Oligodendrocytes
+547,Oligodendrocytes
+548,Astrocytes
+549,Astrocytes
+550,Cholinergic neurons
+551,Oligodendrocytes
+552,Oligodendrocytes
+553,Oligodendrocytes
+554,Oligodendrocytes
+555,Cholinergic neurons
+556,Oligodendrocytes
+557,Astrocytes
+558,Astrocytes
+559,Oligodendrocytes
+560,Oligodendrocytes
+561,Astrocytes
+562,Oligodendrocytes
+563,Endothelial cells
+564,Oligodendrocytes
+565,Oligodendrocytes
+566,Astrocytes
+567,Oligodendrocytes
+568,Astrocytes
+569,Oligodendrocytes
+570,Microglia/Macrophages
+571,Oligodendrocytes
+572,Oligodendrocytes
+573,Oligodendrocytes
+574,Oligodendrocytes
+575,Oligodendrocytes
+576,Inhibitory neurons
+577,Oligodendrocytes
+578,Astrocytes
+579,Inhibitory neurons
+580,Oligodendrocytes
+581,Astrocytes
+582,Oligodendrocytes
+583,Oligodendrocytes
+584,Astrocytes
+585,Oligodendrocytes
+586,Endothelial cells
+587,Astrocytes
+588,Astrocytes
+589,Astrocytes
+590,Oligodendrocytes
+591,Oligodendrocytes
+592,Oligodendrocytes
+593,Oligodendrocytes
+594,Astrocytes
+595,Astrocytes
+596,Astrocytes
+597,Oligodendrocytes
+598,Oligodendrocytes
+599,Oligodendrocytes
+600,Oligodendrocytes
+601,Oligodendrocytes
+602,Oligodendrocytes
+603,Astrocytes
+604,Excitatory neurons
