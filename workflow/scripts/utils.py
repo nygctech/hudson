@@ -4,30 +4,6 @@ from ome_zarr.io import parse_url
 from ome_zarr.reader import Reader
 import yaml
 
-def get_machine_config(machine):
-    '''Get machine config yaml from ~/.config/pyseq2500/machine_settings.yaml.'''
-
-    if isinstance(config_path, str):
-        config_path = Path(config_path)
-
-    if not config_path.exists():
-        raise OSError(f'{config_path} does not exist')
-
-#    if config_path.suffix == '.cfg':
-#        # Create and read experiment config
-#        config = configparser.ConfigParser()
-#        config.read(config_path)
-#
-#        return config
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-    
-    machine_config = config.get(machine, None)
-    if machine_config is None:
-        raise KeyError(f'{machine} does not exist in {config_path}')
-    
-    return machine_config
 
 
 def get_cluster(manager='SLURM', **winfo):
@@ -43,11 +19,14 @@ def get_cluster(manager='SLURM', **winfo):
 
     import re
 
-    assert manager.upper() in ['SLURM']
+    assert manager.upper() in ['SLURM', 'LOCAL']
 
     if re.search(manager, 'SLURM', re.IGNORECASE):
         from dask_jobqueue import SLURMCluster
         cluster = SLURMCluster(**winfo)
+    elif re.search(manager, 'LOCAL', re.IGNORECASE):
+        from dask.distributed import LocalCluster
+        cluster = LocalCluster(**winfo)
 
     #Add elif statements to add your specific cluster scheduler
 
@@ -205,17 +184,20 @@ class HiSeqImage():
         
         # Channel OME metadata
         channels_ = []
-        # print(f'{img.name} dims = {img.im.dims}')
         if 'channel' in self.im.dims:
-            for i, ch in enumerate(self.im['channel']):
-                # print(f'ID {i}: channel {ch}')
-                channels_.append(Channel(name=str(int(ch)), **self.ome_ch_dict[int(ch)]))
+            for ch in self.im['channel']:
+                for cy in self.im['cycle']:
+                    channels_.append(Channel(name=str(int(ch)), fluor = f'Cycle {cy}',
+                                             **self.ome_ch_dict[int(ch)]))
             size_c_ = len(self.im.channel)
         elif 'marker' in self.im.dims:
-            for i, ch in enumerate(self.im['marker']):
-                # print(f'ID {i}: channel {ch}, cycle {ch.cycle}, em_ch {ch.channel}')
-                # channels_.append(Channel(name=f'{ch.values}-Cycle{ch.cycle.values}', **self.ome_ch_dict[int(ch.channel)]))
-                channels_.append(Channel(name=f'{ch.values}', **self.ome_ch_dict[int(ch.channel)]))
+            for ch in self.im['marker']:
+                # self.logger.info(f'marker {ch}')
+                # self.logger.info(f'cycle {ch.cycle}')
+                # self.logger.info(f'channel {ch.channel}')
+                # self.logger.info(f'name {ch.value}')
+                channels_.append(Channel(name=f'{ch.values}', fluor = f'Cycle {str(ch.cycle.values)}',
+                                         **self.ome_ch_dict[int(ch.channel)]))
             size_c_ = len(self.im.marker)
         else:
             raise KeyError('Missing Channel Dimension')
@@ -237,16 +219,16 @@ class HiSeqImage():
                      **self.config['Pixels']
                     )
         
-        description =f"""first_cycle = {self.im.cycle[0]},
-                        last_cycle = {self.im.cycle[-1]},
-                        first_objstep = {self.im.obj_step[0]},
-                        last_objstep = {self.im.obj_step[-1]},
-                        int_objstep = {self.im.obj_step[1]-self.im.obj_step[0]}
+        description =f"""first_cycle = {str(self.im.cycle[0].values)},
+                        last_cycle = {str(self.im.cycle[-1].values)},
+                        first_objstep = {str(self.im.obj_step[0].values)},
+                        last_objstep = {str(self.im.obj_step[-1].values)},
+                        int_objstep = {str(self.im.obj_step[1].values-self.im.obj_step[0].values)}
                       """
         ome = OME()
         ome.images = [Image(name = self.name, pixels = pxs, description = description)]
         ome.instruments = [instrument_]
-        ome.creator = __name__
+        ome.creator = f'hudson::{__name__}'
         ome_dict = to_dict(ome)
 
         #Fix UnSerializable Fields
@@ -352,7 +334,7 @@ def read_ome_zarr(image_path, ome_metadata):
     if meta_dict.get('first_objstep', False):
         coord_dict['Z'] = range(meta_dict['first_objstep'], meta_dict['last_objstep']+1, meta_dict['int_objstep'])
     
-    dim_map = {'X': 'row', 'Y':'col', 'Z': 'obj_step', 'T': 'cycle', 'C': 'channel'}
+    dim_map = {'X': 'col', 'Y':'row', 'Z': 'obj_step', 'T': 'cycle', 'C': 'channel'}
     
     dims_ = []; coords_ = {}
     # loop through dimensions ie XYZCT
@@ -368,14 +350,14 @@ def read_ome_zarr(image_path, ome_metadata):
 
     return xr_im
 
-import yaml
+
 
 def get_machine_config(machine):
     from os import path
     '''Get machine config yaml from ~/.config/pyseq2500/machine_settings.yaml.'''
     homedir = path.expanduser('~')
 
-    config_path = path.join(homedir,'.pyseq2500','machine_settings.yaml')
+    config_path = path.join(homedir, '.config', 'pyseq2500','machine_settings.yaml')
     if isinstance(config_path, str):
         config_path = Path(config_path)
 
@@ -398,30 +380,6 @@ def get_machine_config(machine):
     
     return machine_config
 
-
-# def get_machine_config(machine):
-#     import configparser
-#     from os import path
-
-#     machine = str(machine).lower()
-
-#     config = configparser.ConfigParser()
-#     #config_path = pkg_resources.path(resources, 'background.cfg')
-#     homedir = path.expanduser('~')
-
-#     config_path = path.join(homedir,'.pyseq2500','machine_settings.yaml')
-
-#     if path.exists(config_path):
-#         with open(config_path,'r') as config_path_:
-#             config.read_file(config_path_)
-
-#         if machine not in config.options('machines'):
-#             print('Settings for', machine, 'do not exist')
-#             config = None
-#     else:
-#         print(config_path, 'not found')
-#         config = None
-    # return config, config_path
 
 
 # def open_zarr(image_path):

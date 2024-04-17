@@ -4,7 +4,7 @@ resources:
   dask_worker:
     manager: SLURM
     # or specify in .config/dask/jobqueue.yaml
-    queue: pe2
+    queue: pi3
     cores: 2
     memory: 16G
     log_directory: dask_logs

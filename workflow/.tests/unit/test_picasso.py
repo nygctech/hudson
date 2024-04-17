@@ -14,9 +14,6 @@ import yaml
 
 
 def test_picasso():
-    
-    # Update with call to remote data repo with repo
-    config_path = '/nethome/kpandit/hudson/workflow/.tests/unit/pytest_config.yaml'
 
     with TemporaryDirectory(dir = '.') as tmpdir:
 
@@ -30,7 +27,7 @@ def test_picasso():
         shutil.copytree(data_path, workdir)
 
         # Make test config
-        test_config_path = common.update_outputdir(workdir, config_path)
+        test_config_path = common.update_outputdir(workdir)
         
 
         # dbg

@@ -13,7 +13,7 @@ hs_image = HiSeqImage(image_path = snakemake.input[0], logger = logger)
 image = hs_image.im
 
 # Start logger
-logger.info(f'Opened {image.name}')
+# logger.info(f'Opened {image.name}')
 logger.debug(image.chunks)
 
 # open marker info
@@ -22,19 +22,23 @@ markers_config = snakemake.config.get('markers')
 # open saved picasso info
 with open(snakemake.input[1]) as f:
     picasso_params = yaml.safe_load(f)
+    
+# open section summary
+with open(snakemake.input[2]) as f:
+    section_summary = yaml.safe_load(f)
 
 
 # Start dask cluster
 # specify default worker options in ~/.config/dask/jobqueue.yaml
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
-logger.info(f'Scale dask cluster to {winfo}')
+logger.info(f'Dask worker settings: {winfo}')
 cluster = get_cluster(**winfo)
 logger.debug(cluster.new_worker_spec())
 logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
-nworkers = snakemake.params.tiles
+nworkers = section_summary.get('tiles', 2)
 logger.info(f'Scale dask cluster to {nworkers}')
 cluster.scale(nworkers)
-logger.info(f'Scale dask cluster to {cluster}')
+logger.info(f'Dask cluster info {cluster}')
 client = Client(cluster)
 
 # Save channel/cycle as markers and unmix

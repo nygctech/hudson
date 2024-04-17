@@ -15,7 +15,9 @@ import yaml
 # def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 #     return ''.join(random.choice(chars) for _ in range(size))
 
-def update_outputdir(workdir, config_path):
+def update_outputdir(workdir):
+    # TODO update with path from remote data repo
+    config_path = '/nethome/kpandit/hudson/workflow/.tests/unit/pytest_config.yaml'
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -72,6 +74,7 @@ class OutputChecker:
             return True
         except Exception as error:
             print(type(error).__name__, "–", error)
+            print(error.output)
             return False
  
             

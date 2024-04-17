@@ -13,8 +13,6 @@ import yaml
 
 def test_unmix():
     
-    # Update with call to remote data repo with repo
-    config_path = '/nethome/kpandit/hudson/workflow/.tests/unit/pytest_config.yaml'
 
     with TemporaryDirectory(dir = '.') as tmpdir:
         workdir = Path(tmpdir) / "workdir"
@@ -34,7 +32,7 @@ def test_unmix():
         # shutil.copytree(data_path, workdir)
 
         # Make test config
-        test_config_path = common.update_outputdir(workdir, config_path)
+        test_config_path = common.update_outputdir(workdir)
         print(f'{test_config_path=}')
 
         # dbg

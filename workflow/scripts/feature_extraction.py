@@ -249,7 +249,7 @@ if len(color_dict.keys()) == 3:
     logger.debug(cluster.new_worker_spec())
     logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
     ntiles = image.col.size//2048
-    nworkers = max(1,ntiles*2)
+    nworkers = max(2,ntiles*2)
     logger.info(f'Scale dask cluster to {nworkers}')
     cluster.scale(nworkers)
     client = Client(cluster)
@@ -300,7 +300,7 @@ if len(color_dict.keys()) == 3:
 
     # Loop through cells and compute imagenet features
     logit_stack = []
-    for p, c in gen_cells(props, image.sel(marker = markers_)):
+    for p, c in gen_cells(props, image.sel(channel = markers_)):
         logits = get_logits(c, p.image_filled, dask_transform, dask_model)
         logit_stack.append(da.from_delayed(logits, shape = (1,11221), dtype = np.single))    #Shape is only for 1 set of markers
     imagenet_ = da.concatenate(logit_stack).rechunk() 
