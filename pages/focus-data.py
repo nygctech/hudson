@@ -11,6 +11,7 @@ import numpy as np
 import re
 from datetime import datetime
 from dash import dash_table
+from dash_canvas import DashCanvas
 
 dash.register_page(__name__,name='Auto Focus Data')
        
@@ -41,7 +42,7 @@ layout = html.Div([
             ),
     
 
-])
+])])
 
 @callback(Output("focus-section","options"),
           Input("exp_dir","data"))
@@ -97,8 +98,7 @@ def get_fovs(exp_dir, section_name):
         r = int(r[1:])/scale
         c = (int(c.split('.')[0][1:]))/scale
         fovs_.append((r,c))
-
-     return fovs_
+    return fovs_
 
 def focus_position_map(exp_dir, section_name):
     #fig2 = px.imshow(image_small**gamma, width=len(image_small.col), height = len(image_small.row), aspect = 'equal', color_continuous_scale = 'magma', zmin = 125**gamma, zmax = 3000**gamma)
@@ -114,18 +114,18 @@ def focus_position_map(exp_dir, section_name):
     # Add rectangles to the figure
     for r, c in get_fovs(exp_dir, section_name):
 
-    fig2.add_shape(
-        type="rect",
-        x0=c+c_offset, y0=r+r_offset, x1=(c+c_offset+width), y1=(r+r_offset+height),
-        #line=rect['line']
-    )
-
-    # Configure layout
-    fig2.update_layout(
-        title=section_name,
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        showlegend=False
+        fig2.add_shape(
+            type="rect",
+            x0=c+c_offset, y0=r+r_offset, x1=(c+c_offset+width), y1=(r+r_offset+height),
+            #line=rect['line']
+        )
+    
+        # Configure layout
+        fig2.update_layout(
+            title=section_name,
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            showlegend=False
     )
 
 

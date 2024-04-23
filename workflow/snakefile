@@ -259,3 +259,20 @@ rule spatial_neighborhood:
         'envs/spatial_neighbor.yaml'
     script:
         'scripts/spatial_neighborhood.py'
+
+# Create dictionary where keys are sections and values are a dictionary of cell types & their fractional counts
+rule celltype_analysis: 
+    input:
+        '{output_dir}/tables/{sections}.csv'
+    output: 
+        ## generating individual CSVs for EACH section -- modify dashboard accordingly 
+        '{output_dir}/tables/{sections}_celltypecount.csv'
+        '{output_dir}/tables/{sections}_celltypecount_frac.csv'
+    conda:
+        # reusing anndata env since is has pandas
+        'envs/make_anndata.yaml'
+    script:
+        'scripts/celltype_analysis.py'
+    resources:
+        mem_mb = 32000
+
