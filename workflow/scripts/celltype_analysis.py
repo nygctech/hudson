@@ -8,7 +8,6 @@ from pathlib import Path
 table_path = Path(snakemake.input[0])
 
 # Create dictionary where keys are sections and values are a dictionary of cell types & their fractional counts
-## QUESTIONS: is there a way to get all the sections from the snakemake?
 # sections = [f.name[0:-4] for f in os.scandir(table_path) if f.name[-4:] == '.csv']
 
 cell_type_counts = {}
@@ -27,7 +26,7 @@ with open(table_path, 'r') as csv_file:
 
     # Iterate through the rows in the CSV file
     for row in csv_reader:
-        category = row[1]  # Assuming the category is in the second column (index 1)
+        category = row[1]  # Assuming the category (cell type) is in the second column (index 1)
 
         if category in category_count_dict:
             category_count_dict[category] += 1
@@ -35,19 +34,14 @@ with open(table_path, 'r') as csv_file:
             category_count_dict[category] = 1                
 
 cell_type_counts = category_count_dict
-
-#create dict with fractional values
-sum_of_cells = sum(category_count_dict.values())
-for category in category_count_dict.keys():
-    category_count_dict[category] = category_count_dict[category]/sum_of_cells
-    cell_type_counts_frac = category_count_dict    
     
 df_celltypecount = pd.DataFrame.from_dict(cell_type_counts, orient='index')
-df_celltypecount_frac = pd.DataFrame.from_dict(cell_type_counts_frac, orient='index')
+df_celltypecount.reset_index(inplace=True)
+df_celltypecount.columns = ['Cell Type', 'Count']
+total_count = df['Count'].sum()
 
-# Fill missing values with 0
-df_celltypecount = df.fillna(0).astype(int)
-df_celltypecount_frac = df.fillna(0).astype(int)
+# Add column with fractional count
+df_celltypecount['Fractional Count'] = df_celltypecount['Count'] / total_count
+
 
 df_celltypecount.to_csv(snakemake.output[0], index=False)
-df_celltypecount_frac.to_csv(snakemake.output[1], index=False)
