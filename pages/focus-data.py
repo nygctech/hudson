@@ -13,7 +13,7 @@ from datetime import datetime
 from dash import dash_table
 from dash_canvas import DashCanvas
 
-dash.register_page(__name__,name='Auto Focus Data')
+dash.register_page(__name__,order =3, name='Auto Focus Data')
        
 # Define the layout of the app
 layout = html.Div([
@@ -30,10 +30,13 @@ layout = html.Div([
             'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
             'whiteSpace': 'normal'},
     ),
+    html.Br(),
     "Section",
     dcc.Dropdown(id = 'focus-section',placeholder="Choose a section"),
     html.P("Double click a series number to isolate a curve."), 
     dcc.Graph(id='focus-data-plot'),
+    html.Br(),
+    "In progress: the image below will show the autofocus FOV locations",
     html.Div([
         DashCanvas(id='autofocus-image',
             tool='line',
@@ -277,6 +280,13 @@ def focus_plot(exp_dir,section):
     # Add a solid line at y=0.085
     fig.add_hline(y=0.085, line_dash="solid", line_color="grey")
 
+    # Update x-axis label
+    ## add units
+    fig.update_xaxes(title_text='Objective Position ()')
+
+    # Update y-axis label
+    fig.update_yaxes(title_text='Focus Metric')
+
     
     return fig
 
@@ -315,4 +325,4 @@ def autofocus_time(exp_dir):
     # Drop duplicates to keep only the latest entry for each index
     df = df.drop_duplicates(subset='Index', keep='last')
     
-    return f'Total time taken to autofocus: {total_minutes} minutes. \n\nNumber of autofocus attempts: {autofocus_completed_count}', df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
+    return html.P([f'Total time taken to autofocus: {total_minutes} minutes.',html.Br(), f'Number of autofocus attempts: {autofocus_completed_count}.',html.Br(), f'Autofocus points taken during attempt no.{autofocus_completed_count}:']), df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]

@@ -7,8 +7,11 @@ import plotly.graph_objs as go
 import os
 from pathlib import Path
 from dash.exceptions import PreventUpdate
+from dash_canvas import DashCanvas
+from dash import dash_table
+import pandas as pd
 
-dash.register_page(__name__,name='Cell Type Analysis')
+dash.register_page(__name__,name='Cell Type Analysis and Segmentation')
 
 # Create dictionary where keys are sections and values are a dictionary of cell types & their fractional counts
 def cell_types(exp_dir):
@@ -58,11 +61,29 @@ app = dash.Dash(__name__)
 
 
 layout = html.Div([
-    html.H3("Tissue Section Cell Types Analysis"),
+    html.H3("Aggregate Tissue Section Cell Types Analysis"),
     dcc.Graph(id='stacked-bar-plot'),
-    html.H3("Individual Section Cell Type Analysis"),
+    html.H3("Individual Section Cell Type Analysis and Segmentation"),
     dcc.Dropdown(id='sections',placeholder='Tissue Section'),
     dcc.Graph(id='section-pie-chart'),
+    html.Div([
+        DashCanvas(id='canvas-section',
+            tool='line',
+            lineWidth=5,
+            lineColor='red',
+            ),
+    ]),
+    'Key for cell types:',
+    dash_table.DataTable(
+        id='table',
+        fill_width=False,
+        style_table={'overflowX': 'auto'},
+        style_cell={
+            'height': 'auto',
+            # all three widths are needed
+            'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
+            'whiteSpace': 'normal'},
+    ),
 ])
 
 #stacked bar plot
@@ -78,13 +99,14 @@ def update_stacked_bar_plot(exp_dir,relayoutData):
 
     for cell_type in unique_cell_types:
         counts = [cell_type_counts[tissue_section].get(cell_type, 0) for tissue_section in cell_type_counts.keys()]
-        data.append(go.Bar(x=list(cell_type_counts.keys()), y=counts, name=cell_type))
+        data.append(go.Bar(x=list(cell_type_counts.keys()), y=counts, name=cell_type, width=0.2))
 
     layout = go.Layout(
         barmode='stack',
         xaxis=dict(title='Tissue Section'),
         yaxis=dict(title='Cell Type Count'),
         title='Cell Types in Tissue Sections',
+        width=0.3 * 1920,
     )
 
     return {'data': data, 'layout': layout}
@@ -107,10 +129,32 @@ def update_pie_chart(exp_dir,section):
     cell_type_counts,_ = cell_types(exp_dir)
     data = cell_type_counts[section]
     fig = px.pie(values=list(data.values()), names=list(data.keys()), title=f'{section} Cell Types')
+    fig.update_layout(width=0.3 * 1920)  
     
     return fig
 
-          
+@callback(
+    Output("canvas-section","image_content"),
+    Input("sections","value"),
+)
+def section_image(section):
+    if section is None:
+        raise PreventUpdate
+        
+    return f'/static/{section}_seg_tab20c.jpeg'
 
+# Callback to update the DataTable based on the dropdown selection
+@callback(Output('table', 'data'),
+          Output('table', 'columns'),
+          Input('sections', 'value'),
+          Input('exp_dir','data'),
+          prevent_initial_call = True,
+)
+def update_table(section,exp_dir):
+    if section is None:
+        raise PreventUpdate
+        
+    df = pd.read_csv(f'{exp_dir}/dashboard/{section}_cell_type_key.csv')                  
+    return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
 
     

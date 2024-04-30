@@ -5,8 +5,11 @@ from dash.exceptions import PreventUpdate
 # from dash.dependencies import callback, Input, Output, State
 import os
 from pathlib import Path
+import numpy as np
+import cv2
+import dash_bootstrap_components as dbc
 
-dash.register_page(__name__, order = 2, name = 'Image Preview')
+dash.register_page(__name__, order =4, name = 'Image Preview & Histograms')
 
 # point Dash to image directory of interest here
 # image_directory = '/nethome/kpandit/hudson/images'
@@ -16,7 +19,6 @@ dash.register_page(__name__, order = 2, name = 'Image Preview')
 # image_directory = f'{args.directory}/dashboard/preview/m387ntga1'
 # list_of_images = [f for f in os.listdir(image_directory) if '.jpg' in f]
 static_image_route = '/static/'
-
 
 layout = html.Div([
     html.H3("Image Thumbnails"), 
@@ -34,14 +36,20 @@ layout = html.Div([
     ]),
     html.Button('Previous Image', id='prev',n_clicks=0),
     html.Button('Next Image', id='next',n_clicks=0),
-    html.Div([
-        DashCanvas(id='canvas-image',
-            tool='line',
-            lineWidth=5,
-            lineColor='red',
-  #          image_content=static_image_route+list_of_images[0]
+    dbc.Row(
+        [
+            dbc.Col(
+                children=DashCanvas(
+                    id='canvas-image',
+                    tool='line',
+                    lineWidth=5,
+                    lineColor='red',
+                ),
             ),
-    ]),           
+            dbc.Col(children=dcc.Graph(id="histogram")),
+        ]
+    ),
+    #style={"padding": "20px"},
 ])
 
 # # Serve static images
@@ -85,8 +93,21 @@ def set_markers(exp_dir, section, m):
     else:
         return [], None
 
-# Update canvas image based on image selected in image-dropdown
+# Update canvas image and histogram based on image selected in image-dropdown
+def calculate_histogram(image_path, bins=256):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Calculate the histogram
+    hist, bins = np.histogram(image, bins=bins, range=(0, 256))
+
+    # Apply a logarithmic scale to the histogram
+    hist = np.log1p(hist)
+
+    return hist
+    
 @callback(
+    Output("histogram", "figure"), 
     Output("canvas-image", "image_content"), 
     Output("marker-dropdown","value", allow_duplicate = True),
     #Input("folder-dropdown","value"),
@@ -123,8 +144,23 @@ def display_image(section,marker,marker_,next,prev, exp_dir):
             m = marker_[-1]
     else:
         m = marker
+    
+    image_path = f'{exp_dir}/dashboard/{section}_{m}.jpg'
+   
+    hist = calculate_histogram(image_path)
+    
+    return {
+        'data': [
+            {'x': list(range(256)), 'y': hist, 'type': 'bar', 'name': 'Intensity'},
+        ],
+        'layout': {
+            'title': f'Histogram of Intensity Values for {section}_{m}',
+            'xaxis': {'title': 'Intensity Value'},
+            'yaxis': {'title': 'log(Frequency)'},
+            #'width':1000,
+        }
+    }, f'/static/{section}_{m}.jpg', m
 
-    return f'/static/{section}_{m}.jpg', m
 
 
 '''
