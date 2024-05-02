@@ -282,7 +282,7 @@ def focus_plot(exp_dir,section):
 
     # Update x-axis label
     ## add units
-    fig.update_xaxes(title_text='Objective Position ()')
+    fig.update_xaxes(title_text='Objective Position (steps)')
 
     # Update y-axis label
     fig.update_yaxes(title_text='Focus Metric')
