@@ -1,3 +1,4 @@
+'''
 import dash
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output
@@ -69,7 +70,8 @@ def update_table(section,exp_dir):
         
     df = pd.read_csv(f'{exp_dir}/dashboard/{section}_cell_type_key.csv')                  
     return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
-'''    
+'''  
+'''
 
 @callback(
     Output("section-img", "figure"),
@@ -226,6 +228,7 @@ def resize_matrix(matrix, new_shape):
     return resized_matrix
 
 '''
+
           
 
     

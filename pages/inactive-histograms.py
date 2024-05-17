@@ -1,3 +1,4 @@
+'''
 import dash
 from dash import dcc, ctx, html, callback, Input, Output, State 
 import plotly.express as px
@@ -153,7 +154,7 @@ def display_image(section,marker,marker_,next,prev, exp_dir):
         }
     }, m
 
-
+'''
 
 
       

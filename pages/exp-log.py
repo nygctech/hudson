@@ -17,19 +17,6 @@ layout = html.Div([
     html.H2("Log Data Summary"),
     html.H3("Log File Path"),
     html.Div(id = "log-file"),
-    html.H3("Experiment Duration"),
-    html.Div(id = "exp-duration",style={'whiteSpace': 'pre-line'}),
-    html.H3("Imaging Time"),
-    dash_table.DataTable(
-        id='img-time',
-        fill_width=False,
-        style_table={'overflowX': 'auto'},
-        style_cell={
-            'height': 'auto',
-            # all three widths are needed
-            'minWidth': '300px', 'width': '300px', 'maxWidth': '300px',
-            'whiteSpace': 'normal'},
-    ),
     #html.H3("Autofocus Info"),
     #html.Div(id = "autofocus-time"),
     #dash_table.DataTable(
@@ -66,81 +53,6 @@ layout = html.Div([
 def log_file_path(exp_dir):
     return f'{exp_dir}/logs/20211207_AlternatingSABER.log'
 
-## Get start time, end time, and total duration of exp
-def extract_timestamp(line):
-    # Define a regular expression pattern to match the timestamp
-    timestamp_pattern = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})"
-    
-    # Use re.search to find the timestamp in the log entry
-    match = re.search(timestamp_pattern, line)
-    
-    # Return the timestamp if found, otherwise return None
-    return match.group(1) if match else None
-
-# Get duration
-def calculate_duration(start_timestamp, end_timestamp, timestamp_format='%Y-%m-%d %H:%M:%S,%f'):
-    # Convert timestamps to datetime objects
-    start_time = datetime.strptime(start_timestamp, timestamp_format)
-    end_time = datetime.strptime(end_timestamp, timestamp_format)
-
-    # Calculate the duration
-    duration = end_time - start_time
-
-    # Extract days, hours, minutes, and seconds
-    days, seconds = duration.days, duration.seconds
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-
-    # Return a formatted string
-    duration_string = f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
-    return duration_string
-
-@callback(Output("exp-duration","children"),
-          Input("exp_dir","data"),
-          Input("log-file","children"))
-def get_log_duration(exp_dir,log_file_path):
-
-    # Get number of lines
-    try:
-        with open(log_file_path, 'r',encoding='iso-8859-1') as file:
-            number_of_lines = len(file.readlines())
-            #print(f"Number of lines in the log file: {number_of_lines}")
-    except FileNotFoundError:
-        print(f"The file '{log_file_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    try:
-        with open(log_file_path, 'r', encoding='iso-8859-1') as file:
-            line_id = 1
-
-            for line in file:
-                line.strip()
-
-                ## Get start time from line 1
-                if line_id == 1:
-                    start_time = extract_timestamp(line)
-                    #print(f'Experiment start time: {start_time}')
-                    break
-
-            # Iterate through the lines in reverse order
-            lines = file.readlines()
-            for line in reversed(lines):
-                end_time = extract_timestamp(line)
-
-                if end_time:
-                    #print(f"Experiment end time: {end_time}")
-                    break  # Stop iterating once a line with a timestamp is found
-
-    except FileNotFoundError:
-        print(f"The file '{log_file_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    # Call the function to calculate the duration
-    duration = calculate_duration(start_time, end_time)
-    
-    return f'Experiment start time: {start_time}\nExperiment end time: {end_time}\nExperiment duration: {duration}\n'
 
 ## Display priming data
 @callback(Output('priming', 'data'),
@@ -261,41 +173,7 @@ def laser_power_graph(log_file_path):
 
     return fig
 
-def parse_imgtime_log(log_file_path):
-    with open(log_file_path, 'r', encoding='iso-8859-1') as file:
-        lines = file.readlines()
 
-    data = []
-    for line in lines:
-        match = re.search(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}),.*?cycle(\d+)::m(\d+)::Imaging completed in (\d+) minutes', line)
-        if match:
-            cycle_number = match.group(3)
-            m_number = match.group(4)
-            imaging_time = int(match.group(5))
-            data.append({'Cycle': cycle_number,'Imaging Time (minutes)': imaging_time})
-
-    df = pd.DataFrame(data)
-    return df
-
-@callback(Output('img-time','data'),
-          Output('img-time','columns'),
-          Input('log-file','children'))
-def img_time(log_file_path):
-    # Function to parse log file and extract information
-    if log_file_path is not None:
-        df = parse_imgtime_log(log_file_path)
-        avg_imaging_time = df.groupby('Cycle')['Imaging Time (minutes)'].mean().reset_index().round(2)
-        
-       # avg_imaging_time.drop(columns=['M Number'])
-        overall_avg = df['Imaging Time (minutes)'].mean()
-        
-        # Row to append
-        new_row = {'Cycle': 'Average', 'Imaging Time (minutes)': overall_avg}
-
-        # Append the row
-        avg_imaging_time.append(new_row, ignore_index=True).round(2)
-
-        return avg_imaging_time.to_dict('records'), [{"name": i, "id": i} for i in avg_imaging_time.columns]
 '''    
 @callback(Output('autofocus-time','children'),
           Output('autofocus-pts','data'),

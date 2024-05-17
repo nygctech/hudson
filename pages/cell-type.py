@@ -7,19 +7,40 @@ import plotly.graph_objs as go
 import os
 from pathlib import Path
 from dash.exceptions import PreventUpdate
+from dash_canvas import DashCanvas
+from dash import dash_table
+import pandas as pd
 
-dash.register_page(__name__,name='Cell Type Analysis')
+dash.register_page(__name__,name='Cell Type Analysis and Segmentation')
 
 # Read the sections dicts created by snakemake and displays cell type analysis for the sections 
     
 app = dash.Dash(__name__)
 
 layout = html.Div([
-    html.H3("Tissue Section Cell Types Analysis"),
+    html.H3("Aggregate Tissue Section Cell Types Analysis"),
     dcc.Graph(id='stacked-bar-plot'),
-    html.H3("Individual Section Cell Type Analysis"),
+    html.H3("Individual Section Cell Type Analysis and Segmentation"),
     dcc.Dropdown(id='sections',placeholder='Tissue Section'),
     dcc.Graph(id='section-pie-chart'),
+    html.Div([
+        DashCanvas(id='canvas-section',
+            tool='line',
+            lineWidth=5,
+            lineColor='red',
+            ),
+    ]),
+    'Key for cell types:',
+    dash_table.DataTable(
+        id='table',
+        fill_width=False,
+        style_table={'overflowX': 'auto'},
+        style_cell={
+            'height': 'auto',
+            # all three widths are needed
+            'minWidth': '200px', 'width': '200px', 'maxWidth': '200px',
+            'whiteSpace': 'normal'},
+    ),
 ])
 
 # Make a stacked bar plot of all the sections
@@ -67,7 +88,27 @@ def update_pie_chart(exp_dir,section):
     
     return fig
 
-          
+@callback(
+    Output("canvas-section","image_content"),
+    Input("sections","value"),
+)
+def section_image(section):
+    if section is None:
+        raise PreventUpdate
+        
+    return f'/static/{section}_seg_tab20c.jpeg'
 
-
+# Callback to update the DataTable based on the dropdown selection
+@callback(Output('table', 'data'),
+          Output('table', 'columns'),
+          Input('sections', 'value'),
+          Input('exp_dir','data'),
+          prevent_initial_call = True,
+)
+def update_table(section,exp_dir):
+    if section is None:
+        raise PreventUpdate
+        
+    df = pd.read_csv(f'{exp_dir}/dashboard/{section}_cell_type_key.csv')                  
+    return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns]
     

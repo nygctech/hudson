@@ -156,6 +156,9 @@ rule unmix:
         tiles = get_tiles
     output:
         directory('{output_dir}/final_zarr/{sections}.zarr')
+        # placeholder to convert zarr into jpeg, store in dir(dashboard)
+        # store histogram csv: 
+        '{output_dir}/final_zarr/{sections}_histogram.csv'
     log:
         '{output_dir}/logs/unmix_{sections}.log',
         '{output_dir}/logs/unmix_{sections}.html'
@@ -261,11 +264,18 @@ rule spatial_neighborhood:
         'scripts/spatial_neighborhood.py'
 
 # For every section, creates a dict: 1. keys are cell types, values are count of each
+# Also, creates a jpeg of segmented cell types for each section 
 rule celltype_analysis: 
     input:
         '{output_dir}/tables/{sections}.csv'
+        '{output_dir}/masks/{sections}.tiff'
     output: 
         '{output_dir}/tables/{sections}_celltypecount.csv'
+
+        # is dashboard dir created automatically? 
+        '{output_dir}/dashboard/{sections}_labeled.tiff'
+        '{output_dir}/dashboard/{sections}_seg_tab20c.jpeg
+        '{output_dir}/dashboard/{sections}_cell_type_key.csv'
     conda:
         # reusing anndata env since is has pandas
         'envs/make_anndata.yaml'
