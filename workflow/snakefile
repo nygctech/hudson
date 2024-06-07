@@ -155,7 +155,7 @@ rule unmix:
         '{output_dir}/logs/unmix_{sections}.log',
         '{output_dir}/logs/unmix_{sections}.html'
     conda:
-        'envs/unmix.yaml'
+        'envs/pyseq-image.yaml'
     script:
         'scripts/unmix.py'
 

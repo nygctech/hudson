@@ -112,7 +112,7 @@ if torch.cuda.is_available() == False:
     ##TODO: measure texture / intensity quartiles
     mean_intensity_per_marker = {}
     for m in image.channel.values:
-        logger.info(f'Measuring {m}')
+        smk_logger.info(f'Measuring {m}')
         props = regionprops_table(labels, intensity_image = image.sel(channel = m).values, 
                                   properties = ('intensity_mean',))
         mean_intensity_per_marker.update({m:props['intensity_mean']})
@@ -197,10 +197,10 @@ try:
         if k.upper() in 'RGB':
             color_dict[k.upper()] = extract_imagenet[k]
         else:
-            logger.info(f'Could not map {extract_imagenet[k]} to RGB')
-            logger.info(f'Assign marker to color, R: marker')
+            smk_logger.info(f'Could not map {extract_imagenet[k]} to RGB')
+            smk_logger.info(f'Assign marker to color, R: marker')
 except Exception as e:
-    logger.info(f'imagenet error: {e}')
+    smk_logger.info(f'imagenet error: {e}')
     
 
 # Run imagenet
@@ -231,26 +231,26 @@ if len(color_dict.keys()) == 3:
     markers_ = []
     for k in 'RGB':
         if k in color_dict.keys():
-            logger.info(f'{color_dict[k]} assigned to {k} channel')
+            smk_logger.info(f'{color_dict[k]} assigned to {k} channel')
             markers_.append(color_dict[k])
     
     ############### Loading (ViT) model from timm package ##############
-    logger.info("initializing imagenet model...")
+    smk_logger.info("initializing imagenet model...")
     model = timm.create_model('vit_base_patch16_224_miil.in21k', pretrained=True)
     model.eval()
     config = resolve_data_config({}, model=model)
     transform = create_transform(**config)
-    logger.info("imagenet model initialized")
+    smk_logger.info("imagenet model initialized")
     
     # Start dask cluster
     # specify default worker options in ~/.config/dask/jobqueue.yaml
     winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
     cluster = get_cluster(**winfo)
-    logger.debug(cluster.new_worker_spec())
-    logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
+    smk_logger.debug(cluster.new_worker_spec())
+    smk_logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
     ntiles = image.col.size//2048
     nworkers = max(2,ntiles*2)
-    logger.info(f'Scale dask cluster to {nworkers}')
+    smk_logger.info(f'Scale dask cluster to {nworkers}')
     cluster.scale(nworkers)
     client = Client(cluster)
     client.wait_for_workers(ceil(nworkers/4))
@@ -309,7 +309,7 @@ if len(color_dict.keys()) == 3:
     # delayed_store = features.to_zarr(Path(snakemake.output[1]), compute = False)
                                      
     # Write imagenet features to file and log cluster performance
-    logger.info(f'Computing imagenet features')
+    smk_logger.info(f'Computing imagenet features')
     cluster_report = Path(snakemake.log[0]).with_name(f'features_{image.name}.html')
     with performance_report(filename=cluster_report):
         imagenet = imagenet_.compute()
@@ -319,7 +319,7 @@ if len(color_dict.keys()) == 3:
 
 
 # Write features to file
-logger.info(f'Writing features')
+smk_logger.info(f'Writing features')
 mdata = md.MuData(feat_dict)
 mdata.write(snakemake.output[0])
-logger.info('Completed writing features')
+smk_logger.info('Completed writing features')

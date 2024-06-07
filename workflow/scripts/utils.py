@@ -171,12 +171,12 @@ class HiSeqImage():
         from ome_types import to_dict
         from ome_zarr.writer import write_image
         from ome_types.model import Instrument, Microscope, Objective, Channel, Pixels, TiffData, OME, Image
-        from os import mkdir
+        from os import makedirs
         import zarr
 
         if isinstance(dir_path, str):
             dir_path = Path(dir_path)
-
+        
         # Instrument OME Metadata
         # print(self.config.sections())
         instrument_ = Instrument(microscope = Microscope(**self.config['Microscope']), 
@@ -201,12 +201,12 @@ class HiSeqImage():
             size_c_ = len(self.im.marker)
         else:
             raise KeyError('Missing Channel Dimension')
-
+        
         #Dimension Order
         dim_order = ''
         for d in self.im.dims:
             dim_order += self.dim_map.get(d)
-
+        
         # Pixel OME metadata
         pxs = Pixels(channels = channels_, 
                      dimension_order = 'XYZCT', #Place holder, actually dim order TCZYX
@@ -230,7 +230,7 @@ class HiSeqImage():
         ome.instruments = [instrument_]
         ome.creator = f'hudson::{__name__}'
         ome_dict = to_dict(ome)
-
+        
         #Fix UnSerializable Fields
         # Color Object Not JSON Serializable as dictionary
         nch = len(ome_dict['images'][0]['pixels']['channels'])
@@ -245,8 +245,9 @@ class HiSeqImage():
         # write the image data
         try:
             # zarr_name = dir_path/f'{self.im.name}.zarr' 
+            self.logger.debug(dir_path)
             zarr_name = dir_path
-            mkdir(zarr_name)
+            makedirs(zarr_name, exist_ok = True)
             store = parse_url(zarr_name, mode="w").store
             root = zarr.group(store=store)
             root.attrs["omero"] = ome_dict
@@ -324,7 +325,7 @@ def read_ome_zarr(image_path, ome_metadata):
     meta_dict = {}
     for field in ome_metadata['images'][0]['description'].split(','):
         fn, val = field.split('=')
-        val = val.split('array(')[1].split(')')[0]
+        # val = val.split('array(')[1].split(')')[0]
         meta_dict[fn.strip()] = int(val)
     
     # Map channel, cycle, and obj_step coordinates

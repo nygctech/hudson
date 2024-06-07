@@ -17,10 +17,12 @@ section_name = snakemake.params.section
 
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
+logger.info(f'test')
 
 # Open raw images
 image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
                            logname = f'{section_name}.image')
+logger.info(f'{image.machine}')
 assert image.machine != ''
 
 # Start dask cluster

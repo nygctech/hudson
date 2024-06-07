@@ -4,6 +4,7 @@ import xarray as xr
 import dask.array as da
 from dask.distributed import Client, wait, performance_report
 import dask
+from pathlib import Path
 
 section_name = snakemake.params.section
 logger = get_logger(section_name, filehandler = snakemake.log[0])
@@ -87,11 +88,32 @@ unmixed = HiSeqImage(im = unmixed, logger = logger)
 delayed_store = unmixed.write_ome_zarr(snakemake.output[0])
 logger.info('Unmixing images')
 with performance_report(filename=snakemake.log[1]):
+    logger.debug(delayed_store)
+    # if isinstance(delayed_store, list):
+    #     logger.debug('list')
+    #     futures = []
+    #     for _ in delayed_store:
+    #         logger.debug(_)
+    #         future_store = client.persist(_, retries = 10)
+    #         logger.debug(future_store)
+    #         futures.append(future_store.dask.values())
+    #         logger.debug('flag1c')
+    # else:
+    #     logger.debug('flag')
+    #     future_store = client.persist(delayed_store, retries = 10)
+    #     logger.debug('flag2')
+    #     futures = list(future_store.dask.values())
+    #     logger.debug('flag3')
     future_store = client.persist(delayed_store, retries = 10)
-    futures = list([f.dask for f in future_store])
-    wait(future_store)
+    logger.debug(future_store)
+    futures = [list(f.dask.values())[0] for f in future_store]
+    logger.debug(futures)
+    wait(futures)
+    logger.debug(futures)
     
-futures_done = [list(f.values())[0].done() for f in futures]
+# Double check no errors
+futures_done = [f.done() for f in futures]
+logger.debug(futures_done)
 if all(futures_done):
     logger.info('Finished unmixing images')
 else:

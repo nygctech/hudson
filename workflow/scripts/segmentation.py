@@ -33,7 +33,7 @@ diameter = snakemake.config.get('segmentation',{}).get('diameter', None)
 cprob = snakemake.config.get('segmentation',{}).get('cell probability', -6)
 fthresh = snakemake.config.get('segmentation',{}).get('flow threshold', 1000)
 marker = {'marker':snakemake.config.get('segmentation',{}).get('marker')}
-smk_logger.info(f'Segmenting marker')
+smk_logger.info(f'Segmenting marker {marker}')
 #TODO Log parameters
 smk_logger.info(f'Using model {model_type}')
 
