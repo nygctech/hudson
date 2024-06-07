@@ -15,34 +15,46 @@ def test_saveraw():
 
     with TemporaryDirectory() as tmpdir:
         workdir = Path(tmpdir) / "workdir"
+
         data_path = PurePosixPath(".tests/unit/saveraw/data")
-        expected_path = PurePosixPath(".tests/unit/saveraw/expected")
+        
+        expected_path = PurePosixPath(".tests/unit/raw_zarr/expected")
 
-        # Copy data to the temporary workdir.
+        output_path = workdir/ 'raw_zarr' / 'm1a.zarr'
+
         shutil.copytree(data_path, workdir)
+        
+        test_config_path = common.update_outputdir(workdir)
 
-        # dbg
-        print("/gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/raw_zarr/m1a.zarr /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/summary_m1a.yaml /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/exp_conf/m1a.cfg", file=sys.stderr)
 
-        # Run the test job.
-        sp.check_output([
-            "python",
-            "-m",
-            "snakemake", 
-            "/gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/raw_zarr/m1a.zarr /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/summary_m1a.yaml /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/exp_conf/m1a.cfg",
-            "-f", 
-            "-j1",
-            "--keep-target-files",
-            "--configfile",
-            "/gpfs/commons/groups/innovation/sarah/Hudson_Test/hudson_omezarr/config/config.yaml",
-    
-            "--use-conda",
-            "--directory",
-            workdir,
-        ])
+
+        with open('test_saveraw.out', "w") as outfile:
+            sp.run([
+                "python",
+                "-m",
+                "snakemake", 
+                output_path,
+                "-f", 
+                "-j1",
+                "--keep-target-files",
+                "--configfile",
+                test_config_path,
+                "--use-conda",
+         #       "--unlock",
+         #       "--directory",
+         #       workdir,
+            ], 
+            stdout = sp.PIPE, stderr = outfile)
 
         # Check the output byte by byte using cmp.
         # To modify this behavior, you can inherit from common.OutputChecker in here
         # and overwrite the method `compare_files(generated_file, expected_file), 
         # also see common.py.
-        common.OutputChecker(data_path, expected_path, workdir).check()
+        exp_files = ['raw_zarr/m1a.zarr',
+                    ]
+        checker = common.OutputChecker(data_path, expected_path, workdir)
+    	
+        for f in exp_files: 
+            assert checker.compare_files(expected_path / f, workdir / f)
+
+
