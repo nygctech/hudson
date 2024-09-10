@@ -39,9 +39,9 @@ def get_tiles(wildcards):
         tiles = 1
     return tiles
 
-def get_cores(section):
+def get_cores(summary_path):
     try:
-        with open(join(output_dir,f'summary_{section}.yaml')) as f:
+        with open(summary_path) as f:
             section_info = yaml.safe_load(f)  
         tiles = section_info['tiles']     
     except:
@@ -59,10 +59,11 @@ def get_cycles(wildcards):
     
 def get_mem(wildcards):
     try:
-        with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
+        summary_path = join(wildcards.output_dir,f'summary_{wildcards.sections}.yaml')
+        with open(summary_path) as f:
             section_info = yaml.safe_load(f)    
         mb = section_info['planesizeMB']
-        mb = ceil(mb/8000)*8000 * get_cores(wildcards)
+        mb = ceil(mb/8000)*8000 * get_cores(summary_path)
     except:
         mb = 8000
     return mb
@@ -70,7 +71,7 @@ def get_mem(wildcards):
 
 
 def get_picasso_time(wildcards):
-    return get_cycles(wildcards)*60 # minutes
+    return 600 # minutes
    
   
 # rule all:
@@ -171,9 +172,11 @@ rule segmentation:
     output:
        '{output_dir}/masks/{sections}.tiff'
     resources:
-        mem_mb = get_mem
+        mem_mb = get_mem,
+    	runtime = get_picasso_time
     log:
         '{output_dir}/logs/segment_{sections}.log',
+    threads: 8
     conda:
         'envs/segmentation.yaml'
     script:
@@ -193,7 +196,8 @@ rule feature_extraction:
         '{output_dir}/logs/intensity_{sections}.log'
     threads: 8
     resources:
-        mem_mb = get_mem
+        mem_mb = get_mem,
+        runtime = get_picasso_time
     conda:
         'envs/features.yaml'
     script:
@@ -227,9 +231,9 @@ rule celltype:
     log:
         '{output_dir}/logs/cell_type_{sections}.log'
     params:
-        ref = config["celltype"]["seurat"],
-        typecol = config["celltype"]["typecol"],
-        genedict = config["celltype"].get("genedict", {})
+        ref = config.get('celltype',{}).get('seurat', ''),
+        typecol = config.get('celltype',{}).get('typecol', 'cell_type'),
+        genedict = config.get('celltype',{}).get('genedict', {})
     resources:
         mem_mb = 32000
     conda:

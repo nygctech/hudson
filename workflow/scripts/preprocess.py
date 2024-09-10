@@ -12,9 +12,13 @@ focus_projection = exp_dir = snakemake.config.get('preprocess',{}).get('focus pr
 
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
+logger.info(f'path:: {snakemake.input[0]}')
+logger.info(f'section:: {section_name}')
 
 # Open image
 image = ia.get_HiSeqImages(image_path = snakemake.input[0], logname = f'{section_name}.image')
+logger.info(f'machine::{image.machine}')
+logger.debug(f'{image.im.shape}')
 
 # Check Raw Store saved correctly
 # get 1 plane   

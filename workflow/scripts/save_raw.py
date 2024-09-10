@@ -10,19 +10,24 @@ from math import ceil
 experiment_config = get_config(snakemake.input[0])
 exp_dir = snakemake.config['experiment_directory']
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
-image_path = Path(exp_dir) / Path(image_path)
+
 
 # Get section name
 section_name = snakemake.params.section
 
+# image_path = Path(image_path) / Path(section_name)
+image_path = Path(image_path)
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
-logger.info(f'test')
+logger.info(f'path:: {image_path}')
+logger.info(f'section:: {section_name}')
 
 # Open raw images
 image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
                            logname = f'{section_name}.image')
-logger.info(f'{image.machine}')
+logger.info(f'machine::{image.machine}')
+logger.debug(f'{image.im.shape}')
+
 assert image.machine != ''
 
 # Start dask cluster
@@ -40,7 +45,7 @@ client = Client(cluster)
 # Print out info about section
 logger.info(f'machine:: {image.machine}')
 logger.info(f'image path:: {image_path}')
-logger.info(f'section:: {section_name}')
+
 
 
 

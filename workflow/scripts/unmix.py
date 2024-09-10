@@ -81,6 +81,7 @@ for cy, ch_markers in markers_config.items():
 
 # Write Unmixed Images
 unmixed = xr.concat(marker_stack, dim='marker').assign_coords({'marker':marker_name})
+unmixed = unmixed.sel(row=range(64,len(unmixed.row)))
 #unmixed = unmixed.chunk({'row': len(image.row)})
 logger.debug(unmixed)
 #delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)

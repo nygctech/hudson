@@ -86,7 +86,7 @@ if 'obj_step' in image.dims:
     
 # Get markers
 marker_list = list(image.channel.values)
-for m in snakemake.config.get('feature extraction',{}).get('exclude', []):
+for m in snakemake.config.get('feature_extraction',{}).get('exclude', []):
     marker_list.remove(m)
 msg = 'Intensity features: '
 for m in marker_list:
@@ -249,7 +249,7 @@ if len(color_dict.keys()) == 3:
     smk_logger.debug(cluster.new_worker_spec())
     smk_logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
     ntiles = image.col.size//2048
-    nworkers = max(2,ntiles*2)
+    nworkers = max(2,ntiles*2*2)
     smk_logger.info(f'Scale dask cluster to {nworkers}')
     cluster.scale(nworkers)
     client = Client(cluster)
