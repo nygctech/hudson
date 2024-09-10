@@ -11,38 +11,50 @@ sys.path.insert(0, os.path.dirname(__file__))
 import common
 
 
-def test_fix_lighting():
+def test_saveraw():
 
     with TemporaryDirectory() as tmpdir:
         workdir = Path(tmpdir) / "workdir"
+
         data_path = PurePosixPath(".tests/unit/fix_lighting/data")
+        
         expected_path = PurePosixPath(".tests/unit/fix_lighting/expected")
 
-        # Copy data to the temporary workdir.
+        output_path = workdir/ 'processed_zarr' / 'm1a.zarr'
+
         shutil.copytree(data_path, workdir)
+        
+        test_config_path = common.update_outputdir(workdir)
 
-        # dbg
-        print("/gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/processed_zarr/m1a.zarr", file=sys.stderr)
 
-        # Run the test job.
-        sp.check_output([
-            "python",
-            "-m",
-            "snakemake", 
-            "/gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2/20210323_4i4color/processed_zarr/m1a.zarr",
-            "-f", 
-            "-j1",
-            "--keep-target-files",
-            "--configfile",
-           "/gpfs/commons/groups/innovation/sarah/Hudson_Test/hudson_omezarr/config/config.yaml",
-    
-            "--use-conda",
-            "--directory",
-            workdir,
-        ])
+        with open('test_fix_lighting.out', "w") as outfile:
+            sp.run([
+                "python",
+                "-m",
+                "snakemake", 
+                output_path,
+                "-f", 
+                "-j1",
+                "--keep-target-files",
+                "--configfile",
+                test_config_path,
+                "--use-conda",
+         #       "--unlock",
+         #       "--directory",
+         #       workdir,
+            ], 
+            stdout = sp.PIPE, stderr = outfile)
 
         # Check the output byte by byte using cmp.
         # To modify this behavior, you can inherit from common.OutputChecker in here
         # and overwrite the method `compare_files(generated_file, expected_file), 
         # also see common.py.
-        common.OutputChecker(data_path, expected_path, workdir).check()
+        exp_files = ['processed_zarr/m1a.zarr',
+                    ]
+        checker = common.OutputChecker(data_path, expected_path, workdir)
+    	
+        for f in exp_files: 
+            assert checker.compare_files(expected_path / f, workdir / f)
+
+
+
