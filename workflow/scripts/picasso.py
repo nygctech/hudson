@@ -4,15 +4,17 @@ import numpy as np
 from pathlib import Path
 from dask.distributed import Client, wait, LocalCluster
 from math import log
-from utils import get_logger, open_zarr
+from utils import get_logger, HiSeqImage
 import yaml
     
-# Open image from zarr store
-image = open_zarr(snakemake.input[0])
+section_name = snakemake.params.section
 
 # Start logger
-logger = get_logger(image.name, filehandler = snakemake.log[0])
-logger.info(f'Opened {image.name}')
+smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+image = hs_image.im
+smk_logger.debug(image)
 
 # Make sure only 1 objective step
 if 'obj_step' in image.dims:
@@ -23,7 +25,7 @@ if 'obj_step' in image.dims:
 # Get config data
 markers_config = snakemake.config.get('markers')
 sink_source_ch = snakemake.config.get('unmixing', {610:[558], 740:[687]})
-logger.debug(f'sink source channels:: {sink_source_ch}')
+smk_logger.debug(f'sink source channels:: {sink_source_ch}')
 
 # See if background or autofluorescence image exists
 AF = ()
@@ -31,7 +33,7 @@ for cy, ch_markers in markers_config.items():
     for ch, marker in ch_markers.items():
         if marker in ['background', 'autofluorescence', 'af', 'AF', 'bg', 'BG']:
             AF = (cy,ch)
-            logger.info(f'Autofluoresence reference :: cycle {cy} :: channel {ch}')
+            smk_logger.info(f'Autofluoresence reference :: cycle {cy} :: channel {ch}')
             
 
 
@@ -73,8 +75,8 @@ for cy , ch_markers in markers_config.items():
     mm, all_ch, sinks = cy_mm.get(cy)
 
     if len(sinks) > 0:
-        logger.info(f'Unmixing cycle {cy}')
-        logger.info(f'Optimizing fluorescence removal from channels {sinks}')
+        smk_logger.info(f'Unmixing cycle {cy}')
+        smk_logger.info(f'Optimizing fluorescence removal from channels {sinks}')
         model = PICASSOnn(cy_mm[cy][0])
 
 #         # DELETEME
@@ -101,7 +103,7 @@ for cy , ch_markers in markers_config.items():
         alpha = model.mixing_parameters[0,:,:]
         bg =  model.mixing_parameters[1,:,:]
         picasso_params[cy].update({'alpha':alpha.tolist(), 'background':bg.tolist()})
-        logger.info(f'Finished optimizing fluorescence removal from channels {sinks}')
+        smk_logger.info(f'Finished optimizing fluorescence removal from channels {sinks}')
         
 # Write picasso parameters to yaml
 with open(snakemake.output[0], 'w') as f:

@@ -34,7 +34,7 @@ def test_spatial_neighborhood():
             "-j1",
             "--keep-target-files",
             "--configfile",
-            /gpfs/commons/home/kpandit/hudson/config/config.yaml
+            "/gpfs/commons/home/kpandit/hudson/config/config.yaml",
     
             "--use-conda",
             "--directory",

@@ -85,7 +85,6 @@ if (!file.exists(xargs$ref)) {
   #msg <- simpleError(blankMsg)
   #stop(msg)
 } else {
-
 ref <- readRDS(xargs$ref)
 cell_type <- xargs$typecol
 anchors <- suppressWarnings(FindTransferAnchors(reference = ref,

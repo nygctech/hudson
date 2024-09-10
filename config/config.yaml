@@ -1,5 +1,5 @@
 experiment_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
-output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
+output_directory: /gpfs/commons/groups/innovation/sarah/Hudson_Test/ome_zarr_test_2
 resources:
   dask_worker:
     manager: SLURM

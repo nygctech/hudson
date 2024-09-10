@@ -9,7 +9,7 @@ import pickle
 from os.path import exists, join
 from joblib import Parallel, delayed
 from joblib import parallel_backend
-from utils import open_zarr, get_cluster, get_logger
+from utils import get_cluster, get_logger, HiSeqImage
 from skimage.measure import regionprops_table
 import anndata as ad
 import mudata as md
@@ -21,16 +21,21 @@ import squidpy as sq
 
 ### Morphological features computed when making muon object !!!
 
-# open xarray image from zarr store
-image = open_zarr(snakemake.input[0])
+section_name = snakemake.params.section
 
 # Start logger
-logger = get_logger(image.name, filehandler = snakemake.log[0])
-logger.info(f'Opened {image.name} zarr')
+smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+image = hs_image.im
+smk_logger.debug(image)
+
+
 
 # Open instance labels
 labels = imread(snakemake.input[1])
-logger.info(f'Opened {image.name} labels')
+smk_logger.info(f'Opened {image.name} labels')
 
 
 ##########################################################################################
@@ -40,7 +45,7 @@ logger.info(f'Opened {image.name} labels')
 
 
 # Get Morphological Features
-logger.info(f'Measuring morphological features')
+smk_logger.info(f'Measuring morphological features')
 features = ('area','area_bbox','area_convex','area_filled','axis_major_length','axis_minor_length',
             'eccentricity', 'equivalent_diameter_area','euler_number','extent','feret_diameter_max',
             'orientation','perimeter','perimeter_crofton','solidity', 'label', 'centroid')
@@ -63,7 +68,7 @@ morph_ad = ad.AnnData(X = morph_df, obsm = {'spatial':coords})
 radius = None # get from config file
 if radius is None:
     radius = (morph_table['feret_diameter_max'].mean()+morph_table['feret_diameter_max'].std())*3/2
-logger.info(f'Used {radius} px radius for delaunay graph')
+smk_logger.info(f'Used {radius} px radius for delaunay graph')
 sq.gr.spatial_neighbors(morph_ad, n_neighs = True, delaunay=True, radius=(0,radius), coord_type = 'generic')
 # h5 can't save radius parameter as tuple, so save as float
 morph_ad.uns['spatial_neighbors']['params']['radius'] = radius
@@ -76,17 +81,17 @@ feat_dict = {'morphological': morph_ad}
 
 # Max project if Z dimension still present
 if 'obj_step' in image.dims:
-    logger.info(f'Projecting Z max')
+    smk_logger.info(f'Projecting Z max')
     image = image.max(dim = 'obj_step')
     
 # Get markers
-marker_list = list(image.marker.values)
-for m in snakemake.config.get('feature extraction',{}).get('exclude', []):
+marker_list = list(image.channel.values)
+for m in snakemake.config.get('feature_extraction',{}).get('exclude', []):
     marker_list.remove(m)
 msg = 'Intensity features: '
 for m in marker_list:
     msg += f' {m}'
-logger.info(msg)
+smk_logger.info(msg)
 
 # plane_dict = {}
 
@@ -106,9 +111,9 @@ if torch.cuda.is_available() == False:
     
     ##TODO: measure texture / intensity quartiles
     mean_intensity_per_marker = {}
-    for m in image.marker.values:
-        logger.info(f'Measuring {m}')
-        props = regionprops_table(labels, intensity_image = image.sel(marker = m).values, 
+    for m in image.channel.values:
+        smk_logger.info(f'Measuring {m}')
+        props = regionprops_table(labels, intensity_image = image.sel(channel = m).values, 
                                   properties = ('intensity_mean',))
         mean_intensity_per_marker.update({m:props['intensity_mean']})
 
@@ -192,10 +197,10 @@ try:
         if k.upper() in 'RGB':
             color_dict[k.upper()] = extract_imagenet[k]
         else:
-            logger.info(f'Could not map {extract_imagenet[k]} to RGB')
-            logger.info(f'Assign marker to color, R: marker')
+            smk_logger.info(f'Could not map {extract_imagenet[k]} to RGB')
+            smk_logger.info(f'Assign marker to color, R: marker')
 except Exception as e:
-    logger.info(f'imagenet error: {e}')
+    smk_logger.info(f'imagenet error: {e}')
     
 
 # Run imagenet
@@ -226,26 +231,26 @@ if len(color_dict.keys()) == 3:
     markers_ = []
     for k in 'RGB':
         if k in color_dict.keys():
-            logger.info(f'{color_dict[k]} assigned to {k} channel')
+            smk_logger.info(f'{color_dict[k]} assigned to {k} channel')
             markers_.append(color_dict[k])
     
     ############### Loading (ViT) model from timm package ##############
-    logger.info("initializing imagenet model...")
+    smk_logger.info("initializing imagenet model...")
     model = timm.create_model('vit_base_patch16_224_miil.in21k', pretrained=True)
     model.eval()
     config = resolve_data_config({}, model=model)
     transform = create_transform(**config)
-    logger.info("imagenet model initialized")
+    smk_logger.info("imagenet model initialized")
     
     # Start dask cluster
     # specify default worker options in ~/.config/dask/jobqueue.yaml
     winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
     cluster = get_cluster(**winfo)
-    logger.debug(cluster.new_worker_spec())
-    logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
+    smk_logger.debug(cluster.new_worker_spec())
+    smk_logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
     ntiles = image.col.size//2048
-    nworkers = max(1,ntiles*2)
-    logger.info(f'Scale dask cluster to {nworkers}')
+    nworkers = max(2,ntiles*2*2)
+    smk_logger.info(f'Scale dask cluster to {nworkers}')
     cluster.scale(nworkers)
     client = Client(cluster)
     client.wait_for_workers(ceil(nworkers/4))
@@ -295,7 +300,7 @@ if len(color_dict.keys()) == 3:
 
     # Loop through cells and compute imagenet features
     logit_stack = []
-    for p, c in gen_cells(props, image.sel(marker = markers_)):
+    for p, c in gen_cells(props, image.sel(channel = markers_)):
         logits = get_logits(c, p.image_filled, dask_transform, dask_model)
         logit_stack.append(da.from_delayed(logits, shape = (1,11221), dtype = np.single))    #Shape is only for 1 set of markers
     imagenet_ = da.concatenate(logit_stack).rechunk() 
@@ -304,7 +309,7 @@ if len(color_dict.keys()) == 3:
     # delayed_store = features.to_zarr(Path(snakemake.output[1]), compute = False)
                                      
     # Write imagenet features to file and log cluster performance
-    logger.info(f'Computing imagenet features')
+    smk_logger.info(f'Computing imagenet features')
     cluster_report = Path(snakemake.log[0]).with_name(f'features_{image.name}.html')
     with performance_report(filename=cluster_report):
         imagenet = imagenet_.compute()
@@ -314,7 +319,7 @@ if len(color_dict.keys()) == 3:
 
 
 # Write features to file
-logger.info(f'Writing features')
+smk_logger.info(f'Writing features')
 mdata = md.MuData(feat_dict)
 mdata.write(snakemake.output[0])
-logger.info('Completed writing features')
+smk_logger.info('Completed writing features')
