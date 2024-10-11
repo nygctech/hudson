@@ -8,7 +8,7 @@ from math import ceil
 
 # Find raw image path
 experiment_config = get_config(snakemake.input[0])
-exp_dir = snakemake.config['experiment_directory']
+exp_dir = Path(snakemake.config['experiment_directory'])
 image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
 
 
@@ -16,7 +16,7 @@ image_path = snakemake.config.get('image_path',experiment_config['experiment']['
 section_name = snakemake.params.section
 
 # image_path = Path(image_path) / Path(section_name)
-image_path = Path(image_path)
+image_path = exp_dir / image_path
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
 logger.info(f'path:: {image_path}')
