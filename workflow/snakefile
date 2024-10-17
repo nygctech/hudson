@@ -151,7 +151,8 @@ rule unmix:
     params:
         section = '{sections}'
     output:
-        directory('{output_dir}/final_zarr/{sections}.zarr')
+        directory('{output_dir}/final_zarr/{sections}.zarr'),
+        directory('{output_dir}/preview/{sections}')
     log:
         '{output_dir}/logs/unmix_{sections}.log',
         '{output_dir}/logs/unmix_{sections}.html'

@@ -60,7 +60,7 @@ if nuclei is None:
     cp_args['channels'] = [0,0]
 else:
     nchan = 2
-    cp_args['channels'] = [1,2]
+    cp_args['channels'] = [0,1]
     for key in nuclei.copy():
         if key not in image.dims:
             smk_logger.warning(f'No dimension named {key}')

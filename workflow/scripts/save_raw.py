@@ -23,8 +23,8 @@ logger.info(f'path:: {image_path}')
 logger.info(f'section:: {section_name}')
 
 # Open raw images
-image = ia.get_HiSeqImages(image_path = image_path, common_name = section_name,
-                           logname = f'{section_name}.image')
+image = ia.get_HiSeqImages(image_path=image_path, common_name=section_name,
+                           logname=f'{section_name}.image')
 logger.info(f'machine::{image.machine}')
 logger.debug(f'{image.im.shape}')
 
@@ -45,8 +45,6 @@ client = Client(cluster)
 # Print out info about section
 logger.info(f'machine:: {image.machine}')
 logger.info(f'image path:: {image_path}')
-
-
 
 
 # Write Raw Images
