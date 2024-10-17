@@ -216,5 +216,5 @@ dependencies:
     - urllib3==1.26.11
     - wrapt==1.14.1
     - yte==1.5.1
-    - git+https://github.com/nygctech/pyseq-image@44777d3040013e886ad2026e2e1e87eacf280b70
+    - git+https://github.com/nygctech/pyseq-image@3331dce5243b8e7039c93aefa25b9c2545bf561d
     - ome-types

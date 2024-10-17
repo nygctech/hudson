@@ -4,15 +4,16 @@ import numpy as np
 from pathlib import Path
 from dask.distributed import Client, wait, LocalCluster
 from math import log
-from utils import get_logger, HiSeqImage
+from utils import get_logger
 import yaml
+from pre import image_analysis as ia
     
 section_name = snakemake.params.section
 
 # Start logger
 smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
 # Open image from zarr store
-hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+hs_image = ia.get_HiSeqImages(image_path = snakemake.input[0], logger = smk_logger)
 image = hs_image.im
 smk_logger.debug(image)
 
@@ -79,27 +80,9 @@ for cy , ch_markers in markers_config.items():
         smk_logger.info(f'Optimizing fluorescence removal from channels {sinks}')
         model = PICASSOnn(cy_mm[cy][0])
 
-#         # DELETEME
-#         test = image.sel(cycle=cy, channel=all_ch)
-#         max_px = test.max().compute()
-#         min_px = test.min().compute()
-#         M = 1                                                                   # Max MINE model value
-#         d = max_px - min_px                                                     # dimension of parameter space
-#         K = 1                                                                   # Max MINE parameter value
-#         L = 10                                                                  # Lipshitz constant, no idea just overestimate
-#         e = 0.1                                                            # accuracy
-#         c = 0.9                                                          # confidence
-
-#         print(max_px, min_px)
-#         print((2*M**2*(d*log(16*K*L*d**(0.5)/e) + 2*d*M + log(2/c)))/(e**2))
-
         # Fit alpha and background
         for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=snakemake.params.max_iter):
             pass
-#         logger.info('Mixing params:')
-#         coords = {'channel':all_ch, 'sink':sinks}
-#         alpha = xr.DataArray(model.mixing_parameters[0,:,:], name = 'alpha', dims = dims, coords = coords)
-#         bg = xr.DataArray(model.mixing_parameters[1,:,:], name = 'background', dims = dims, coords = coords)
         alpha = model.mixing_parameters[0,:,:]
         bg =  model.mixing_parameters[1,:,:]
         picasso_params[cy].update({'alpha':alpha.tolist(), 'background':bg.tolist()})
@@ -108,39 +91,4 @@ for cy , ch_markers in markers_config.items():
 # Write picasso parameters to yaml
 with open(snakemake.output[0], 'w') as f:
     f.write(yaml.dump(picasso_params))
-
-#         # Unmix Images
-#         ims = image.sel(cycle=cy, channel=all_ch).stack(dims = ['row','col']).T
-#         ch_stack = []
-#         for sink_ch in sinks:
-#             unmixed_im = ((ims - bg.sel(sink=sink_ch)) @ alpha.sel(sink=sink_ch)).unstack().drop_vars('sink')
-#             ch_stack.append(unmixed_im)
-#         unmixed_ims = xr.concat(ch_stack, dim='channel').assign_coords({'channel':sinks})
-
-#     # Save as markers instead of cycle & channel
-#     for ch, marker in ch_stains.items():
-#         if ch in sinks:
-#             stain_stack.append(unmixed_ims.sel(channel=ch))                     # add unmixed sink
-#         else:
-#             stain_stack.append(image.sel(cycle=cy, channel=ch))              # add channel that did not have any spillover
-#         stain_name.append(marker)
-        
-# unmixed = xr.concat(stain_stack, dim='marker').assign_coords({'marker':stain_name})  
-# unmixed.to_dataset().to_zarr(snakemake.output[0], compute = True)
-   
-# # Save images  
-
-# cluster = LocalCluster()
-# logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
-# cluster.scale(snakemake.resources.cores)
-
-            
-# zarr_path = snakemake.output[0]  
-# delayed_store = unmixed.to_dataset().to_zarr(zarr_path, compute = False)
-# logger.info('Writing Unmixed Images')
-# future_store = client.persist(delayed_store)
-# wait(future_store)
-# logger.info('Finished Writing Unmixed Images')
-
-# client.close()
        

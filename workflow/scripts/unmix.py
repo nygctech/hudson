@@ -1,16 +1,19 @@
-from utils import get_cluster, get_logger, HiSeqImage
+from utils import get_cluster, get_logger
 import yaml
 import xarray as xr
 import dask.array as da
 from dask.distributed import Client, wait, performance_report
 import dask
 from pathlib import Path
+from math import floor
+from pre import image_analysis as ia
+from os import makedirs 
 
 section_name = snakemake.params.section
 logger = get_logger(section_name, filehandler = snakemake.log[0])
 
 # Open image from zarr store
-hs_image = HiSeqImage(image_path = snakemake.input[0], logger = logger)
+hs_image = ia.get_HiSeqImages(image_path = snakemake.input[0], logger = logger)
 image = hs_image.im
 
 # Start logger
@@ -79,32 +82,19 @@ for cy, ch_markers in markers_config.items():
             marker_stack.append(image.sel(cycle=cy, channel=ch))              # add channel that did not have any spillover
         marker_name.append(marker)
 
-# Write Unmixed Images
+
+# Make xarray unmixed image
 unmixed = xr.concat(marker_stack, dim='marker').assign_coords({'marker':marker_name})
 unmixed = unmixed.sel(row=range(64,len(unmixed.row)))
-#unmixed = unmixed.chunk({'row': len(image.row)})
 logger.debug(unmixed)
-#delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
-unmixed = HiSeqImage(im = unmixed, logger = logger)
-delayed_store = unmixed.write_ome_zarr(snakemake.output[0])
+# Make HiSeqImage
+unmixed = ia.HiSeqImages(im=unmixed, machine=hs_image.machine, files=[snakemake.input[0]], logger=logger)
+save_path = Path(snakemake.output[0]).parent
+# Write Unmixed Images
+delayed_store = unmixed.save_ome_zarr(save_path)
 logger.info('Unmixing images')
 with performance_report(filename=snakemake.log[1]):
     logger.debug(delayed_store)
-    # if isinstance(delayed_store, list):
-    #     logger.debug('list')
-    #     futures = []
-    #     for _ in delayed_store:
-    #         logger.debug(_)
-    #         future_store = client.persist(_, retries = 10)
-    #         logger.debug(future_store)
-    #         futures.append(future_store.dask.values())
-    #         logger.debug('flag1c')
-    # else:
-    #     logger.debug('flag')
-    #     future_store = client.persist(delayed_store, retries = 10)
-    #     logger.debug('flag2')
-    #     futures = list(future_store.dask.values())
-    #     logger.debug('flag3')
     future_store = client.persist(delayed_store, retries = 10)
     logger.debug(future_store)
     futures = [list(f.dask.values())[0] for f in future_store]
@@ -119,3 +109,8 @@ if all(futures_done):
     logger.info('Finished unmixing images')
 else:
     logger.info('Error unmixing images')
+
+# Write preview images
+downscale = floor(section_summary['planesizeMB']/25)
+makedirs(snakemake.output[1], exist_ok=True)
+unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
