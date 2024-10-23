@@ -1,17 +1,20 @@
-from utils import open_zarr, get_cluster, get_logger
+from utils import get_cluster, get_logger, HiSeqImage
 import yaml
 import xarray as xr
 import dask.array as da
 from dask.distributed import Client, wait, performance_report
 import dask
+from pathlib import Path
 
+section_name = snakemake.params.section
+logger = get_logger(section_name, filehandler = snakemake.log[0])
 
-# open xarray image from zarr store
-image = open_zarr(snakemake.input[0])
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = logger)
+image = hs_image.im
 
 # Start logger
-logger = get_logger(image.name, filehandler = snakemake.log[0])
-logger.info(f'Opened {image.name}')
+# logger.info(f'Opened {image.name}')
 logger.debug(image.chunks)
 
 # open marker info
@@ -20,17 +23,23 @@ markers_config = snakemake.config.get('markers')
 # open saved picasso info
 with open(snakemake.input[1]) as f:
     picasso_params = yaml.safe_load(f)
+    
+# open section summary
+with open(snakemake.input[2]) as f:
+    section_summary = yaml.safe_load(f)
 
 
 # Start dask cluster
 # specify default worker options in ~/.config/dask/jobqueue.yaml
 winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
+logger.info(f'Dask worker settings: {winfo}')
 cluster = get_cluster(**winfo)
 logger.debug(cluster.new_worker_spec())
 logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
-nworkers = snakemake.params.tiles
+nworkers = section_summary.get('tiles', 2)
 logger.info(f'Scale dask cluster to {nworkers}')
 cluster.scale(nworkers)
+logger.info(f'Dask cluster info {cluster}')
 client = Client(cluster)
 
 # Save channel/cycle as markers and unmix
@@ -72,16 +81,40 @@ for cy, ch_markers in markers_config.items():
 
 # Write Unmixed Images
 unmixed = xr.concat(marker_stack, dim='marker').assign_coords({'marker':marker_name})
+unmixed = unmixed.sel(row=range(64,len(unmixed.row)))
 #unmixed = unmixed.chunk({'row': len(image.row)})
 logger.debug(unmixed)
-delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
+#delayed_store = unmixed.to_dataset().to_zarr(snakemake.output[0], compute = False)
+unmixed = HiSeqImage(im = unmixed, logger = logger)
+delayed_store = unmixed.write_ome_zarr(snakemake.output[0])
 logger.info('Unmixing images')
 with performance_report(filename=snakemake.log[1]):
+    logger.debug(delayed_store)
+    # if isinstance(delayed_store, list):
+    #     logger.debug('list')
+    #     futures = []
+    #     for _ in delayed_store:
+    #         logger.debug(_)
+    #         future_store = client.persist(_, retries = 10)
+    #         logger.debug(future_store)
+    #         futures.append(future_store.dask.values())
+    #         logger.debug('flag1c')
+    # else:
+    #     logger.debug('flag')
+    #     future_store = client.persist(delayed_store, retries = 10)
+    #     logger.debug('flag2')
+    #     futures = list(future_store.dask.values())
+    #     logger.debug('flag3')
     future_store = client.persist(delayed_store, retries = 10)
-    futures = list(future_store.dask.values())
-    wait(future_store)
+    logger.debug(future_store)
+    futures = [list(f.dask.values())[0] for f in future_store]
+    logger.debug(futures)
+    wait(futures)
+    logger.debug(futures)
     
+# Double check no errors
 futures_done = [f.done() for f in futures]
+logger.debug(futures_done)
 if all(futures_done):
     logger.info('Finished unmixing images')
 else:

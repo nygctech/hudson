@@ -3,48 +3,98 @@ import cellpose
 from cellpose import core, models, io
 from pathlib import Path
 import imageio
-from utils import get_logger, open_zarr
+from utils import get_logger, HiSeqImage
+import subprocess
 
-
-
-
-# Open image from zarr store
-image = open_zarr(snakemake.input[0])
+section_name = snakemake.params.section
 
 # Start logger
-smk_logger = get_logger(image.name, filehandler = snakemake.log[0])
+smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+
+# Open image from zarr store
+hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
+image = hs_image.im
 smk_logger.debug(image)
 
+
 # Make sure only 1 objective step
-if 'obj_step' in image.dims and 'obj_step' not in snakemake.config.get('segmentation',{}):
+cytoplasm = snakemake.config.get('segmentation').get('cytoplasm')
+nuclei = snakemake.config.get('segmentation').get('nuclei', None)
+
+for key in cytoplasm.copy():
+    if key not in image.dims:
+        smk_logger.warning(f'No dimension named {key}')
+        del cytoplasm[key]
+
+if 'obj_step' in image.dims and 'obj_step' not in cytoplasm:
     if image.obj_step.size > 1:
-        mid_step = image.obj_step[image.obj_step.size//2]
-        image = image.sel(obj_step = mid_step)
-        smk_logger.debug(image)
+        step = image.obj_step[image.obj_step.size - 1]
+        cytoplasm['obj_step'] = step
+        smk_logger.info(f'Using objective step {step}')       
+        #smk_logger.debug(image)
 
 # segment
 logger = io.logger_setup()
 use_GPU = core.use_gpu()
+que = str(subprocess.check_output(['squeue','--me']))
+smk_logger.info(f'{que}')
 smk_logger.info(f'Using GPU: {use_GPU}')
-model_type = snakemake.config.get('segmentation',{}).get('model type', 'TN2')
-diameter = snakemake.config.get('segmentation',{}).get('diameter', None)
-cprob = snakemake.config.get('segmentation',{}).get('cell probability', -6)
-fthresh = snakemake.config.get('segmentation',{}).get('flow threshold', 1000)
-marker = {'marker':snakemake.config.get('segmentation',{}).get('marker')}
-smk_logger.info(f'Segmenting marker')
-#TODO Log parameters
-smk_logger.info(f'Using model {model_type}')
+seg_args = snakemake.config.get('segmentation')
+model_type = seg_args.get('model_type', 'TN2')
+diameter = seg_args.get('diameter', 30)
+cp_args = {}
+cp_args['cellprob_threshold'] = seg_args.get('cell probability', -6)
+cp_args['flow_threshold'] = seg_args.get('flow threshold', 1000)
 
-model = models.CellposeModel(gpu=use_GPU,model_type=model_type)
+
+# smk_logger.info(f'Using model {model_type}')
+# smk_logger.info(f'diameter = {diameter}')
+# smk_logger.info(f'cell probability = {cprob}')
+# smk_logger.info(f'flow threshold = {fthresh}')
+
+smk_logger.info(f'Segmenting cytoplasm {cytoplasm}')
+_im1 = image.sel(cytoplasm).max('channel')
+smk_logger.debug('cytoplasm')
+smk_logger.debug(_im1)
+if nuclei is None:
+    nchan = 1
+    im = _im1
+    cp_args['channels'] = [0,0]
+else:
+    nchan = 2
+    cp_args['channels'] = [1,2]
+    for key in nuclei.copy():
+        if key not in image.dims:
+            smk_logger.warning(f'No dimension named {key}')
+            del nuclei[key]
+    if 'obj_step' not in nuclei:
+        nuclei['obj_step'] = cytoplasm['obj_step']
+    smk_logger.info(f'Segmenting nuclei {nuclei}')
+    _im2 = image.sel(nuclei).max('channel')
+    smk_logger.debug('nuclei')
+    smk_logger.debug(_im2)
+    im = xr.concat([_im1, _im2], dim='channel')
+    smk_logger.debug('cytoplasm + nuclei')
+    smk_logger.debug(im)
+
+model = models.CellposeModel(gpu=use_GPU, model_type=model_type, diam_mean=diameter)
 #model = models.CellposeModel(model_type='TN2')
 # Remove once priors steps in pipe
 #one_z_plane = image.sel(obj_step = 8498, channel = 558, cycle=1)
-sel = snakemake.config.get('segmentation')
-for key in sel.copy():
-    if key not in image.dims:
-        del sel[key]
-        
-arr = image.sel(sel)
-channels = [0,0]
-masks, flows, styles = model.eval(arr.values, diameter=diameter, channels=channels, cellprob_threshold= cprob, flow_threshold= fthresh)
+#sel = snakemake.config.get('segmentation')
+# for key in marker.copy():
+#     if key not in image.dims:
+#         smk_logger.warning(f'No dimension named {key}')
+#         del marker[key]
+     
+# arr = image.sel(marker)
+# smk_logger.debug(arr)
+# arr = arr.max(dim='channel')
+# smk_logger.debug(arr)
+
+cp_args['channel_axis'] = im.dims.index('channel')
+smk_logger.info(cp_args)
+smk_logger.info('Starting segmentation')
+masks, flows, styles = model.eval(im.values, **cp_args)
+smk_logger.info('Finished segmentation, writing mask')
 imageio.imwrite(snakemake.output[0],masks)

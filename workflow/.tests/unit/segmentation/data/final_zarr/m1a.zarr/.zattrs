@@ -1,0 +1,246 @@
+{
+    "multiscales": [
+        {
+            "axes": [
+                {
+                    "name": "c",
+                    "type": "channel"
+                },
+                {
+                    "name": "z",
+                    "type": "space"
+                },
+                {
+                    "name": "y",
+                    "type": "space"
+                },
+                {
+                    "name": "x",
+                    "type": "space"
+                }
+            ],
+            "datasets": [
+                {
+                    "coordinateTransformations": [
+                        {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "type": "scale"
+                        }
+                    ],
+                    "path": "0"
+                },
+                {
+                    "coordinateTransformations": [
+                        {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                2.0,
+                                2.0009775171065494
+                            ],
+                            "type": "scale"
+                        }
+                    ],
+                    "path": "1"
+                },
+                {
+                    "coordinateTransformations": [
+                        {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                4.0,
+                                4.00587084148728
+                            ],
+                            "type": "scale"
+                        }
+                    ],
+                    "path": "2"
+                },
+                {
+                    "coordinateTransformations": [
+                        {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                8.016949152542374,
+                                8.027450980392157
+                            ],
+                            "type": "scale"
+                        }
+                    ],
+                    "path": "3"
+                },
+                {
+                    "coordinateTransformations": [
+                        {
+                            "scale": [
+                                1.0,
+                                1.0,
+                                16.033898305084747,
+                                16.118110236220474
+                            ],
+                            "type": "scale"
+                        }
+                    ],
+                    "path": "4"
+                }
+            ],
+            "name": "/",
+            "version": "0.4"
+        }
+    ],
+    "omero": {
+        "creator": "hudson::utils",
+        "images": [
+            {
+                "description": "first_cycle = 1,\n                        last_cycle = 5,\n                        first_objstep = 25698,\n                        last_objstep = 25798,\n                        int_objstep = 100\n                      ",
+                "id": "Image:0",
+                "name": "m1a",
+                "pixels": {
+                    "channels": [
+                        {
+                            "color": [
+                                150,
+                                255,
+                                234
+                            ],
+                            "emission_wavelength": 610.0,
+                            "excitation_wavelength": 532.0,
+                            "fluor": "Cycle 1",
+                            "id": "Channel:0",
+                            "name": "GFAP"
+                        },
+                        {
+                            "color": [
+                                255,
+                                0,
+                                94
+                            ],
+                            "emission_wavelength": 740.0,
+                            "excitation_wavelength": 660.0,
+                            "fluor": "Cycle 2",
+                            "id": "Channel:1",
+                            "name": "ELAVL2"
+                        },
+                        {
+                            "color": [
+                                0,
+                                66,
+                                157
+                            ],
+                            "emission_wavelength": 558.0,
+                            "excitation_wavelength": 532.0,
+                            "fluor": "Cycle 3",
+                            "id": "Channel:2",
+                            "name": "LMN1b"
+                        },
+                        {
+                            "color": [
+                                147,
+                                0,
+                                58
+                            ],
+                            "emission_wavelength": 687.0,
+                            "excitation_wavelength": 660.0,
+                            "fluor": "Cycle 4",
+                            "id": "Channel:3",
+                            "name": "MBP"
+                        },
+                        {
+                            "color": [
+                                0,
+                                66,
+                                157
+                            ],
+                            "emission_wavelength": 558.0,
+                            "excitation_wavelength": 532.0,
+                            "fluor": "Cycle 5",
+                            "id": "Channel:4",
+                            "name": "LMN1b_5"
+                        },
+                        {
+                            "color": [
+                                150,
+                                255,
+                                234
+                            ],
+                            "emission_wavelength": 610.0,
+                            "excitation_wavelength": 532.0,
+                            "fluor": "Cycle 5",
+                            "id": "Channel:5",
+                            "name": "GFAP_5"
+                        },
+                        {
+                            "color": [
+                                147,
+                                0,
+                                58
+                            ],
+                            "emission_wavelength": 687.0,
+                            "excitation_wavelength": 660.0,
+                            "fluor": "Cycle 5",
+                            "id": "Channel:6",
+                            "name": "MBP_5"
+                        },
+                        {
+                            "color": [
+                                255,
+                                0,
+                                94
+                            ],
+                            "emission_wavelength": 740.0,
+                            "excitation_wavelength": 660.0,
+                            "fluor": "Cycle 5",
+                            "id": "Channel:7",
+                            "name": "ELAVL2_5"
+                        }
+                    ],
+                    "dimension_order": "CZYX",
+                    "id": "Pixels:0",
+                    "physical_size_x": 0.375,
+                    "physical_size_y": 0.375,
+                    "significant_bits": 12,
+                    "size_c": 8,
+                    "size_t": 8,
+                    "size_x": 2047,
+                    "size_y": 1892,
+                    "size_z": 2,
+                    "tiff_data_blocks": [
+                        {
+                            "first_t": 1,
+                            "first_z": 25698
+                        }
+                    ],
+                    "type": "int16"
+                }
+            }
+        ],
+        "instruments": [
+            {
+                "id": "Instrument:0",
+                "microscope": {
+                    "kind": "microscope",
+                    "manufacturer": "Illumina",
+                    "model": "HiSeq2500",
+                    "serial_number": "Origin,SND10273"
+                },
+                "objectives": [
+                    {
+                        "id": "Objective:0",
+                        "kind": "objective",
+                        "lens_na": 0.75,
+                        "manufacturer": "Nikon",
+                        "model": "20XAirNA0.75",
+                        "nominal_magnification": 20.0
+                    }
+                ]
+            }
+        ]
+    }
+}
