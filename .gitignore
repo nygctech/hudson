@@ -130,6 +130,7 @@ dmypy.json
 .pyre/
 
 # snakemake stuff
+.snakemake/
 workflow/.snakemake/*
 workflow/.snakemake
 workflow/*.out
@@ -158,6 +159,9 @@ config/*
 
 #bash scripts
 workflow/*.sh
+workflow/run_files/
 
 #tests
-workflo/.tests
+.tests/
+
+
