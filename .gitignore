@@ -154,8 +154,8 @@ workflow/dask*/
 workflow/logs/
 
 #configs
-config/mouse_genotype*
-config/*
+config/extras/*
+config/config*
 
 #bash scripts
 workflow/*.sh

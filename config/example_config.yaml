@@ -1,10 +1,10 @@
-experiment_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
-output_directory: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline
+experiment_directory: ## INSERT PATH TO RAW DATA
+output_directory: ## INSERT PATH TO OUTPUT OF PIPELINE
 resources:
   dask_worker:
     manager: SLURM
     # or specify in .config/dask/jobqueue.yaml
-    queue: pi3
+    queue: pe2
     cores: 2
     memory: 16G
     log_directory: dask_logs
@@ -35,6 +35,6 @@ gpu_spec:
 unmix:
   max_iter: 10               # Max iterations to optimize unmixing
 reference:
-  seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
+  seurat: ## INSERT PATH TO SEURAT .rds file
   typecol: cell_type
-  genedict: /nfs/home/rfu/hudson_misc/v2/genedict.csv 
+  genedict: ./genedict.csv
