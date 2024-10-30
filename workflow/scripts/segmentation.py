@@ -74,6 +74,7 @@ else:
     smk_logger.debug('nuclei')
     smk_logger.debug(_im2)
     im = xr.concat([_im1, _im2], dim='channel')
+    cp_args['channel_axis'] = im.dims.index('channel')
     smk_logger.debug('cytoplasm + nuclei')
     smk_logger.debug(im)
 
@@ -92,7 +93,7 @@ model = models.CellposeModel(gpu=use_GPU, model_type=model_type, diam_mean=diame
 # arr = arr.max(dim='channel')
 # smk_logger.debug(arr)
 
-cp_args['channel_axis'] = im.dims.index('channel')
+#cp_args['channel_axis'] = im.dims.index('channel')
 smk_logger.info(cp_args)
 smk_logger.info('Starting segmentation')
 masks, flows, styles = model.eval(im.values, **cp_args)

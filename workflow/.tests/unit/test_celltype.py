@@ -20,8 +20,8 @@ def test_celltype():
         expected_path = PurePosixPath(".tests/unit/celltype/expected")
         output_path = workdir / 'tables' / 'm1a.csv'
 
-        with zipfile.ZipFile(f"{data_path}/tables/m1a.h5mu.zip", 'r') as zip_ref:
-            zip_ref.extract('m1a.h5mu', data_path / 'tables')
+        with zipfile.ZipFile(f"{data_path}/features/m1a.h5mu.zip", 'r') as zip_ref:
+            zip_ref.extract('m1a.h5mu', data_path / 'features')
         # Copy data to the temporary workdir.
         shutil.copytree(data_path, workdir)
 
