@@ -1,6 +1,0 @@
-cycles: 5
-experiment: 20210323_4i4color
-machine: Origin
-planesizeMB: 8
-rawpath: /gpfs/commons/groups/nygcfaculty/PySeq/20210323_4i4color/pipeline/20210323_4i4color/raw_zarr
-tiles: 1

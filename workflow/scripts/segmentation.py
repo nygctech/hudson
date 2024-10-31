@@ -4,6 +4,7 @@ from cellpose import core, models, io
 from pathlib import Path
 import imageio
 from utils import get_logger, HiSeqImage
+import subprocess
 
 
 section_name = snakemake.params.section
@@ -36,9 +37,11 @@ if 'obj_step' in image.dims and 'obj_step' not in cytoplasm:
 # segment
 logger = io.logger_setup()
 use_GPU = core.use_gpu()
+que = str(subprocess.check_output(['squeue','--me']))
+smk_logger.info(f'{que}')
 smk_logger.info(f'Using GPU: {use_GPU}')
 seg_args = snakemake.config.get('segmentation')
-model_type = seg_args.get('model type', 'TN2')
+model_type = seg_args.get('model_type', 'TN2')
 diameter = seg_args.get('diameter', 30)
 cp_args = {}
 cp_args['cellprob_threshold'] = seg_args.get('cell probability', -6)
@@ -60,7 +63,7 @@ if nuclei is None:
     cp_args['channels'] = [0,0]
 else:
     nchan = 2
-    cp_args['channels'] = [0,1]
+    cp_args['channels'] = [1,2]
     for key in nuclei.copy():
         if key not in image.dims:
             smk_logger.warning(f'No dimension named {key}')
@@ -74,7 +77,8 @@ else:
     im = xr.concat([_im1, _im2], dim='channel')
     smk_logger.debug('cytoplasm + nuclei')
     smk_logger.debug(im)
-    
+
+
 model = models.CellposeModel(gpu=use_GPU, model_type=model_type, diam_mean=diameter)
 #model = models.CellposeModel(model_type='TN2')
 # Remove once priors steps in pipe
@@ -89,6 +93,7 @@ model = models.CellposeModel(gpu=use_GPU, model_type=model_type, diam_mean=diame
 # smk_logger.debug(arr)
 # arr = arr.max(dim='channel')
 # smk_logger.debug(arr)
+
 
 cp_args['channel_axis'] = im.dims.index('channel')
 smk_logger.info(cp_args)

@@ -1,3 +1,4 @@
+
 from utils import get_cluster, get_logger
 import yaml
 import xarray as xr
@@ -8,6 +9,7 @@ from pathlib import Path
 from math import floor
 from pre import image_analysis as ia
 from os import makedirs 
+
 
 section_name = snakemake.params.section
 logger = get_logger(section_name, filehandler = snakemake.log[0])
@@ -114,3 +116,4 @@ else:
 downscale = floor(section_summary['planesizeMB']/25)
 makedirs(snakemake.output[1], exist_ok=True)
 unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
+

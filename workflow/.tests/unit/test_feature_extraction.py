@@ -10,23 +10,25 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 import common
 import yaml
+import zipfile
 
 
 def test_feature_extraction():
     
     with TemporaryDirectory(dir='.') as tmpdir:
         workdir = Path(tmpdir) / "workdir"
-        #workdir = Path('./20240417/workdir')
         data_path = PurePosixPath(".tests/unit/feature_extraction/data")
         expected_path = PurePosixPath(".tests/unit/feature_extraction/expected")
         output_path = workdir / 'features' / 'm1a.h5mu'
 
+        with zipfile.ZipFile(f"{expected_path}/features/m1a.h5mu.zip", 'r') as zip_ref:
+            zip_ref.extract('m1a.h5mu', expected_path / 'features')
+            
         # Copy data to the temporary workdir.
         shutil.copytree(data_path, workdir)
 
         # Make test config
         test_config_path = common.update_outputdir(workdir)
-        print(f'{test_config_path=}')
 
         # Increase SLURM resources for test
         with open(test_config_path) as f:
@@ -61,24 +63,14 @@ def test_feature_extraction():
                 "--configfile",
                 test_config_path,
                 "--use-conda",
-                "--profile",
-                "slurm",
-                #"-n",
-                # "--directory",
-                # workdir,
+
+                '--allowed-rules', 'feature_extraction'
             ],
            stderr = outfile)
 
-        # Check the output byte by byte using cmp.
-        # To modify this behavior, you can inherit from common.OutputChecker in here
-        # and overwrite the method `compare_files(generated_file, expected_file), 
-        # also see common.py.
-        #common.OutputChecker(data_path, expected_path, workdir).check()
+        exp_files = ['features/m1a.h5mu']
 
-        #common.OutputChecker(data_path, expected_path, workdir).check()
-        exp_files = ['features/m1a.h5mu',
-                    ]
         checker = common.OutputChecker(data_path, expected_path, workdir)
-    	
+
         for f in exp_files: 
             assert checker.compare_files(expected_path / f, workdir / f)

@@ -17,7 +17,7 @@ import yaml
 
 def update_outputdir(workdir):
     # TODO update with path from remote data repo
-    config_path = '/nethome/kpandit/hudson/workflow/.tests/unit/pytest_config.yaml'
+    config_path = Path(os.path.abspath(__file__)).parent / 'pytest_config.yaml'
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -77,5 +77,3 @@ class OutputChecker:
             print(error.output)
             return False
  
-            
-            

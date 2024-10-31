@@ -7,7 +7,10 @@ import shutil
 from pathlib import Path, PurePosixPath
 
 sys.path.insert(0, os.path.dirname(__file__))
+<<<<<<< HEAD
 print(os.path.dirname(__file__))
+=======
+>>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f
 
 import common
 import yaml
@@ -18,9 +21,13 @@ def test_picasso():
     with TemporaryDirectory(dir = '.') as tmpdir:
 
         workdir = Path(tmpdir) / "workdir"
+<<<<<<< HEAD
         # Update with call to remote data repo with repo
         data_path = PurePosixPath(".tests/unit/picasso/data")
         #expected_path = PurePosixPath(".tests/unit/picasso/expected")
+=======
+        data_path = PurePosixPath(".tests/unit/picasso/data")
+>>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f
         output_path = workdir / 'final_zarr' / 'picasso_m1a.yaml'
 
         # Copy data to the temporary workdir.
@@ -30,6 +37,7 @@ def test_picasso():
         test_config_path = common.update_outputdir(workdir)
         
 
+<<<<<<< HEAD
         # dbg
         print(f'{test_config_path=}', file = sys.stderr)
         print(f'{workdir=}', file = sys.stderr)
@@ -37,6 +45,8 @@ def test_picasso():
         #print(f'{expected_path=}', file = sys.stderr)
         print(f'{output_path=}', file=sys.stderr)
 
+=======
+>>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f
         # Run the test job.
         with open('test_picasso.out', "w") as outfile:
             sp.run([
@@ -50,6 +60,7 @@ def test_picasso():
                 "--configfile",
                 test_config_path,
                 "--use-conda",
+<<<<<<< HEAD
          #       "--unlock",
          #       "--directory",
          #       workdir,
@@ -62,6 +73,12 @@ def test_picasso():
         # also see common.py.
         # checker = common.OutputChecker(data_path, expected_path, workdir).check()
 
+=======
+                '--allowed-rules', 'picasso'
+            ], 
+            stdout = sp.PIPE, stderr = outfile)
+
+>>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f
 
         with open(output_path) as f:
             picasso_params = yaml.safe_load(f)
