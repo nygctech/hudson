@@ -234,9 +234,9 @@ rule celltype:
     log:
         '{output_dir}/logs/cell_type_{sections}.log'
     params:
-        ref = config.get('celltype',{}).get('seurat', ''),
-        typecol = config.get('celltype',{}).get('typecol', 'cell_type'),
-        genedict = config.get('celltype',{}).get('genedict', {})
+        ref = config.get('reference',{}).get('seurat', ''),
+        typecol = config.get('reference',{}).get('typecol', 'cell_type'),
+        genedict = config.get('reference',{}).get('genedict', {})
     resources:
         mem_mb = 32000
     conda:
