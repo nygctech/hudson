@@ -14,9 +14,7 @@ image_path = snakemake.config.get('image_path',experiment_config['experiment']['
 
 # Get section name
 section_name = snakemake.params.section
-
-# image_path = Path(image_path) / Path(section_name)
-image_path = exp_dir / image_path
+image_path = Path(image_path)
 # Start logger
 logger = get_logger(logname = section_name, filehandler = snakemake.log[0])
 logger.info(f'path:: {image_path}')
@@ -25,6 +23,7 @@ logger.info(f'section:: {section_name}')
 # Open raw images
 image = ia.get_HiSeqImages(image_path=image_path, common_name=section_name,
                            logname=f'{section_name}.image')
+
 logger.info(f'machine::{image.machine}')
 logger.debug(f'{image.im.shape}')
 

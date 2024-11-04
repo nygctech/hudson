@@ -22,11 +22,12 @@ core_limit = cluster_config.get('nodes')
 
 
 def get_gpu():
-    result = subprocess.run(['sinfo -p gpu | grep idle'],shell=True,capture_output=True,text=True)
+    result = subprocess.run(['sinfo -p gpu | grep "idle\|mix"'],shell=True,capture_output=True,text=True)
+    
+
     gpu_available = 0
     if 'pe2dg2' in result.stdout:
         gpu_available = 1
-
     return gpu_available  
 
     
@@ -116,8 +117,8 @@ rule fix_lighting:
     script:
         'scripts/preprocess.py'
 
-#if get_gpu():
-#    cluster_config.update({'picasso':config['gpu_spec']})
+if get_gpu():
+    cluster_config.update({'picasso':config['gpu_spec']})
 
 
 rule picasso:
@@ -162,6 +163,7 @@ rule unmix:
         'scripts/unmix.py'
 
 if get_gpu():
+    print("Using GPUS")
     cluster_config.update({'segmentation':config['gpu_spec']})
     
 rule segmentation:
@@ -262,3 +264,4 @@ rule celltype:
 #         'envs/spatial_neighbor.yaml'
 #     script:
 #         'scripts/spatial_neighborhood.py'
+

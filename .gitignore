@@ -130,7 +130,8 @@ dmypy.json
 .pyre/
 
 # snakemake stuff
-**/.snakemake
+.snakemake/*
+workflow/.snakemake/*
 workflow/.snakemake
 workflow/*.out
 results/
@@ -153,11 +154,14 @@ workflow/dask*/
 workflow/logs/
 
 #configs
-config/mouse_genotype*
-config/*
+config/extras/*
+config/config*
 
 #bash scripts
 workflow/*.sh
+workflow/run_files/
 
 #tests
-workflo/.tests
+#.tests/
+
+

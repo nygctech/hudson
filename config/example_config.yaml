@@ -1,0 +1,40 @@
+experiment_directory: ## INSERT PATH TO RAW DATA
+output_directory: ## INSERT PATH TO OUTPUT OF PIPELINE
+resources:
+  dask_worker:
+    manager: SLURM
+    # or specify in .config/dask/jobqueue.yaml
+    queue: pe2
+    cores: 2
+    memory: 16G
+    log_directory: dask_logs
+markers:
+  # cycle:
+  #   channel1: marker1
+  #   channel2: marker2
+  1:
+    610: GFAP
+  2:
+    740: ELAVL2
+  3:
+    558: LMN1b
+  4:
+    687: MBP
+  5:
+    558: LMN1b_5
+    610: GFAP_5
+    687: MBP_5
+    740: ELAVL2_5
+segmentation:
+  marker: LMN1b_5
+unmix:
+  max_iter: 10               # Max iterations to optimize unmixing
+gpu_spec:
+  partition: gpu
+  gres: gpu:tesla:1
+unmix:
+  max_iter: 10               # Max iterations to optimize unmixing
+reference:
+  seurat: ## INSERT PATH TO SEURAT .rds file
+  typecol: cell_type
+  genedict: ./genedict.csv
