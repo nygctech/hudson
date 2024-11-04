@@ -9,29 +9,6 @@ from pathlib import Path, PurePosixPath
 sys.path.insert(0, os.path.dirname(__file__))
 
 import common
-<<<<<<< HEAD
-
-
-def test_saveraw():
-
-    with TemporaryDirectory() as tmpdir:
-        workdir = Path(tmpdir) / "workdir"
-
-        data_path = PurePosixPath(".tests/unit/saveraw/data")
-        
-        expected_path = PurePosixPath(".tests/unit/raw_zarr/expected")
-
-        output_path = workdir/ 'raw_zarr' / 'm1a.zarr'
-
-        shutil.copytree(data_path, workdir)
-        
-        test_config_path = common.update_outputdir(workdir)
-
-
-
-        with open('test_saveraw.out', "w") as outfile:
-            sp.run([
-=======
 import yaml
 import xarray as xr
 import numpy as np 
@@ -51,7 +28,6 @@ def test_saverae():
         # Run the test job.
         with open('test_saveraw.out', "w") as outfile:
             sp.check_output([
->>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f
                 "python",
                 "-m",
                 "snakemake", 
@@ -62,26 +38,6 @@ def test_saverae():
                 "--configfile",
                 test_config_path,
                 "--use-conda",
-<<<<<<< HEAD
-         #       "--unlock",
-         #       "--directory",
-         #       workdir,
-            ], 
-            stdout = sp.PIPE, stderr = outfile)
-
-        # Check the output byte by byte using cmp.
-        # To modify this behavior, you can inherit from common.OutputChecker in here
-        # and overwrite the method `compare_files(generated_file, expected_file), 
-        # also see common.py.
-        exp_files = ['raw_zarr/m1a.zarr',
-                    ]
-        checker = common.OutputChecker(data_path, expected_path, workdir)
-    	
-        for f in exp_files: 
-            assert checker.compare_files(expected_path / f, workdir / f)
-
-
-=======
                 '--allowed-rules', 'saveraw'
             ],
             stderr = outfile)
@@ -103,4 +59,3 @@ def test_saverae():
         
         for marker in np.unique(markers):
             assert marker in data.channel.values
->>>>>>> 1ca7d0717a923e11c061e50f32a0b20468f1041f

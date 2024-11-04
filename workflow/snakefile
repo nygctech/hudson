@@ -137,7 +137,7 @@ rule picasso:
         mem_mb = get_mem,
         runtime = get_picasso_time
     conda:
-        'envs/unmix.yaml'
+        'envs/picasso.yaml'
     script:
         'scripts/picasso.py'
 # Reset nodes to core_limit after specifying cores in rule

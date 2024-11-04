@@ -30,25 +30,6 @@ def test_feature_extraction():
         # Make test config
         test_config_path = common.update_outputdir(workdir)
 
-        # Increase SLURM resources for test
-        with open(test_config_path) as f:
-             config = yaml.safe_load(f)
-        config.update({'resources': 
-                        {'dask_worker':
-                          {'cores': 1,
-                           'memory': '8G',
-                           'manager': 'SLURM',
-                           'log_directory': 'dask_logs'
-                      }}})
-        with open(test_config_path, 'w') as f:
-             f.write(yaml.dump(config))
-
-        # dbg
-        print(f'{workdir=}')
-        print(f'{data_path=}')
-        print(f'{expected_path=}')
-        print(f'{output_path=}')
-
 
         # Run the test job.
         with open('test_feature_extraction.out', "w") as outfile:
