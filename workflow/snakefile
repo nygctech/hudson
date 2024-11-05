@@ -192,6 +192,7 @@ rule feature_extraction:
         section = '{sections}'
     output:
         '{output_dir}/features/{sections}.h5mu'
+        '{output_dir}/features/{sections}.csv'
     log: 
         '{output_dir}/logs/intensity_{sections}.log'
     threads: 8
