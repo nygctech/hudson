@@ -39,7 +39,6 @@ def test_unmix():
                 "--configfile",
                 test_config_path,
                 "--use-conda",
-
                 '--allowed-rules', 'unmix'
             ],
             stderr = outfile)
