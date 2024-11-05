@@ -83,8 +83,10 @@ if all(futures_done):
                     'experiment': experiment_config['experiment']['experiment name'],
                     'cycles': cycles
                    }
+    data = {}
+    data['section_information'] =  section_info
     with open(snakemake.output[1], 'w') as f:
-        f.write(yaml.dump(section_info))
+        f.write(yaml.dump(data))
         
    
     with open(snakemake.output[2], 'w') as f:
