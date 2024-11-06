@@ -1,0 +1,10 @@
+cycles: 5
+experiment: 20210323_4i4color
+machine: Origin
+planesizeMB: 8
+rawpath: /gpfs/commons/groups/innovation/sarah/hudson_pytests/20210323_4i4color/raw_zarr
+segmentation:
+  avergae_cell_size: 23.6776
+  cell_size_standard_deviation: 10.6845
+  number_of_cells: 1958
+tiles: 1
