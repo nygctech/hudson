@@ -1,6 +1,7 @@
-cycles: 5
-experiment: 20210323_4i4color
-machine: Origin
-planesizeMB: 8
-rawpath: /gpfs/commons/groups/innovation/sarah/hudson_pytests/20210323_4i4color/raw_zarr
-tiles: 1
+section_information:
+  cycles: 5
+  experiment: 20210323_4i4color
+  machine: Origin
+  planesizeMB: 8
+  rawpath: /gpfs/commons/groups/innovation/sarah/metrics_test/20210323_4i4color/raw_zarr
+  tiles: 1
