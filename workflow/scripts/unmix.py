@@ -41,7 +41,7 @@ logger.info(f'Dask worker settings: {winfo}')
 cluster = get_cluster(**winfo)
 logger.debug(cluster.new_worker_spec())
 logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
-nworkers = section_summary.get('tiles', 2)
+nworkers = section_summary['section_information'].get('tiles', 2)
 logger.info(f'Scale dask cluster to {nworkers}')
 cluster.scale(nworkers)
 logger.info(f'Dask cluster info {cluster}')
@@ -113,7 +113,7 @@ else:
     logger.info('Error unmixing images')
 
 # Write preview images
-downscale = floor(section_summary['planesizeMB']/25)
+downscale = floor(section_summary['section_information']['planesizeMB']/25)
 makedirs(snakemake.output[1], exist_ok=True)
 unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
 

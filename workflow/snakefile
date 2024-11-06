@@ -191,7 +191,7 @@ rule feature_extraction:
         tiles = get_tiles,
         section = '{sections}'
     output:
-        '{output_dir}/features/{sections}.h5mu'
+        '{output_dir}/features/{sections}.h5mu',
         '{output_dir}/features/{sections}.csv'
     log: 
         '{output_dir}/logs/intensity_{sections}.log'

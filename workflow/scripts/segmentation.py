@@ -5,6 +5,8 @@ from pathlib import Path
 import imageio
 from utils import get_logger, HiSeqImage
 import subprocess
+import numpy as np
+import yaml
 
 
 section_name = snakemake.params.section
