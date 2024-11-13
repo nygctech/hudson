@@ -35,7 +35,7 @@ def get_tiles(wildcards):
     try:
         with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
             section_info = yaml.safe_load(f)  
-        tiles = section_info['tiles'] 
+        tiles = section_info['section_information']['tiles'] 
     except:
         tiles = 1
     return tiles
@@ -44,7 +44,7 @@ def get_cores(summary_path):
     try:
         with open(summary_path) as f:
             section_info = yaml.safe_load(f)  
-        tiles = section_info['tiles']     
+        tiles = section_info['section_information']['tiles']     
     except:
         tiles = 8
     return tiles
@@ -53,7 +53,7 @@ def get_cycles(wildcards):
     try:
         with open(join(output_dir,f'summary_{wildcards.sections}.yaml')) as f:
             section_info = yaml.safe_load(f)
-        cycles = section_info['cycles']
+        cycles = section_info['section_information']['cycles']
     except:
         cycles = exp_conf.get('experiment', 'cycles')
     return cycles
@@ -63,7 +63,7 @@ def get_mem(wildcards):
         summary_path = join(wildcards.output_dir,f'summary_{wildcards.sections}.yaml')
         with open(summary_path) as f:
             section_info = yaml.safe_load(f)    
-        mb = section_info['planesizeMB']
+        mb = section_info['section_information']['planesizeMB']
         mb = ceil(mb/8000)*8000 * get_cores(summary_path)
     except:
         mb = 8000
