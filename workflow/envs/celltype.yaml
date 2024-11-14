@@ -2,31 +2,10 @@ name: astir
 channels:
   - conda-forge
 dependencies:
-  - _libgcc_mutex=0.1=conda_forge
-  - _openmp_mutex=4.5=2_gnu
-  - ca-certificates=2024.8.30=hbcca054_0
-  - ld_impl_linux-64=2.43=h712a8e2_2
-  - libffi=3.4.2=h7f98852_5
-  - libgcc=14.2.0=h77fa898_1
-  - libgcc-ng=14.2.0=h69a702a_1
-  - libgomp=14.2.0=h77fa898_1
-  - libnsl=2.0.1=hd590300_0
-  - libsqlite=3.47.0=hadc24fc_1
-  - libstdcxx=14.2.0=hc0a3c3a_1
-  - libstdcxx-ng=14.2.0=h4852527_1
-  - libzlib=1.3.1=hb9d3cd8_2
-  - ncurses=6.5=he02047a_1
-  - openssl=3.4.0=hb9d3cd8_0
   - pip=24.0=pyhd8ed1ab_0
-  - python=3.7.12=hf930737_100_cpython
-  - readline=8.2=h8228510_1
-  - setuptools=69.0.3=pyhd8ed1ab_0
-  - sqlite=3.47.0=h9eae976_1
-  - tk=8.6.13=noxft_h4845f30_101
-  - wheel=0.42.0=pyhd8ed1ab_0
-  - xz=5.2.6=h166bdaf_0
+  - python=3.10
+  - ome-zarr
   - pip:
       - git+https://github.com/camlab-bioml/astir.git
-      - muon==0.1.3
-      -importlib-metadata
+      - muon
 prefix: /gpfs/commons/groups/innovation/sarah/mambaforge/envs/astir

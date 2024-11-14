@@ -6,6 +6,7 @@ import anndata as ad
 import pandas as pd
 import sys
 import pickle
+from utils import get_cluster, get_logger
 from astir.astir import Astir
 
 
@@ -18,7 +19,7 @@ def arcsinh(X, cofactor_dict, var_names):
     stack = []
     for c in range(ncols):
         cofactor_ = cofactor_dict[var_names[c]]
-        stack.append(np.arcsinh(X[:,c]/(cofactor_[0])))
+        stack.append(np.arcsinh(X[:,c]/(cofactor_)))
     return np.stack(stack, axis=1)
 
 
@@ -47,8 +48,8 @@ mdata = mu.read(data_path)
 marker_path = snakemake.config.get('celltype').get('markers', None)
 smk_logger.info(f'Reading in {marker_path}')
 try: 
-    with open(marker_path) as f: 
-        marker_dict = yaml.safe_laod(f)
+    with open(marker_path, 'r') as f: 
+        marker_dict = yaml.safe_load(f)
 except:
     print("Error: Unable to read in a marker file")
     sys.exit(1)
@@ -109,8 +110,8 @@ if remove:
 ## Save output 
 smk_logger.info('Saving Output')
 ast_adata = ad.AnnData(X, obs = cells, var= adata.var)
-adata.uns['model'] = pickle.dumps(ast)
-mdata['celltypes'] = ast_adata
+adata.uns['model'] = ast._type_run_info
+mdata.mod['celltypes'] = ast_adata
 mdata.write(snakemake.output[0])
 
 smk_logger.info('Writing metrics to Summary')
