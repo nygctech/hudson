@@ -210,26 +210,17 @@ cluster_config.update({'nodes':core_limit})
 
 rule celltype:
     input:
-        '{output_dir}/features/{sections}.h5mu'
+        '{output_dir}/features/{sections}.h5mu',
+        '{output_dir}/summary_{sections}.yaml'
     output:
-        '{output_dir}/tables/{sections}.csv'
+        '{output_dir}/celltype/{sections}.h5mu'
     log:
         '{output_dir}/logs/cell_type_{sections}.log'
     params:
-        ref = config.get('reference',{}).get('seurat', ''),
-        typecol = config.get('reference',{}).get('typecol', 'cell_type'),
-        genedict = config.get('reference',{}).get('genedict', {})
+        section = '{sections}'
     resources:
-        mem_mb = 32000
+        mem_mb = get_mem
     conda:
         'envs/celltype.yaml'
-    shell:
-        '''
-            Rscript scripts/celltype.R \
-              --input_h5={input} \
-              --output={output} \
-              --ref={params.ref} \
-              --typecol={params.typecol} \
-              --genedict={params.genedict} > {log}
-        '''
-
+    script:
+        'scripts/celltype.py'
