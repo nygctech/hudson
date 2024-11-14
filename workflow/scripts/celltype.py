@@ -119,6 +119,7 @@ with open(snakemake.input[1], 'r') as file:
     data = yaml.safe_load(file)
 
 counts = ast.get_celltypes().value_counts()
+counts.index = [counts.index[i][0] for i in range(len(counts.index))]
 data['celltyping'] = {}
 data['celltyping']['counts'] = counts.to_dict()
 data['celltyping']['proportion'] = (counts/N).to_dict()

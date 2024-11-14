@@ -18,10 +18,13 @@ def test_celltype():
         workdir = Path(tmpdir) / "workdir"
         data_path = PurePosixPath(".tests/unit/celltype/data")
         expected_path = PurePosixPath(".tests/unit/celltype/expected")
-        output_path = workdir / 'tables' / 'm1a.csv'
+        output_path = workdir / 'celltype' / 'm1a.h5mu'
 
         with zipfile.ZipFile(f"{data_path}/features/m1a.h5mu.zip", 'r') as zip_ref:
             zip_ref.extract('m1a.h5mu', data_path / 'features')
+        
+        with zipfile.ZipFile(f"{expected_path}/celltype/m1a.h5mu.zip", 'r') as zip_ref:
+            zip_ref.extract('m1a.h5mu', expected_path / 'celltype')
         # Copy data to the temporary workdir.
         shutil.copytree(data_path, workdir)
 
@@ -45,7 +48,7 @@ def test_celltype():
             ],
            stderr = outfile)
 
-        exp_files = ['tables/m1a.csv']
+        exp_files = ['celltype/m1a.h5mu']
         checker = common.OutputChecker(data_path, expected_path, workdir)
         for f in exp_files: 
             assert checker.compare_files(expected_path / f, workdir / f)
