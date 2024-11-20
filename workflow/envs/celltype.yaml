@@ -1,20 +1,11 @@
-name: celltype
+name: astir
 channels:
   - conda-forge
-  - bioconda  
-  - defaults
 dependencies:
-  - r-base
-  - r-tidyverse
-  - mamba
-  - r-seurat
-  - ca-certificates
-  - certifi
-  - openssl
-  - r-argparse
-  - r-essentials
-  - bioconductor-cytotree
-  - bioconductor-sva
-  - bioconductor-genomeinfodbdata
-  - gcc
-  - r-hdf5r
+  - pip=24.0=pyhd8ed1ab_0
+  - python=3.10
+  - ome-zarr
+  - pip:
+      - git+https://github.com/camlab-bioml/astir.git
+      - muon
+prefix: /gpfs/commons/groups/innovation/sarah/mambaforge/envs/astir

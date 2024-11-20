@@ -42,7 +42,5 @@ gpu_spec:
   gres: gpu:1
 unmix:
   max_iter: 10               # Max iterations to optimize unmixing
-reference:
-  seurat: /gpfs/commons/groups/compbio/projects/rf_scrna_refs/mouse_spinalcord_seurat_object_subset.rds
-  typecol: cell_type
-  genedict: /nfs/home/rfu/hudson_misc/v2/genedict.csv 
+celltype:
+  markers: '/gpfs/commons/groups/innovation/sarah/hudson/config/markers.yaml'

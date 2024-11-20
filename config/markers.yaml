@@ -1,0 +1,28 @@
+cell_states: {}
+cell_type:
+  astrocytes:
+  - GFAP
+  interneurons:
+  - PVALB
+  microglia:
+  - IBA1
+  motor neurons:
+  - ELAVL2
+  neurons_1:
+  - NFH
+  neurons_2:
+  - MAP2
+  oligodendrocytes:
+  - MBP
+  opc:
+  - PDGFRA
+hierarchy:
+  glial:
+  - astrocytes
+  - microglia
+  - oligodendrocytes
+  - opc
+  neurons:
+  - motor neurons
+  - neurons
+  - interneurons

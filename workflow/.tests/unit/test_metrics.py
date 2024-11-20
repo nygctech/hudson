@@ -18,7 +18,7 @@ def test_metrics():
         workdir = Path(tmpdir) / "workdir"
         data_path = PurePosixPath(".tests/unit/metrics/data")
         expected_path = PurePosixPath(".tests/unit/metrics/expected")
-        output_path = workdir / 'features' / 'm1a.csv'
+        output_path = workdir / 'celltype' / 'm1a.h5mu'
         # Copy data to the temporary workdir.
         shutil.copytree(data_path, workdir)
 
@@ -38,12 +38,12 @@ def test_metrics():
                 "--configfile",
                 test_config_path,
                 "--use-conda",
-                '--allowed-rules', 'segmentation', 'feature_extraction'
+                '--allowed-rules', 'segmentation', 'feature_extraction', 'celltype'
             ],
            stderr = outfile)
 
         exp_files = ['features/m1a.csv', 'summary_m1a.yaml']
-
+        shutil.copy(workdir/ 'summary_m1a.yaml', '/commons/groups/innovation/sarah/hudson/workflow/summary_m1a.yaml')
         checker = common.OutputChecker(data_path, expected_path, workdir)
     
         for f in exp_files: 
