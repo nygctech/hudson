@@ -80,9 +80,19 @@ for cy , ch_markers in markers_config.items():
         smk_logger.info(f'Optimizing fluorescence removal from channels {sinks}')
         model = PICASSOnn(cy_mm[cy][0])
 
-        # Fit alpha and background
-        for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=snakemake.params.max_iter):
+        # # Fit alpha and background
+        # for i in model.train_loop(images = image.sel(cycle=cy, channel=all_ch), max_iter=snakemake.params.max_iter):
+        #     pass
+
+        ## TRY EXCEPT BLOCK TO HANDLE SINGLE CYCLE EXPERIMENTS 
+        try:
+            img = image.sel(cycle=cy, channel=all_ch)
+        except:
+            img = image.sel(channel=all_ch)
+
+        for i in model.train_loop(images = img, max_iter=snakemake.params.max_iter):
             pass
+
         alpha = model.mixing_parameters[0,:,:]
         bg =  model.mixing_parameters[1,:,:]
         picasso_params[cy].update({'alpha':alpha.tolist(), 'background':bg.tolist()})

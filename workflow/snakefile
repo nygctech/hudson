@@ -76,9 +76,14 @@ def get_picasso_time(wildcards):
    
 
 
+# rule all:
+#     input:
+#         expand('{dir}/celltype/{s}.h5mu', dir = output_dir, s = sections)
+
+
 rule all:
     input:
-        expand('{dir}/celltype/{s}.h5mu', dir = output_dir, s = sections)
+        expand('{dir}/features/{s}.h5mu', dir = output_dir, s = sections)
 
 rule saveraw:
     input:

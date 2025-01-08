@@ -66,7 +66,10 @@ for cy, ch_markers in markers_config.items():
         # Unmix Images
 #         with dask.config.set(**{'array.slicing.split_large_chunks': False}):
 #             ims = image.sel(cycle=cy, channel=all_ch).stack(px = ('row','col'))
-        ims = image.sel(cycle=cy, channel=all_ch)
+        try:
+            ims = image.sel(cycle=cy, channel=all_ch)
+        except:
+            ims = image.sel(channel=all_ch)
         ch_stack = []
         for sink_ch in sinks:
             unmixed_im = (ims - bg.sel(sink=sink_ch)).clip(min=0).dot(alpha.sel(sink=sink_ch))
@@ -81,17 +84,27 @@ for cy, ch_markers in markers_config.items():
         if ch in sinks:
             marker_stack.append(unmixed_ims.sel(channel=ch))                     # add unmixed sink
         else:
-            marker_stack.append(image.sel(cycle=cy, channel=ch))              # add channel that did not have any spillover
+            try:
+                marker_stack.append(image.sel(cycle=cy, channel=ch))
+            except: 
+                marker_stack.append(image.sel(channel=ch))                 # add channel that did not have any spillover
         marker_name.append(marker)
 
 
 # Make xarray unmixed image
 unmixed = xr.concat(marker_stack, dim='marker').assign_coords({'marker':marker_name})
 unmixed = unmixed.sel(row=range(64,len(unmixed.row)))
-logger.debug(unmixed)
+
+# Add 'cycle' dimension (if it doesn't exist)
+if 'cycle' not in unmixed.dims:
+    unmixed = unmixed.assign_coords(cycle=("marker", [1] * unmixed.sizes['marker']))
+
+unmixed.name = section_name
+logger.info(unmixed.name)
 # Make HiSeqImage
 unmixed = ia.HiSeqImages(im=unmixed, machine=hs_image.machine, files=[snakemake.input[0]], logger=logger)
 save_path = Path(snakemake.output[0]).parent
+logger.info(save_path)
 # Write Unmixed Images
 delayed_store = unmixed.save_ome_zarr(save_path)
 logger.info('Unmixing images')
