@@ -9,7 +9,7 @@ from math import ceil
 # Find raw image path
 experiment_config = get_config(snakemake.input[0])
 exp_dir = Path(snakemake.config['experiment_directory'])
-image_path = snakemake.config.get('image_path',experiment_config['experiment']['image path'])
+image_path = snakemake.config.get('image_path', exp_dir/experiment_config['experiment']['image path'])
 
 
 # Get section name

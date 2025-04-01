@@ -72,11 +72,22 @@ else:
     minper = snakemake.config.get('celltype').get('minper', 5)
     maxper = snakemake.config.get('celltype').get('maxper', 99.99)
     X = minmax(adata.X, minper, maxper)
+var_names = adata.var_names
+
+for feat, norm in snakemake.config.get('celltype').get('extra_features', {}).items():
+    if feat in mdata['morphological'].vars:
+        f = mdata['morphological'][:,feat]
+
+        if 'minmax' in norm:
+            X = np.concatenate([X, minmax(f.to_numpy())])
+        else:
+            X = np.concatenate([X, f.to_numpy()])
+        var_names.append(feat)
 
 ## Create Astir Object
 smk_logger.info('Initalizing Astir Model')
 df_gex = pd.DataFrame(X)
-df_gex.columns = adata.var_names
+df_gex.columns = var_names
 df_gex.index = adata.obs_names
 ast = Astir(df_gex, marker_dict)
 

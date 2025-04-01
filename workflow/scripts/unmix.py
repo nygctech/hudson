@@ -43,7 +43,8 @@ logger.debug(cluster.new_worker_spec())
 logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
 nworkers = section_summary['section_information'].get('tiles', 2)
 logger.info(f'Scale dask cluster to {nworkers}')
-cluster.scale(nworkers)
+cluster.adapt(minimum=nworkers-1, maximum=nworkers+1)
+#cluster.scale(nworkers)
 logger.info(f'Dask cluster info {cluster}')
 client = Client(cluster)
 
@@ -104,16 +105,36 @@ with performance_report(filename=snakemake.log[1]):
     wait(futures)
     logger.debug(futures)
     
-# Double check no errors
-futures_done = [f.done() for f in futures]
-logger.debug(futures_done)
-if all(futures_done):
-    logger.info('Finished unmixing images')
-else:
-    logger.info('Error unmixing images')
+    # Double check no errors
+    futures_done = [f.done() for f in futures]
+    logger.debug(futures_done)
+    if all(futures_done):
+        logger.info('Finished unmixing images')
+    else:
+        logger.info('Error unmixing images')
 
-# Write preview images
-downscale = floor(section_summary['section_information']['planesizeMB']/25)
-makedirs(snakemake.output[1], exist_ok=True)
-unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
+    # makedirs(snakemake.output[1], exist_ok=True)
+    # if False:
+    if all(futures_done):
+        # Write preview images
+        downscale = floor(section_summary['section_information']['planesizeMB']/25)
+        makedirs(snakemake.output[1], exist_ok=True)
+        # Read unmixed image from disk to free up memory:
+        unmixed = ia.get_HiSeqImages(image_path = snakemake.output[0], logger = logger)
+        # Rename channel -> markers, preview_jpeg only loops through markers, fixed in ia commit bd7ec17
+        unmixed = ia.HiSeqImages(im=unmixed.im.rename({'channel':'marker'}),
+                                 machine=hs_image.machine,
+                                 files=[snakemake.output[0]],
+                                 logger=logger)
+                                 
+        logger.debug(unmixed.im)
+        unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
+        # Make preview images 1 marker at a time to conserve memory
+        # for m in unmixed.im.channel:
+        #     logger.info(f'Writing {m} preview image')
+        #     m_unmixed = ia.HiSeqImages(im=unmixed.im.sel(channel=m),
+        #                                machine=hs_image.machine,
+        #                                files=[snakemake.output[0]], 
+        #                                logger=logger)
+        #     m_unmixed.preview_jpeg(image_path=snakemake.output[1], downscale=downscale)
 

@@ -20,15 +20,9 @@ sections = [s.replace('_','') for s in sections]
 
 core_limit = cluster_config.get('nodes')
 
-
 def get_gpu():
-    result = subprocess.run(['sinfo -p gpu | grep "idle\|mix"'],shell=True,capture_output=True,text=True)
-    
-
-    gpu_available = 0
-    if 'pe2dg2' in result.stdout:
-        gpu_available = 1
-    return gpu_available  
+    result = subprocess.run(['sinfo -p gpu | grep "idle"'],shell=True,capture_output=True,text=True)
+    return 'gpu' in result.stdout
 
     
 def get_tiles(wildcards):
@@ -72,13 +66,22 @@ def get_mem(wildcards):
 
 
 def get_picasso_time(wildcards):
-    return 600 # minutes
+    try:
+        summary_path = join(wildcards.output_dir,f'summary_{wildcards.sections}.yaml')
+        with open(summary_path) as f:
+            section_info = yaml.safe_load(f)
+        mb = section_info['section_information']['planesizeMB']
+        mb = ceil(mb/8000)*8000 * get_cores(summary_path)
+        minutes = int(mb/1000)*30
+    except:
+        minutes = 600
+    return minutes
    
 
 
 rule all:
     input:
-        expand('{dir}/tables/{s}.csv', dir = output_dir, s = sections)
+        expand('{dir}/features/{s}.h5mu', dir = output_dir, s = sections)
 
 rule saveraw:
     input:
@@ -154,6 +157,8 @@ rule unmix:
     log:
         '{output_dir}/logs/unmix_{sections}.log',
         '{output_dir}/logs/unmix_{sections}.html'
+    resources:
+        mem_mb = 8000
     conda:
         'envs/pyseq-image.yaml'
     script:
@@ -173,7 +178,7 @@ rule segmentation:
        '{output_dir}/masks/{sections}.tiff'
     resources:
         mem_mb = get_mem,
-    	runtime = get_picasso_time
+        runtime = get_picasso_time
     log:
         '{output_dir}/logs/segment_{sections}.log',
     threads: 8

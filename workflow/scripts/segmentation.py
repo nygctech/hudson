@@ -1,18 +1,17 @@
+from utils import get_logger, HiSeqImage
 import xarray as xr
 import cellpose
 from cellpose import core, models, io
-from pathlib import Path
 import imageio
-from utils import get_logger, HiSeqImage
 import subprocess
 import numpy as np
 import yaml
 
 
-section_name = snakemake.params.section
-
 # Start logger
+section_name = snakemake.params.section
 smk_logger = get_logger(section_name, filehandler = snakemake.log[0])
+smk_logger.debug(section_name)
 
 # Open image from zarr store
 hs_image = HiSeqImage(image_path = snakemake.input[0], logger = smk_logger)
@@ -23,6 +22,8 @@ smk_logger.debug(image)
 # Make sure only 1 objective step
 cytoplasm = snakemake.config.get('segmentation').get('cytoplasm')
 nuclei = snakemake.config.get('segmentation').get('nuclei', None)
+smk_logger.debug(cytoplasm)
+smk_logger.debug(nuclei)
 
 for key in cytoplasm.copy():
     if key not in image.dims:
@@ -34,12 +35,14 @@ if 'obj_step' in image.dims and 'obj_step' not in cytoplasm:
         step = image.obj_step[image.obj_step.size - 1]
         cytoplasm['obj_step'] = step
         smk_logger.info(f'Using objective step {step}')       
-        #smk_logger.debug(image)
+
 
 # segment
 logger = io.logger_setup()
 use_GPU = core.use_gpu()
-que = str(subprocess.check_output(['squeue','--me']))
+res = subprocess.run(['squeue','--format="%.18i %.9P %.30j %.8u %.1T %.10M %.9l %.6D %R"', '--me'], 
+                     capture_output=True, text=True)
+que = subprocess.run(['grep', f'{section_name}'], input=res.stdout, capture_output=True, text=True)
 smk_logger.info(f'{que}')
 smk_logger.info(f'Using GPU: {use_GPU}')
 seg_args = snakemake.config.get('segmentation')
@@ -121,7 +124,4 @@ with open(snakemake.input[1], 'w') as file:
     yaml.dump(data, file)
 
 smk_logger.info('Writing mask')
-
-
-smk_logger.info('Finished segmentation, writing mask')
 imageio.imwrite(snakemake.output[0],masks)

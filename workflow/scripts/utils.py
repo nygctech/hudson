@@ -45,7 +45,7 @@ def get_logger(logname = None, filehandler = None):
     
     '''
     
-    import logging
+    import logging, sys, traceback
 
     if logname is  None:
         logname = __name__
@@ -69,13 +69,17 @@ def get_logger(logname = None, filehandler = None):
         ch.setFormatter(formatter)
         logger.addHandler(ch)
 
+    def exc_handler(exctype, value, tb):
+        logger.exception(''.join(traceback.format_exception(exctype, value, tb)))
+    sys.excepthook = exc_handler
+
     return logger
 
 
 class HiSeqImage():
     """HiSeqImages
 
-       **Attributes:**
+      **Attributes:**
         - im: image as xarray DataArray
         - config: PySeq YAML configuration file from ~/.config/.pyseq2500/machine_settings.yaml
         - machine: Name of machine
