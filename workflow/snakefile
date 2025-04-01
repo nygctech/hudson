@@ -21,7 +21,7 @@ sections = [s.replace('_','') for s in sections]
 core_limit = cluster_config.get('nodes')
 
 def get_gpu():
-    result = subprocess.run(['sinfo -p gpu | grep "idle"'],shell=True,capture_output=True,text=True)
+    result = subprocess.run(['sinfo -p gpu | grep "idle\|mix"'],shell=True,capture_output=True,text=True)
     return 'gpu' in result.stdout
 
     
