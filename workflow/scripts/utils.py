@@ -1,9 +1,27 @@
-import xarray as xr
+# import built ins
 from pathlib import Path
-from ome_zarr.io import parse_url
-from ome_zarr.reader import Reader
 import yaml
+import sys
+from os import makedirs, path
 
+# Try importing modules specific to some rules
+module_dict = {'zarr':'zarr', 'xr':'xarray'}
+namespace = sys.modules[__name__].__dict__
+for mname, mmod in module_dict.items():
+    try:
+        module = __import__(mmod)
+        namespace[mname] = module
+    except:
+        pass
+try:
+    from ome_zarr.io import parse_url
+except:
+    pass
+        
+# Other modules imported within classes and functions to avoid installing them in step specific environments
+# If we have 1 common environment move them back to the top
+# Or implement lazyloading of modules
+# see https://docs.python.org/3/library/importlib.html LazyLoader
 
 
 def get_cluster(manager='SLURM', **winfo):
@@ -45,7 +63,7 @@ def get_logger(logname = None, filehandler = None):
     
     '''
     
-    import logging, sys, traceback
+    import logging, traceback
 
     if logname is  None:
         logname = __name__
@@ -77,6 +95,7 @@ def get_logger(logname = None, filehandler = None):
 
 
 class HiSeqImage():
+    
     """HiSeqImages
 
       **Attributes:**
@@ -100,10 +119,8 @@ class HiSeqImage():
             - HiSeqImage object
 
         """
-        
-        import zarr
 
-  
+        
         if logger is None:
             logger = get_logger(**kwargs)
         self.logger = logger
@@ -143,9 +160,7 @@ class HiSeqImage():
            **Returns:**
            - list: Names of labeled image datasets 
     
-        """
-    
-        import zarr
+        """ 
     
         ome_metadata = zarr.open_group(image_path, mode = 'r').attrs.get('omero',None)
         if ome_metadata is not None:
@@ -175,9 +190,8 @@ class HiSeqImage():
         from ome_types import to_dict
         from ome_zarr.writer import write_image
         from ome_types.model import Instrument, Microscope, Objective, Channel, Pixels, TiffData, OME, Image
-        from os import makedirs
-        import zarr
 
+        
         if isinstance(dir_path, str):
             dir_path = Path(dir_path)
         
@@ -223,11 +237,11 @@ class HiSeqImage():
                      **self.config['Pixels']
                     )
         
-        description =f"""first_cycle = {str(self.im.cycle[0].values)},
-                        last_cycle = {str(self.im.cycle[-1].values)},
-                        first_objstep = {str(self.im.obj_step[0].values)},
-                        last_objstep = {str(self.im.obj_step[-1].values)},
-                        int_objstep = {str(self.im.obj_step[1].values-self.im.obj_step[0].values)}
+        description =f"""first_cycle = {int(self.im.cycle[0].values)},
+                        last_cycle = {int(self.im.cycle[-1].values)},
+                        first_objstep = {int(self.im.obj_step[0].values)},
+                        last_objstep = {int(self.im.obj_step[-1].values)},
+                        int_objstep = {int(self.im.obj_step[1].values-self.im.obj_step[0].values)}
                       """
         ome = OME()
         ome.images = [Image(name = self.name, pixels = pxs, description = description)]
@@ -248,9 +262,9 @@ class HiSeqImage():
         
         # write the image data
         try:
-            # zarr_name = dir_path/f'{self.im.name}.zarr' 
+            zarr_name = dir_path/f'{self.im.name}.zarr' 
             self.logger.debug(dir_path)
-            zarr_name = dir_path
+            # zarr_name = dir_path
             makedirs(zarr_name, exist_ok = True)
             store = parse_url(zarr_name, mode="w").store
             root = zarr.group(store=store)
@@ -316,6 +330,8 @@ def read_ome_zarr(image_path, ome_metadata):
        xarray DataArray backed by dask arrays
     
     '''
+    
+    from ome_zarr.reader import Reader
 
     reader = Reader(parse_url(image_path, mode="r"))
     # nodes may include images, labels etc
@@ -358,7 +374,7 @@ def read_ome_zarr(image_path, ome_metadata):
 
 
 def get_machine_config(machine):
-    from os import path
+
     '''Get machine config yaml from ~/.config/pyseq2500/machine_settings.yaml.'''
     homedir = path.expanduser('~')
 

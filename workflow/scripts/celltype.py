@@ -6,7 +6,7 @@ import anndata as ad
 import pandas as pd
 import sys
 import pickle
-from utils import get_cluster, get_logger
+from utils import get_logger
 from astir.astir import Astir
 
 

@@ -58,7 +58,7 @@ def get_mem(wildcards):
         with open(summary_path) as f:
             section_info = yaml.safe_load(f)    
         mb = section_info['section_information']['planesizeMB']
-        mb = ceil(mb/8000)*8000 * get_cores(summary_path)
+        mb = ceil(mb/200)*8000 * get_cores(summary_path)
     except:
         mb = 8000
     return mb
@@ -81,7 +81,7 @@ def get_picasso_time(wildcards):
 
 rule all:
     input:
-        expand('{dir}/features/{s}.h5mu', dir = output_dir, s = sections)
+        expand('{dir}/celltype/{s}.h5mu', dir = output_dir, s = sections)
 
 rule saveraw:
     input:
@@ -165,7 +165,6 @@ rule unmix:
         'scripts/unmix.py'
 
 if get_gpu():
-    print("Using GPUS")
     cluster_config.update({'segmentation':config['gpu_spec']})
     
 rule segmentation:
@@ -212,7 +211,8 @@ rule feature_extraction:
 cluster_config.update({'nodes':core_limit})
 
 
-
+if get_gpu():
+    cluster_config.update({'celltype':config['gpu_spec']})
 rule celltype:
     input:
         '{output_dir}/features/{sections}.h5mu',
