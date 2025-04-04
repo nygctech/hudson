@@ -169,12 +169,12 @@ if get_gpu():
     
 rule segmentation:
     input:
-        '{output_dir}/final_zarr/{sections}.zarr',
-        '{output_dir}/summary_{sections}.yaml'
+        '{output_dir}/final_zarr/{sections}.zarr'
     params:
         section = '{sections}'
     output:
-       '{output_dir}/masks/{sections}.tiff'
+        '{output_dir}/masks/{sections}.tiff',
+        '{output_dir}/summary_segmentation_{sections}.yaml',
     resources:
         mem_mb = get_mem,
         runtime = get_picasso_time
@@ -215,10 +215,10 @@ if get_gpu():
     cluster_config.update({'celltype':config['gpu_spec']})
 rule celltype:
     input:
-        '{output_dir}/features/{sections}.h5mu',
-        '{output_dir}/summary_{sections}.yaml'
+        '{output_dir}/features/{sections}.h5mu'
     output:
-        '{output_dir}/celltype/{sections}.h5mu'
+        '{output_dir}/celltype/{sections}.h5mu',
+        '{output_dir}/summary_celltype_{sections}.yaml'
     log:
         '{output_dir}/logs/cell_type_{sections}.log'
     params:
