@@ -19,6 +19,8 @@ def arcsinh(X, cofactor_dict, var_names):
     stack = []
     for c in range(ncols):
         cofactor_ = cofactor_dict[var_names[c]]
+        if cofactor_ == 0:
+            cofactor_ += 1
         stack.append(np.arcsinh(X[:,c]/(cofactor_)))
     return np.stack(stack, axis=1)
 
