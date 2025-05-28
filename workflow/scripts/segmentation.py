@@ -112,15 +112,13 @@ std_diam = np.std(diam[1])
 mean_diam = np.mean(diam[1])
 
 smk_logger.info('Writing metrics to Summary')
-with open(snakemake.input[1], 'r') as file:
-    data = yaml.safe_load(file)
-
+data = {}
 data['segmentation'] = {}
 data['segmentation']['number_of_cells'] = int(diam[1].shape[0])
 data['segmentation']['avergae_cell_size'] = round(float(mean_diam), 4)
 data['segmentation']['cell_size_standard_deviation'] = round(float(std_diam), 4)
 
-with open(snakemake.input[1], 'w') as file:
+with open(snakemake.output[1], 'w') as file:
     yaml.dump(data, file)
 
 smk_logger.info('Writing mask')

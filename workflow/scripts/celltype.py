@@ -128,15 +128,14 @@ mdata.mod['celltypes'] = ast_adata
 mdata.write(snakemake.output[0])
 
 smk_logger.info('Writing metrics to Summary')
-with open(snakemake.input[1], 'r') as file:
-    data = yaml.safe_load(file)
 
 counts = ast.get_celltypes().value_counts()
 counts.index = [counts.index[i][0] for i in range(len(counts.index))]
+data = {}
 data['celltyping'] = {}
 data['celltyping']['counts'] = counts.to_dict()
 data['celltyping']['proportion'] = (counts/N).to_dict()
 
-with open(snakemake.input[1], 'w') as file:
+with open(snakemake.output[1], 'w') as file:
     yaml.dump(data, file)
 
