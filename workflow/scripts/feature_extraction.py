@@ -15,6 +15,7 @@ import anndata as ad
 import mudata as md
 import pandas as pd
 import squidpy as sq
+from pathlib import Path
 
 
 
@@ -101,21 +102,35 @@ for m in image.channel.values:
     props = regionprops_table(labels, intensity_image = image.sel(channel = m).values, 
                                   properties = ('intensity_mean',))
     mean_intensity_per_marker.update({m:props['intensity_mean']})
-
-# Make Protein object
 prot_df = pd.DataFrame(data = mean_intensity_per_marker, index = ind, dtype = np.single)
+
+# Measure features inside expanded cell segments
+if len(snakemake.config.get('segmentation').get('expand', {})) > 0: 
+    fname = Path(snakemake.input[1])
+    fname = fname.with_name(f"expanded_{section_name}.tiff")
+    labels = imread(fname)
+    expanded_mean_intensity_per_marker = {}
+    for m in image.channel.values:
+        smk_logger.info(f'Measuring {m} in expanded segment')
+        props = regionprops_table(labels, intensity_image = image.sel(channel = m).values, 
+                                  properties = ('intensity_mean',"label"))
+        expanded_mean_intensity_per_marker.update({f"expanded_{m}":props['intensity_mean']})
+    ind = props["label"]
+    expanded_prot_df = pd.DataFrame(data = expanded_mean_intensity_per_marker, index = ind, dtype = np.single)
+    prot_df = prot_df.join(expanded_prot_df).fillna(0)
+    
 prot_ad = ad.AnnData(X = prot_df)
 
 # Save intensity histograms 
 protein_names = np.array(prot_ad.var.index)
 protein = prot_ad.X
 
-df = pd.DataFrame(columns=['Protein Name', 'Counts', 'Bins'])
-for i, pro in enumerate(protein_names):
-    counts, bins= np.histogram(protein[:,i], bins=20)
-    df.loc[i] = [pro, counts, bins]
+df = pd.DataFrame(index = range(0, 4096-16, 16))
+for i, m in enumerate(image.channel.values):
+    counts, bins= np.histogram(protein[:,i], bins=range(0, 4096, 16))
+    df[m] = counts
 
-df.to_csv(snakemake.output[1], index=False)
+df.to_csv(snakemake.output[1])
 
 feat_dict['protein'] = prot_ad        
 ##########################################################################################
@@ -178,11 +193,16 @@ if len(color_dict.keys()) == 3:
     # Start dask cluster
     # specify default worker options in ~/.config/dask/jobqueue.yaml
     winfo = snakemake.config.get('resources',{}).get('dask_worker',{})
+    # For inference, better to use 1 core with more memory
+    rescale_workers = winfo.get("cores", 1)
+    memory = winfo.get("memory", "16G")
+    winfo["cores"] = 1
+    winfo["memory"] = f"{int(memory.split("G")[0])*rescale_workers}G"
     cluster = get_cluster(**winfo)
     smk_logger.debug(cluster.new_worker_spec())
     smk_logger.info(f'cluster dashboard link:: {cluster.dashboard_link}')
     ntiles = image.col.size//2048
-    nworkers = max(2,ntiles*2*2)
+    nworkers = max(2*rescale_workers,ntiles*2*2)
     smk_logger.info(f'Scale dask cluster to {nworkers}')
     cluster.scale(nworkers)
     client = Client(cluster)
@@ -191,21 +211,26 @@ if len(color_dict.keys()) == 3:
     # Get label bbox and image_filled
     # Might want to do this with regionprops_table
     props = regionprops(labels)
+
     
     #Run cell through imagenet 
     @delayed
-    def get_logits(im, mask, transform, model, px_min = 0, px_max = 4095):
+    def get_logits_batch(cells_data, transform, model, px_min = 0, px_max = 4095):
 
-        mask = np.array([mask]*3)
+        batch_results = []
+        for im, mask_filled in cells_data:
+            mask = np.array([mask_filled]*3)
 
-        im = ((im - px_min)/(px_max-px_min)*255).astype('uint8').values
-        im[~mask] = 0
-        pil = to_pil_image(torch.tensor(im))
-        tensor = (transform(pil)).unsqueeze(0)
-
+            im = ((im - px_min)/(px_max-px_min)*255).astype('uint8').values
+            im[~mask] = 0
+            pil = to_pil_image(torch.tensor(im))
+            tensor = transform(pil)
+            batch_results.append(tensor)
+            
+        batch_tensor = torch.stack(batch_results)
 
         with torch.no_grad():
-            logits = model(tensor).to('cpu').detach().numpy()
+            logits = model(batch_tensor).to('cpu').detach().numpy()
 
         return logits
 
@@ -221,23 +246,34 @@ if len(color_dict.keys()) == 3:
             rmin, cmin, rmax, cmax = props[n].bbox
             cell = im.sel({'row':slice(rmin, rmax), 'col':slice(cmin, cmax)})
 
-
             yield props[n], cell
 
             n += 1
 
+    # Group cells into batches
+    def batch_generator(iterable, size):
+        batch = []
+        for item in iterable:
+            batch.append(item)
+            if len(batch) == size:
+                yield batch
+                batch = []
+        if batch:
+            yield batch
             
     # send model/transform to dask workers
     dask_model = client.scatter(model, broadcast=True)
     dask_transform = client.scatter(transform, broadcast=True)
 
-    # Loop through cells and compute imagenet features
+    # Loop through batches of cells and compute imagenet features
+    batch_size = snakemake.config.get('feature_extraction',{}).get('batch_size', 32)
     logit_stack = []
-    for p, c in gen_cells(props, image.sel(channel = markers_)):
-        logits = get_logits(c, p.image_filled, dask_transform, dask_model)
-        logit_stack.append(da.from_delayed(logits, shape = (1,11221), dtype = np.single))    #Shape is only for 1 set of markers
-    imagenet_ = da.concatenate(logit_stack).rechunk() 
-
+    cell_gen = gen_cells(props, image.sel(channel=markers_))
+    for batch in batch_generator(cell_gen, batch_size):
+        cells_batch = [(c, p.image_filled) for p, c in batch]
+        logits = get_logits_batch(cells_batch, dask_transform, dask_model)
+        logit_stack.append(da.from_delayed(logits, shape = (len(batch),11221), dtype = np.single)) 
+    _imagenet = da.concatenate(logit_stack, axis=0)
 
     # delayed_store = features.to_zarr(Path(snakemake.output[1]), compute = False)
                                      
@@ -245,7 +281,7 @@ if len(color_dict.keys()) == 3:
     smk_logger.info(f'Computing imagenet features')
     cluster_report = Path(snakemake.log[0]).with_name(f'features_{image.name}.html')
     with performance_report(filename=cluster_report):
-        imagenet = imagenet_.compute()
+        imagenet = _imagenet.compute()
         
     imagenet_df = pd.DataFrame(data = imagenet, index = ind, columns = [f'{i:05d}' for i in range(11221)], dtype = np.single)
     feat_dict['imagenet'] = ad.AnnData(X = imagenet_df)

@@ -18,6 +18,13 @@ image = hs_image.im
 smk_logger.debug(image)
 
 # Make sure only 1 objective step
+summary_path = Path(snakemake.input[1])
+with open(summary_path, 'r') as f:
+    summary = yaml.safe_load(f)
+    o = summary.get("best_obj_step", None)
+    if o is not None:
+        image = image.sel(obj_step=o)   
+        
 if 'obj_step' in image.dims:
     if image.obj_step.size > 1:
         mid_step = image.obj_step[image.obj_step.size//2]
