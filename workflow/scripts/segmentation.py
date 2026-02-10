@@ -6,6 +6,9 @@ import imageio
 import subprocess
 import numpy as np
 import yaml
+from pathlib import Path
+from scipy.signal import find_peaks
+from skimage.segmentation import watershed
 
 
 # Start logger
@@ -31,10 +34,19 @@ for key in cytoplasm.copy():
         del cytoplasm[key]
 
 if 'obj_step' in image.dims and 'obj_step' not in cytoplasm:
-    if image.obj_step.size > 1:
-        step = image.obj_step[image.obj_step.size - 1]
-        cytoplasm['obj_step'] = step
-        smk_logger.info(f'Using objective step {step}')       
+    summary_path = Path(snakemake.output[0]).parents[1] / f"summary_{section_name}.yaml"
+    with open(summary_path, 'r') as f:
+        summary = yaml.safe_load(f)
+        o = summary.get("best_obj_step", None)
+        
+    if o is not None:
+        cytoplasm['obj_step'] = o
+    elif image.obj_step.size > 1:
+        cytoplasm['obj_step'] = image.obj_step[image.obj_step.size - 1]
+    else:
+        cytoplasm['obj_step'] = image.obj_step[0]
+    
+    smk_logger.info(f'Using objective step {cytoplasm["obj_step"]}')
 
 
 # segment
@@ -123,3 +135,21 @@ with open(snakemake.output[1], 'w') as file:
 
 smk_logger.info('Writing mask')
 imageio.imwrite(snakemake.output[0],masks)
+
+# Expand masks for cell+ segments
+find_peaks_kws = snakemake.config.get('segmentation').get('expand', {})
+if len(find_peaks_kws) > 0: 
+    smk_logger.info('Expanding segments')
+    smk_logger.info(f"{find_peaks_kws}")
+    _im1 = _im1.values
+    # Threshold image so we don't label background
+    counts, bins = np.histogram(_im1.flatten(), bins=range(0, 4097))
+    peaks, props = find_peaks(counts, **find_peaks_kws)
+    mask = _im1 > (peaks[0] + 3*props["widths"][0])
+    # Expand cell segemnts to cover tissue
+    expanded_segments = watershed(-_im1, masks, mask=mask)
+    # Save expanded segments
+    fname = Path(snakemake.output[0])
+    fname = fname.with_name(f"expanded_{section_name}.tiff")
+    imageio.imwrite(fname, expanded_segments)
+
