@@ -287,17 +287,6 @@ if len(color_dict.keys()) == 3:
         for prop in props:
             yield prop.image_intensity
 
-        #n_cells = len(props)
-        #n = 0
-        #while n < n_cells:
-        #    # get cell mask / bounding box
-        #    rmin, cmin, rmax, cmax = props[n].bbox
-        #    cell = im.sel({'row':slice(rmin, rmax), 'col':slice(cmin, cmax)})
-        #    
-        #    yield cell
-        #
-        #    n += 1
-
     # Group cells into batches
     def batch_generator(iterable, size):
         batch = []
